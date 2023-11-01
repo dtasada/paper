@@ -10,8 +10,7 @@ vertices = []
 
 for _ in range(8):
     vertices.append([randf(-1, 1), randf(-1, 1), randf(-1, 1)])
-y = 0
-g = 0.1
+
 m = 1
 base_color = lambda: rand_rgba()
 outline_color = (0, 0, 0, 255)
