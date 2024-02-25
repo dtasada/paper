@@ -2,5 +2,4 @@
 
 #include "things.hpp"
 
-Plane genPoly() {
-}
+Plane genPoly() {}
