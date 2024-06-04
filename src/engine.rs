@@ -105,67 +105,68 @@ pub fn advect(b: i32, d: Vec<f32>, d0: Vec<f32>, velocX: Vec<f32>, velocY: Vec<f
     let (s0, s1, t0, t1, u0, u1): (f32, f32, f32, f32, f32, f32);
     let (tmp1, tmp2, tmp3, x, y, z): (f32, f32, f32, f32, f32, f32);
     
-    let Nfloat: f32 = N as f32;
-    let (ifloat, jfloat, kfloat): (f32, f32, f32);
-    let (i, j, k): (i32, i32, i32);
+    let n_float: f32 = N as f32;
+    let (mut ifloat, mut jfloat, mut kfloat): (f32, f32, f32);
+    let (mut i, mut j, mut k): (i32, i32, i32);
     
     (k, kfloat) = (1, 1.0);
+while k < N - 1 {
     (j, jfloat) = (1, 1.0);
-    (i, ifloat) = (1, 1.0);
-    while k < N - 1 {
-
-    
-    
-    }
-    for(k = 1, kfloat = 1; k < N - 1; k++, kfloat++) {
-        for(j = 1, jfloat = 1; j < N - 1; j++, jfloat++) { 
-            for(i = 1, ifloat = 1; i < N - 1; i++, ifloat++) {
+    while j < N - 1 {
+        (i, ifloat) = (1, 1.0);
+            while i < N - 1 {
                 tmp1 = dtx * velocX[IX(i, j, k)];
                 tmp2 = dty * velocY[IX(i, j, k)];
                 tmp3 = dtz * velocZ[IX(i, j, k)];
                 x    = ifloat - tmp1; 
                 y    = jfloat - tmp2;
                 z    = kfloat - tmp3;
-                
-                if(x < 0.5f) x = 0.5f; 
-                if(x > Nfloat + 0.5f) x = Nfloat + 0.5f; 
-                i0 = floorf(x); 
-                i1 = i0 + 1.0f;
-                if(y < 0.5f) y = 0.5f; 
-                if(y > Nfloat + 0.5f) y = Nfloat + 0.5f; 
+
+                if x < 0.5 {x = 0.5};
+                if x > n_float + 0.5 {x = n_float + 0.5}; 
+                i0 = x.float(); 
+                i1 = i0 + 1.0;
+                if y < 0.5 {y = 0.5}; 
+                if y > n_float + 0.5 {y = n_float + 0.5}; 
                 j0 = floorf(y);
-                j1 = j0 + 1.0f; 
-                if(z < 0.5f) z = 0.5f;
-                if(z > Nfloat + 0.5f) z = Nfloat + 0.5f;
+                j1 = j0 + 1.0; 
+                if z < 0.5 {z = 0.5};
+                if z > n_float + 0.5 {z = n_float + 0.5};
                 k0 = floorf(z);
-                k1 = k0 + 1.0f;
-                
+                k1 = k0 + 1.0;
+
                 s1 = x - i0; 
-                s0 = 1.0f - s1; 
+                s0 = 1.0 - s1; 
                 t1 = y - j0; 
-                t0 = 1.0f - t1;
+                t0 = 1.0 - t1;
                 u1 = z - k0;
-                u0 = 1.0f - u1;
-                
-                int i0i = i0;
-                int i1i = i1;
-                int j0i = j0;
-                int j1i = j1;
-                int k0i = k0;
-                int k1i = k1;
-                
+                u0 = 1.0 - u1;
+
+                let i0i: i32 = i0 as i32;
+                let i1i: i32 = i1 as i32;
+                let j0i: i32 = j0 as i32;
+                let j1i: i32 = j1 as i32;
+                let k0i: i32 = k0 as i32;
+                let k1i: i32 = k1 as i32;
+
                 d[IX(i, j, k)] = 
-                
+
                     s0 * ( t0 * (u0 * d0[IX(i0i, j0i, k0i)]
-                                +u1 * d0[IX(i0i, j0i, k1i)])
-                        +( t1 * (u0 * d0[IX(i0i, j1i, k0i)]
-                                +u1 * d0[IX(i0i, j1i, k1i)])))
-                   +s1 * ( t0 * (u0 * d0[IX(i1i, j0i, k0i)]
-                                +u1 * d0[IX(i1i, j0i, k1i)])
-                        +( t1 * (u0 * d0[IX(i1i, j1i, k0i)]
-                                +u1 * d0[IX(i1i, j1i, k1i)])));
+                    +u1 * d0[IX(i0i, j0i, k1i)])
+                    +( t1 * (u0 * d0[IX(i0i, j1i, k0i)]
+                    +u1 * d0[IX(i0i, j1i, k1i)])))
+                    +s1 * ( t0 * (u0 * d0[IX(i1i, j0i, k0i)]
+                    +u1 * d0[IX(i1i, j0i, k1i)])
+                    +( t1 * (u0 * d0[IX(i1i, j1i, k0i)]
+                    +u1 * d0[IX(i1i, j1i, k1i)])));
+                i += 1;
+                i_float += 1;
             }
+            j += 1;
+            j_float += 1;
         }
+        k += 1;
+        kfloat += 1.0;
     }
     set_bnd(b, d, N);
 }
