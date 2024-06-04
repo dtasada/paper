@@ -1,20 +1,28 @@
+use log::log;
+
+use raylib::color::Color;
 use raylib::prelude::*;
 
 /// # paper-engine
 /// Functions & equations adapted from [Mike Ash](https://mikeash.com/pyblog/fluid-simulation-for-dummies.html)
 
-pub static N: i32 = 256;
-pub static ITER: i32 = 10;
+pub static N: i32 = 64;
+pub static SCALE: i32 = 10;
+pub static ITER: i32 = 4;
 
 pub fn IX(x: i32, y: i32, z: i32) -> usize {
+    let x = x.min(N - 1).max(0);
+    let y = y.min(N - 1).max(0);
+    let z = z.min(N - 1).max(0);
+
     (x + y * N + z * i32::pow(N, 2)) as usize
 }
 
 /// Set bounds: prevents fluid from leaking out of the environment (box/window). Counters any
 /// outwards pressure with an equal and opposite pressure, to keep the fluid inside.
 pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
-    for j in 1..N {
-        for i in 1..N {
+    for j in 1..(N - 1) {
+        for i in 1..(N - 1) {
             x[IX(i, j, 0)] = if b == 3 {
                 -x[IX(i, j, 1)]
             } else {
@@ -27,8 +35,8 @@ pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
             }
         }
     }
-    for k in 1..N {
-        for i in 1..N {
+    for k in 1..(N - 1) {
+        for i in 1..(N - 1) {
             x[IX(i, 0, k)] = if b == 2 {
                 -x[IX(i, 1, k)]
             } else {
@@ -41,8 +49,8 @@ pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
             };
         }
     }
-    for k in 1..N {
-        for j in 1..N {
+    for k in 1..(N - 1) {
+        for j in 1..(N - 1) {
             x[IX(0, j, k)] = if b == 1 {
                 -x[IX(1, j, k)]
             } else {
@@ -71,20 +79,19 @@ pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
 }
 
 pub fn lin_solve(b: i32, x: &mut Vec<f32>, x0: &Vec<f32>, a: f32, c: f32) {
-    let c_repic: f32 = 1.0 / c;
+    let c_recip: f32 = 1.0 / c;
     for _ in 0..ITER {
-        for m in 1..N {
-            for j in 1..N {
-                for i in 1..N {
-                    println!("x: {:?}, index: {:?}", x, IX(i, j, m));
-                    x[IX(i, j, m)] = (x0[IX(i, j, m)]
-                        + a * (x[IX(i + 1, j, m)]
-                            + x[IX(i - 1, j, m)]
-                            + x[IX(i, j + 1, m)]
-                            + x[IX(i, j - 1, m)]
-                            + x[IX(i, j, m + 1)]
-                            + x[IX(i, j, m - 1)]))
-                        * c_repic;
+        for i in 1..(N - 1) {
+            for j in 1..(N - 1) {
+                for k in 1..(N - 1) {
+                    x[IX(k, j, i)] = (x0[IX(k, j, i)]
+                        + a * (x[IX(k + 1, j, i)]
+                            + x[IX(k - 1, j, i)]
+                            + x[IX(k, j + 1, i)]
+                            + x[IX(k, j - 1, i)]
+                            + x[IX(k, j, i + 1)]
+                            + x[IX(k, j, i - 1)]))
+                        * c_recip;
                 }
             }
         }
@@ -112,30 +119,28 @@ pub fn advect(
     dt: f32,
 ) {
     let (mut i0, mut i1, mut j0, mut j1, mut k0, mut k1): (f32, f32, f32, f32, f32, f32);
+    let (mut s0, mut s1, mut t0, mut t1, mut u0, mut u1): (f32, f32, f32, f32, f32, f32);
+
+    let (mut tmp1, mut tmp2, mut tmp3, mut x, mut y, mut z): (f32, f32, f32, f32, f32, f32);
 
     let dtx: f32 = dt * (N - 2) as f32;
     let dty: f32 = dt * (N - 2) as f32;
     let dtz: f32 = dt * (N - 2) as f32;
 
-    let (mut s0, mut s1, mut t0, mut t1, mut u0, mut u1): (f32, f32, f32, f32, f32, f32);
-    let (mut tmp1, mut tmp2, mut tmp3, mut x, mut y, mut z): (f32, f32, f32, f32, f32, f32);
-
     let n_float: f32 = N as f32;
-    let (mut ifloat, mut jfloat, mut kfloat): (f32, f32, f32);
-    let (mut i, mut j, mut k): (i32, i32, i32);
 
-    (k, kfloat) = (1, 1.0);
+    let (mut k, mut k_float) = (1, 1.0);
     while k < N - 1 {
-        (j, jfloat) = (1, 1.0);
+        let (mut j, mut j_float) = (1, 1.0);
         while j < N - 1 {
-            (i, ifloat) = (1, 1.0);
+            let (mut i, mut i_float) = (1, 1.0);
             while i < N - 1 {
                 tmp1 = dtx * vx[IX(i, j, k)];
                 tmp2 = dty * vy[IX(i, j, k)];
                 tmp3 = dtz * vz[IX(i, j, k)];
-                x = ifloat - tmp1;
-                y = jfloat - tmp2;
-                z = kfloat - tmp3;
+                x = i_float - tmp1;
+                y = j_float - tmp2;
+                z = k_float - tmp3;
 
                 if x < 0.5 {
                     x = 0.5
@@ -182,13 +187,13 @@ pub fn advect(
                     + s1 * (t0 * (u0 * d0[IX(i1i, j0i, k0i)] + u1 * d0[IX(i1i, j0i, k1i)])
                         + (t1 * (u0 * d0[IX(i1i, j1i, k0i)] + u1 * d0[IX(i1i, j1i, k1i)])));
                 i += 1;
-                ifloat += 1.0;
+                i_float += 1.0;
             }
             j += 1;
-            jfloat += 1.0;
+            j_float += 1.0;
         }
         k += 1;
-        kfloat += 1.0;
+        k_float += 1.0;
     }
     set_bnd(b, d);
 }
@@ -203,9 +208,9 @@ pub fn project(
     p: &mut Vec<f32>,
     div: &mut Vec<f32>,
 ) {
-    for k in 1..N {
-        for j in 1..N {
-            for i in 1..N {
+    for k in 1..(N - 1) {
+        for j in 1..(N - 1) {
+            for i in 1..(N - 1) {
                 div[IX(i, j, k)] = -0.5
                     * (vx[IX(i + 1, j, k)] - vx[IX(i - 1, j, k)] + vy[IX(i, j + 1, k)]
                         - vy[IX(i, j - 1, k)]
@@ -220,9 +225,9 @@ pub fn project(
     set_bnd(0, p);
     lin_solve(0, p, div, 1.0, 6.0);
 
-    for k in 1..N {
-        for j in 1..N {
-            for i in 1..N {
+    for k in 1..(N - 1) {
+        for j in 1..(N - 1) {
+            for i in 1..(N - 1) {
                 vx[IX(i, j, k)] -= 0.5 * (p[IX(i + 1, j, k)] - p[IX(i - 1, j, k)]) * N as f32;
                 vy[IX(i, j, k)] -= 0.5 * (p[IX(i, j + 1, k)] - p[IX(i, j - 1, k)]) * N as f32;
                 vz[IX(i, j, k)] -= 0.5 * (p[IX(i, j, k + 1)] - p[IX(i, j, k - 1)]) * N as f32;
@@ -256,7 +261,7 @@ impl FluidCube {
     pub fn new(dt: f32, diffusion: f32, viscosity: f32) -> Self {
         let def = Vec::with_capacity(i32::pow(N, 3) as usize);
         Self {
-            dt: dt,
+            dt,
             size: N as i32,
             diff: diffusion,
             visc: viscosity,
@@ -275,12 +280,12 @@ impl FluidCube {
     }
 
     /// Add density refers to the density of the "dye", not the fluid
-    pub fn add_density(mut self, x: i32, y: i32, z: i32, amount: f32) {
+    pub fn add_density(&mut self, x: i32, y: i32, z: i32, amount: f32) {
         self.density[IX(x, y, z)] += amount;
     }
 
     pub fn add_velocity(
-        mut self,
+        &mut self,
         x: i32,
         y: i32,
         z: i32,
@@ -300,6 +305,7 @@ impl FluidCube {
         diffuse(2, &mut self.vy0, &mut self.vy, self.visc, self.dt);
         diffuse(3, &mut self.vz0, &mut self.vz, self.visc, self.dt);
 
+        println!("step!!!!!!! asdfhasdfhjkasdfhjkl");
         project(
             &mut self.vx0,
             &mut self.vy0,
@@ -353,5 +359,20 @@ impl FluidCube {
             &self.vz,
             self.dt,
         );
+    }
+
+    pub fn render(&mut self, dh: &mut RaylibDrawHandle) {
+        for i in 0..N {
+            for j in 0..N {
+                for k in 0..N {
+                    let x: i32 = i * SCALE;
+                    let y: i32 = j * SCALE;
+                    let z: i32 = k * SCALE;
+
+                    let d: f32 = self.density[IX(i, j, k)];
+                    dh.draw_rectangle(x, y, SCALE, SCALE, Color::WHITESMOKE);
+                }
+            }
+        }
     }
 }
