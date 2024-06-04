@@ -1,19 +1,17 @@
 use raylib::prelude::*;
 
+/// # paper-engine
+/// Functions & equations adapted from [Mike Ash](https://mikeash.com/pyblog/fluid-simulation-for-dummies.html)
+
 pub static N: i32 = 256;
 pub static ITER: i32 = 10;
-
-pub enum State {
-    Menu,
-    Play,
-    SettingsMenu,
-    SettingsPlay,
-}
 
 pub fn IX(x: i32, y: i32, z: i32) -> usize {
     (x + y * N + z * i32::pow(N, 2)) as usize
 }
 
+/// Set bounds: prevents fluid from leaking out of the environment (box/window). Counters any
+/// outwards pressure with an equal and opposite pressure, to keep the fluid inside.
 pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
     for j in 1..N {
         for i in 1..N {
@@ -74,10 +72,11 @@ pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
 
 pub fn lin_solve(b: i32, x: &mut Vec<f32>, x0: &Vec<f32>, a: f32, c: f32) {
     let c_repic: f32 = 1.0 / c;
-    for k in 0..ITER {
+    for _ in 0..ITER {
         for m in 1..N {
             for j in 1..N {
                 for i in 1..N {
+                    println!("x: {:?}, index: {:?}", x, IX(i, j, m));
                     x[IX(i, j, m)] = (x0[IX(i, j, m)]
                         + a * (x[IX(i + 1, j, m)]
                             + x[IX(i - 1, j, m)]
@@ -93,11 +92,16 @@ pub fn lin_solve(b: i32, x: &mut Vec<f32>, x0: &Vec<f32>, a: f32, c: f32) {
     }
 }
 
+// Precalculates a value and passes everything off to lin_solve.
 pub fn diffuse(b: i32, x: &mut Vec<f32>, x0: &mut Vec<f32>, diff: f32, dt: f32) {
     let a: f32 = dt * diff * i32::pow(N - 2, 2) as f32;
     lin_solve(b, x, x0, a, 1.0 + 6.0 * a);
 }
 
+/// This function is responsible for actually moving things around. To that end, it looks at each
+/// cell in turn. In that cell, it grabs the velocity, follows that velocity b ack in time, and
+/// sees where it lands. It the ntakes a weighted average of the cells around the spot where it
+/// lands, then applies the value to the current cell.
 pub fn advect(
     b: i32,
     d: &mut Vec<f32>,
@@ -189,6 +193,9 @@ pub fn advect(
     set_bnd(b, d);
 }
 
+/// When dealing with *incompressible* fluids, the amount of fluid in each box has to stay constant.
+/// This means that the amount of fluid input has to equal the amount of fluid output. Some boxes
+/// generate a net inflow/outflow. This function balances everything out.
 pub fn project(
     vx: &mut Vec<f32>,
     vy: &mut Vec<f32>,
@@ -267,6 +274,7 @@ impl FluidCube {
         }
     }
 
+    /// Add density refers to the density of the "dye", not the fluid
     pub fn add_density(mut self, x: i32, y: i32, z: i32, amount: f32) {
         self.density[IX(x, y, z)] += amount;
     }
@@ -287,7 +295,7 @@ impl FluidCube {
         self.density[i] += amount_z;
     }
 
-    pub fn step(mut self) {
+    pub fn step(&mut self) {
         diffuse(1, &mut self.vx0, &mut self.vx, self.visc, self.dt);
         diffuse(2, &mut self.vy0, &mut self.vy, self.visc, self.dt);
         diffuse(3, &mut self.vz0, &mut self.vz, self.visc, self.dt);
@@ -335,7 +343,6 @@ impl FluidCube {
             &mut self.vx0,
             &mut self.vy0,
         );
-
         diffuse(0, &mut self.s, &mut self.density, self.diff, self.dt);
         advect(
             0,
