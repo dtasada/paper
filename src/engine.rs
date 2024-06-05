@@ -1,3 +1,6 @@
+#![feature(try_blocks)]
+use std::error::Error;
+
 use log::log;
 
 use raylib::color::Color;
@@ -84,14 +87,16 @@ pub fn lin_solve(b: i32, x: &mut Vec<f32>, x0: &Vec<f32>, a: f32, c: f32) {
         for i in 1..(N - 1) {
             for j in 1..(N - 1) {
                 for k in 1..(N - 1) {
-                    x[IX(k, j, i)] = (x0[IX(k, j, i)]
-                        + a * (x[IX(k + 1, j, i)]
-                            + x[IX(k - 1, j, i)]
-                            + x[IX(k, j + 1, i)]
-                            + x[IX(k, j - 1, i)]
-                            + x[IX(k, j, i + 1)]
-                            + x[IX(k, j, i - 1)]))
-                        * c_recip;
+                    let result: Result<(), Error> = try {
+                        x[IX(k, j, i)] = (x0[IX(k, j, i)]
+                            + a * (x[IX(k + 1, j, i)]
+                                + x[IX(k - 1, j, i)]
+                                + x[IX(k, j + 1, i)]
+                                + x[IX(k, j - 1, i)]
+                                + x[IX(k, j, i + 1)]
+                                + x[IX(k, j, i - 1)]))
+                            * c_recip
+                    };
                 }
             }
         }

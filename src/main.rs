@@ -13,7 +13,7 @@ fn main() -> Result<(), String> {
     while !rl.window_should_close() {
         let mut dh = rl.begin_drawing(&thread);
 
-        fluid.step();
+        // fluid.step();
 
         dh.clear_background(Color::BLACK);
         dh.draw_fps(24, 24);
@@ -30,7 +30,7 @@ fn main() -> Result<(), String> {
             );
         }
 
-        fluid.render(&mut dh);
+        // fluid.render(&mut dh);
     }
 
     Ok(())
