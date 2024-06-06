@@ -1,4 +1,6 @@
 use raylib::prelude::*;
+use log::log;
+
 
 mod engine;
 use engine::*;

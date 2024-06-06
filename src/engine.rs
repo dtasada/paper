@@ -1,7 +1,6 @@
 #![feature(try_blocks)]
-use std::error::Error;
-
-use log::log;
+use std::error;
+use std::ptr::{write_volatile, read_volatile};
 
 use raylib::color::Color;
 use raylib::prelude::*;
@@ -21,6 +20,12 @@ pub fn IX(x: i32, y: i32, z: i32) -> usize {
     (x + y * N + z * i32::pow(N, 2)) as usize
 }
 
+pub fn unsafe_index(array: &mut Vec<f32>, index: usize, write: f32) {
+    unsafe {
+        write_volatile(&mut array[index], write);
+    }
+}
+
 /// Set bounds: prevents fluid from leaking out of the environment (box/window). Counters any
 /// outwards pressure with an equal and opposite pressure, to keep the fluid inside.
 pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
@@ -29,13 +34,13 @@ pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
             x[IX(i, j, 0)] = if b == 3 {
                 -x[IX(i, j, 1)]
             } else {
-                x[IX(i, j, 1)]
-            };
+                    x[IX(i, j, 1)]
+                };
             x[IX(i, j, N - 1)] = if b == 3 {
                 -x[IX(i, j, N - 2)]
             } else {
-                -x[IX(i, j, N - 2)]
-            }
+                    -x[IX(i, j, N - 2)]
+                }
         }
     }
     for k in 1..(N - 1) {
@@ -43,13 +48,13 @@ pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
             x[IX(i, 0, k)] = if b == 2 {
                 -x[IX(i, 1, k)]
             } else {
-                x[IX(i, 1, k)]
-            };
+                    x[IX(i, 1, k)]
+                };
             x[IX(i, N - 1, k)] = if b == 2 {
                 -x[IX(i, N - 2, k)]
             } else {
-                x[IX(i, N - 2, k)]
-            };
+                    x[IX(i, N - 2, k)]
+                };
         }
     }
     for k in 1..(N - 1) {
@@ -57,13 +62,13 @@ pub fn set_bnd(b: i32, x: &mut Vec<f32>) {
             x[IX(0, j, k)] = if b == 1 {
                 -x[IX(1, j, k)]
             } else {
-                x[IX(1, j, k)]
-            };
+                    x[IX(1, j, k)]
+                };
             x[IX(N - 1, j, k)] = if b == 1 {
                 -x[IX(N - 2, j, k)]
             } else {
-                x[IX(N - 2, j, k)]
-            };
+                    x[IX(N - 2, j, k)]
+                };
         }
     }
 
@@ -87,16 +92,18 @@ pub fn lin_solve(b: i32, x: &mut Vec<f32>, x0: &Vec<f32>, a: f32, c: f32) {
         for i in 1..(N - 1) {
             for j in 1..(N - 1) {
                 for k in 1..(N - 1) {
-                    let result: Result<(), Error> = try {
-                        x[IX(k, j, i)] = (x0[IX(k, j, i)]
-                            + a * (x[IX(k + 1, j, i)]
-                                + x[IX(k - 1, j, i)]
-                                + x[IX(k, j + 1, i)]
-                                + x[IX(k, j - 1, i)]
-                                + x[IX(k, j, i + 1)]
-                                + x[IX(k, j, i - 1)]))
-                            * c_recip
-                    };
+                    unsafe {
+                        write_volatile(&mut x[IX(k,j,i)], (
+                            x0[IX(k, j, i)]
+                            + (x[IX(k + 1, j, i)]
+                            + x[IX(k - 1, j, i)]
+                            + x[IX(k, j + 1, i)]
+                            + x[IX(k, j - 1, i)]
+                            + x[IX(k, j, i + 1)]
+                            + x[IX(k, j, i - 1)])
+                        ) * c_recip
+                        );
+                    }
                 }
             }
         }
@@ -188,9 +195,9 @@ pub fn advect(
 
                 d[IX(i, j, k)] = s0
                     * (t0 * (u0 * d0[IX(i0i, j0i, k0i)] + u1 * d0[IX(i0i, j0i, k1i)])
-                        + (t1 * (u0 * d0[IX(i0i, j1i, k0i)] + u1 * d0[IX(i0i, j1i, k1i)])))
+                    + (t1 * (u0 * d0[IX(i0i, j1i, k0i)] + u1 * d0[IX(i0i, j1i, k1i)])))
                     + s1 * (t0 * (u0 * d0[IX(i1i, j0i, k0i)] + u1 * d0[IX(i1i, j0i, k1i)])
-                        + (t1 * (u0 * d0[IX(i1i, j1i, k0i)] + u1 * d0[IX(i1i, j1i, k1i)])));
+                    + (t1 * (u0 * d0[IX(i1i, j1i, k0i)] + u1 * d0[IX(i1i, j1i, k1i)])));
                 i += 1;
                 i_float += 1.0;
             }
@@ -218,9 +225,9 @@ pub fn project(
             for i in 1..(N - 1) {
                 div[IX(i, j, k)] = -0.5
                     * (vx[IX(i + 1, j, k)] - vx[IX(i - 1, j, k)] + vy[IX(i, j + 1, k)]
-                        - vy[IX(i, j - 1, k)]
-                        + vz[IX(i, j, k + 1)]
-                        - vz[IX(i, j, k - 1)])
+                    - vy[IX(i, j - 1, k)]
+                    + vz[IX(i, j, k + 1)]
+                    - vz[IX(i, j, k - 1)])
                     / N as f32;
                 p[IX(i, j, k)] = 0.0;
             }
@@ -286,7 +293,12 @@ impl FluidCube {
 
     /// Add density refers to the density of the "dye", not the fluid
     pub fn add_density(&mut self, x: i32, y: i32, z: i32, amount: f32) {
-        self.density[IX(x, y, z)] += amount;
+        unsafe {
+            write_volatile(
+                &mut self.density[IX(x,y,z)],
+                read_volatile(&self.density[IX(x, y, z)] as *const f32) + amount
+            );
+        }
     }
 
     pub fn add_velocity(
@@ -298,11 +310,12 @@ impl FluidCube {
         amount_y: f32,
         amount_z: f32,
     ) {
-        let i = IX(x, y, z);
-
-        self.density[i] += amount_x;
-        self.density[i] += amount_y;
-        self.density[i] += amount_z;
+        unsafe {
+            // I'm so sorry
+            let mut a = self.density[IX(x,y,z)];
+            let sum = &mut &mut (a + amount_x + amount_y + amount_z) as *const &mut f32;
+            write_volatile(&mut &mut a, read_volatile(sum));
+        }
     }
 
     pub fn step(&mut self) {
@@ -374,7 +387,7 @@ impl FluidCube {
                     let y: i32 = j * SCALE;
                     let z: i32 = k * SCALE;
 
-                    let d: f32 = self.density[IX(i, j, k)];
+                    // let d: f32 = self.density[IX(i, j, k)];
                     dh.draw_rectangle(x, y, SCALE, SCALE, Color::WHITESMOKE);
                 }
             }
