@@ -37,8 +37,9 @@ impl Grid {
     }
 
     pub fn find_collisions(&mut self) {
-        for x in 1..self.width {
-            for y in 1..self.height {
+        // x and y start at one to skip topmost and bottommost rows, and leftmost and rightmost columns
+        for x in 1..=self.width {
+            for y in 1..=self.height {
                 for dx in -1..=1 {
                     for dy in -1..=1 {
                         self.check_collision((x, y), (x + dx, y + dy));
@@ -48,9 +49,13 @@ impl Grid {
         }
     }
 
-    fn check_collision(&mut self, cell_a_xy: (i32, i32), cell_b_xy: (i32, i32)) {
-        let cell_a = &mut self.content[cell_a_xy.0 as usize][cell_a_xy.1 as usize];
-        let cell_b = &mut self.content[cell_b_xy.0 as usize][cell_b_xy.1 as usize];
+    fn check_collision(&mut self, (cell_a_x, cell_a_y): (i32, i32), (cell_b_x, cell_b_y): (i32, i32)) {
+        let (cell_a, cell_b) = {
+            let cell_a = &mut self.content[cell_a_x as usize][cell_a_y as usize] as *mut Vec<Option<Particle>>;
+            let cell_b = &mut self.content[cell_b_x as usize][cell_b_y as usize] as *mut Vec<Option<Particle>>;
+
+            unsafe { (&mut *cell_a, &mut *cell_b) }
+        };
 
         for particle_a_wrapped in cell_a.iter_mut() {
             for particle_b_wrapped in cell_b.iter_mut() {
