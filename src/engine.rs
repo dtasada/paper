@@ -1,9 +1,15 @@
+use std::{
+    cell,
+    cell::RefCell,
+    borrow::BorrowMut,
+    rc::Rc
+};
 use raylib::prelude::*;
 
 /// # paper-engine
 // asdf
 
-type Cell = Vec<Option<Particle>>;
+type GridCell = Vec<Option<Rc<RefCell<Particle>>>>;
 
 pub static GRAVITY: f32 = 9.81;
 
@@ -18,10 +24,12 @@ pub fn get_sign(number: f32) -> f32 {
 }
 
 
+#[derive(Debug)]
 pub struct Grid {
     pub width: i32,
     pub height: i32,
-    pub content: Vec<Vec<Cell>>,
+    // Arc of two-dimensional arraylist that contains cells
+    pub content: Vec<Vec<GridCell>>,
 }
 
 impl Grid {
@@ -32,36 +40,35 @@ impl Grid {
         Self {
             width,
             height,
-            content: vec![vec![]],
+            content: vec![],
         }
     }
 
+    /// Finds collisions with adjacent cells
     pub fn find_collisions(&mut self) {
         // x and y start at one to skip topmost and bottommost rows, and leftmost and rightmost columns
         for x in 1..=self.width {
             for y in 1..=self.height {
                 for dx in -1..=1 {
                     for dy in -1..=1 {
-                        self.check_collision((x, y), (x + dx, y + dy));
+                        self.solve_collision((x, y), (x + dx, y + dy));
                     }
                 }
             }
         }
     }
 
-    fn check_collision(&mut self, (cell_a_x, cell_a_y): (i32, i32), (cell_b_x, cell_b_y): (i32, i32)) {
-        let (cell_a, cell_b) = {
-            let cell_a = &mut self.content[cell_a_x as usize][cell_a_y as usize] as *mut Vec<Option<Particle>>;
-            let cell_b = &mut self.content[cell_b_x as usize][cell_b_y as usize] as *mut Vec<Option<Particle>>;
+    fn solve_collision(&mut self, (cell_a_x, cell_a_y): (i32, i32), (cell_b_x, cell_b_y): (i32, i32)) {
+        let self1 = Rc::new(cell::Cell::new(self));
 
-            unsafe { (&mut *cell_a, &mut *cell_b) }
-        };
+        let cell_a = &mut self1.get_mut().content[cell_a_x as usize][cell_a_y as usize].to_owned();
+        let cell_b = &mut self1.into_inner().content[cell_b_x as usize][cell_b_y as usize].to_owned();
 
         for particle_a_wrapped in cell_a.iter_mut() {
             for particle_b_wrapped in cell_b.iter_mut() {
                 if !std::ptr::eq(particle_a_wrapped, particle_b_wrapped) {
-                    let a = particle_a_wrapped.as_mut().unwrap();
-                    let b = particle_b_wrapped.as_mut().unwrap();
+                    let mut a = particle_a_wrapped.as_mut().unwrap();
+                    let mut b = particle_b_wrapped.as_mut().unwrap();
 
                     if check_collision_circles(a.pos, a.radius, b.pos, b.radius) {
                         let compensation_length = a.radius + b.radius - a.pos.distance_to(b.pos);
@@ -74,6 +81,7 @@ impl Grid {
     }
 }
 
+#[derive(Debug)]
 pub struct Particle {
     pub pos: Vector2,
     pub vel: Vector2,
@@ -107,7 +115,7 @@ impl Particle {
         }
     }
 
-    pub fn update(&mut self, dh: &mut RaylibDrawHandle, bounds: &Rectangle) {
+    pub fn update(&mut self, dh: &mut RaylibDrawHandle, bounds: &Rectangle, grid: &mut Grid) {
         self.vel.y += GRAVITY;
 
         self.pos += self.vel * dh.get_frame_time();

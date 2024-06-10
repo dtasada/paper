@@ -1,4 +1,6 @@
 use raylib::prelude::*;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 mod engine;
 use engine::*;
@@ -17,25 +19,31 @@ fn main() -> Result<(), String> {
 
     let mut grid = Grid::new();
 
-    let mut particles: Vec<Particle> = Vec::new();
+    let mut particles: Vec<Rc<RefCell<Particle>>> = Vec::new();
 
     // Generate particles
-    for i in 1..=grid.width {
-        for j in 1..=grid.height {
-            particles.push(Particle::new(
-                Vector2::new(bounds.x + i as f32 * 50.0, bounds.y + j as f32 * 50.0),
+    for i in 1..=grid.height {
+        grid.content.push(vec![]); // Create row
+        for j in 1..=grid.width {
+            grid.content[(i - 1) as usize].push(vec![]); // Create Column
+            let mut new_particle = Particle::new(
+                Vector2::new(bounds.x + j as f32 * 50.0, bounds.y + i as f32 * 50.0),
                 Vector2::zero(),
                 20.0,
-            ));
+            );
+
+            let p = Rc::new(RefCell::new(new_particle));
+            particles.push(p.clone());
+            grid.content[(i - 1) as usize][(j - 1) as usize].push(Some(p));
         }
     }
-
+    
     while !rl.window_should_close() {
         let mut dh = rl.begin_drawing(&thread);
         dh.clear_background(Color::BLACK);
 
         for particle in &mut particles {
-            particle.update(&mut dh, &bounds);
+            particle.borrow_mut().update(&mut dh, &bounds, &mut grid);
         }
 
         grid.find_collisions();
