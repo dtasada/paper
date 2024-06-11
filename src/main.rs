@@ -1,7 +1,5 @@
 use raylib::prelude::*;
-use std::{
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 
 mod engine;
 use engine::*;
@@ -41,12 +39,12 @@ fn main() -> Result<(), String> {
             }
         }
     }
-    
+
     while !rl.window_should_close() {
         let mut dh = rl.begin_drawing(&thread);
         dh.clear_background(Color::BLACK);
 
-        println!("particles: {:?}", particles);
+        // println!("particles: {:?}", particles);
         for particle in &mut particles {
             particle.lock().unwrap().update(&mut dh, &bounds, &mut grid);
         }

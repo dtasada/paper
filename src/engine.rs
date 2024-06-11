@@ -1,7 +1,8 @@
-use std::{
-    sync::{Arc, Mutex},
-};
 use raylib::prelude::*;
+use std::{
+    ops::Deref,
+    sync::{Arc, Mutex, MutexGuard},
+};
 
 /// # paper-engine
 // asdf
@@ -19,7 +20,6 @@ pub fn get_sign(number: f32) -> f32 {
         0.0
     }
 }
-
 
 #[derive(Debug)]
 pub struct Grid {
@@ -56,7 +56,11 @@ impl Grid {
         }
     }
 
-    fn solve_collision(&mut self, (cell_a_x, cell_a_y): (i32, i32), (cell_b_x, cell_b_y): (i32, i32)) {
+    fn solve_collision(
+        &mut self,
+        (cell_a_x, cell_a_y): (i32, i32),
+        (cell_b_x, cell_b_y): (i32, i32),
+    ) {
         let cell_a = &mut self.content.lock().unwrap()[cell_a_x as usize][cell_a_y as usize];
         let cell_b = &mut self.content.lock().unwrap()[cell_b_x as usize][cell_b_y as usize];
 
@@ -69,7 +73,8 @@ impl Grid {
                             let mut b = b_refcell.lock().unwrap();
 
                             if check_collision_circles(a.pos, a.radius, b.pos, b.radius) {
-                                let compensation_length = a.radius + b.radius - a.pos.distance_to(b.pos);
+                                let compensation_length =
+                                    a.radius + b.radius - a.pos.distance_to(b.pos);
                                 a.pos -= compensation_length / 2.0;
                                 b.pos += compensation_length / 2.0;
                             }
@@ -81,7 +86,7 @@ impl Grid {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Particle {
     pub pos: Vector2,
     pub vel: Vector2,
@@ -100,9 +105,8 @@ impl Particle {
     }
 
     pub fn collision(&mut self, bounds: &Rectangle) {
-        let bounds_size =
-            Vector2::new(bounds.x + bounds.width, bounds.y + bounds.height) -
-                Vector2::one() * self.radius;
+        let bounds_size = Vector2::new(bounds.x + bounds.width, bounds.y + bounds.height)
+            - Vector2::one() * self.radius;
 
         if self.pos.x > bounds_size.x {
             self.pos.x = bounds_size.x * get_sign(self.pos.x);
@@ -117,9 +121,10 @@ impl Particle {
 
     fn in_cell(&self, grid: &Grid, cell: (i32, i32)) -> bool {
         if self.pos.x > (grid.width * cell.0) as f32
-        && self.pos.x < (grid.width * cell.0 + grid.width) as f32
-        && self.pos.y > (grid.width * cell.1 + grid.height) as f32
-        && self.pos.y < (grid.width * cell.1) as f32 {
+            && self.pos.x < (grid.width * cell.0 + grid.width) as f32
+            && self.pos.y > (grid.width * cell.1 + grid.height) as f32
+            && self.pos.y < (grid.width * cell.1) as f32
+        {
             true
         } else {
             false
@@ -135,30 +140,37 @@ impl Particle {
         let g = grid.content.to_owned();
 
         for (i, row) in g.lock().unwrap().iter_mut().enumerate() {
-            for (j, cell) in row.iter_mut().enumerate() {
+            for (j, c) in row.iter_mut().enumerate() {
                 let mut indices: Vec<usize> = vec![];
-                for (k, particle) in cell.iter().enumerate() {
-                    if std::ptr::eq(
-                        &*particle.to_owned().unwrap().lock().unwrap() as *const Particle,
-                        self as *const Particle
-                    ) && !self.in_cell(&grid, (j as i32, i as i32)) {
-                        indices.push(k);
+                let cell = Arc::new(Mutex::new(c));
+                for (k, p) in cell.lock().unwrap().iter().enumerate() {
+                    if let Some(arc_mutex) = p {
+                        if let Ok(mut particle) = arc_mutex.lock() {
+                            let particle_ref = &mut *particle;
+                            let particle_addr = particle_ref as *mut Particle;
+                            let self_addr = self as *mut Particle;
+
+                            if particle_addr == self_addr {
+                                indices.push(k);
+                            }
+                        }
+                    }
+
+                    // Mutate self in grid
+                    for &k in indices.iter().rev() {
+                        g.lock().unwrap()[(self.pos.y / grid.height as f32) as usize]
+                            [(self.pos.x / grid.width as f32) as usize]
+                            .push(cell.lock().unwrap().swap_remove(k));
                     }
                 }
-
-                // Mutate self in grid
-                for &k in indices.iter().rev() {
-                    g.lock().unwrap()[(self.pos.y / grid.height as f32) as usize][(self.pos.x / grid.width as f32) as usize].push(cell.swap_remove(k));
-                    
-                }
             }
-        }
 
-        dh.draw_circle(
-            self.pos.x as i32,
-            self.pos.y as i32,
-            self.radius,
-            Color::LIGHTBLUE,
-        );
+            dh.draw_circle(
+                self.pos.x as i32,
+                self.pos.y as i32,
+                self.radius,
+                Color::LIGHTBLUE,
+            );
+        }
     }
 }
