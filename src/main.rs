@@ -1,6 +1,7 @@
 use raylib::prelude::*;
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::{
+    sync::{Arc, Mutex},
+};
 
 mod engine;
 use engine::*;
@@ -19,22 +20,25 @@ fn main() -> Result<(), String> {
 
     let mut grid = Grid::new();
 
-    let mut particles: Vec<Rc<RefCell<Particle>>> = Vec::new();
+    let mut particles: Vec<Arc<Mutex<Particle>>> = Vec::new();
 
     // Generate particles
-    for i in 1..=grid.height {
-        grid.content.push(vec![]); // Create row
-        for j in 1..=grid.width {
-            grid.content[(i - 1) as usize].push(vec![]); // Create Column
-            let mut new_particle = Particle::new(
-                Vector2::new(bounds.x + j as f32 * 50.0, bounds.y + i as f32 * 50.0),
-                Vector2::zero(),
-                20.0,
-            );
+    {
+        let g = Arc::new(&mut grid);
+        for i in 1..=g.height {
+            g.clone().content.lock().unwrap().push(vec![]); // Create row
+            for j in 1..=g.width {
+                g.content.lock().unwrap()[(i - 1) as usize].push(vec![]); // Create Column
+                let new_particle = Particle::new(
+                    Vector2::new(bounds.x + j as f32 * 50.0, bounds.y + i as f32 * 50.0),
+                    Vector2::zero(),
+                    20.0,
+                );
 
-            let p = Rc::new(RefCell::new(new_particle));
-            particles.push(p.clone());
-            grid.content[(i - 1) as usize][(j - 1) as usize].push(Some(p));
+                let p = Arc::new(Mutex::new(new_particle));
+                particles.push(p.clone());
+                g.clone().content.lock().unwrap()[(i - 1) as usize][(j - 1) as usize].push(Some(p));
+            }
         }
     }
     
@@ -42,8 +46,9 @@ fn main() -> Result<(), String> {
         let mut dh = rl.begin_drawing(&thread);
         dh.clear_background(Color::BLACK);
 
+        println!("particles: {:?}", particles);
         for particle in &mut particles {
-            particle.borrow_mut().update(&mut dh, &bounds, &mut grid);
+            particle.lock().unwrap().update(&mut dh, &bounds, &mut grid);
         }
 
         grid.find_collisions();

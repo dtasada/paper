@@ -1,15 +1,12 @@
 use std::{
-    cell,
-    cell::RefCell,
-    borrow::BorrowMut,
-    rc::Rc
+    sync::{Arc, Mutex},
 };
 use raylib::prelude::*;
 
 /// # paper-engine
 // asdf
 
-type GridCell = Vec<Option<Rc<RefCell<Particle>>>>;
+type GridCell = Vec<Option<Arc<Mutex<Particle>>>>;
 
 pub static GRAVITY: f32 = 9.81;
 
@@ -26,10 +23,11 @@ pub fn get_sign(number: f32) -> f32 {
 
 #[derive(Debug)]
 pub struct Grid {
+    /// width and height are the width and height of each cell
     pub width: i32,
     pub height: i32,
     // Arc of two-dimensional arraylist that contains cells
-    pub content: Vec<Vec<GridCell>>,
+    pub content: Arc<Mutex<Vec<Vec<GridCell>>>>,
 }
 
 impl Grid {
@@ -40,7 +38,7 @@ impl Grid {
         Self {
             width,
             height,
-            content: vec![],
+            content: Arc::new(Mutex::new(vec![])),
         }
     }
 
@@ -59,21 +57,23 @@ impl Grid {
     }
 
     fn solve_collision(&mut self, (cell_a_x, cell_a_y): (i32, i32), (cell_b_x, cell_b_y): (i32, i32)) {
-        let self1 = Rc::new(cell::Cell::new(self));
-
-        let cell_a = &mut self1.get_mut().content[cell_a_x as usize][cell_a_y as usize].to_owned();
-        let cell_b = &mut self1.into_inner().content[cell_b_x as usize][cell_b_y as usize].to_owned();
+        let cell_a = &mut self.content.lock().unwrap()[cell_a_x as usize][cell_a_y as usize];
+        let cell_b = &mut self.content.lock().unwrap()[cell_b_x as usize][cell_b_y as usize];
 
         for particle_a_wrapped in cell_a.iter_mut() {
             for particle_b_wrapped in cell_b.iter_mut() {
                 if !std::ptr::eq(particle_a_wrapped, particle_b_wrapped) {
-                    let mut a = particle_a_wrapped.as_mut().unwrap();
-                    let mut b = particle_b_wrapped.as_mut().unwrap();
+                    if let Some(a_refcell) = particle_a_wrapped.to_owned() {
+                        if let Some(b_refcell) = particle_b_wrapped.to_owned() {
+                            let mut a = a_refcell.lock().unwrap();
+                            let mut b = b_refcell.lock().unwrap();
 
-                    if check_collision_circles(a.pos, a.radius, b.pos, b.radius) {
-                        let compensation_length = a.radius + b.radius - a.pos.distance_to(b.pos);
-                        a.pos -= compensation_length / 2.0;
-                        b.pos += compensation_length / 2.0;
+                            if check_collision_circles(a.pos, a.radius, b.pos, b.radius) {
+                                let compensation_length = a.radius + b.radius - a.pos.distance_to(b.pos);
+                                a.pos -= compensation_length / 2.0;
+                                b.pos += compensation_length / 2.0;
+                            }
+                        }
                     }
                 }
             }
@@ -115,11 +115,44 @@ impl Particle {
         }
     }
 
+    fn in_cell(&self, grid: &Grid, cell: (i32, i32)) -> bool {
+        if self.pos.x > (grid.width * cell.0) as f32
+        && self.pos.x < (grid.width * cell.0 + grid.width) as f32
+        && self.pos.y > (grid.width * cell.1 + grid.height) as f32
+        && self.pos.y < (grid.width * cell.1) as f32 {
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn update(&mut self, dh: &mut RaylibDrawHandle, bounds: &Rectangle, grid: &mut Grid) {
         self.vel.y += GRAVITY;
 
         self.pos += self.vel * dh.get_frame_time();
         self.collision(&bounds);
+
+        let g = grid.content.to_owned();
+
+        for (i, row) in g.lock().unwrap().iter_mut().enumerate() {
+            for (j, cell) in row.iter_mut().enumerate() {
+                let mut indices: Vec<usize> = vec![];
+                for (k, particle) in cell.iter().enumerate() {
+                    if std::ptr::eq(
+                        &*particle.to_owned().unwrap().lock().unwrap() as *const Particle,
+                        self as *const Particle
+                    ) && !self.in_cell(&grid, (j as i32, i as i32)) {
+                        indices.push(k);
+                    }
+                }
+
+                // Mutate self in grid
+                for &k in indices.iter().rev() {
+                    g.lock().unwrap()[(self.pos.y / grid.height as f32) as usize][(self.pos.x / grid.width as f32) as usize].push(cell.swap_remove(k));
+                    
+                }
+            }
+        }
 
         dh.draw_circle(
             self.pos.x as i32,
