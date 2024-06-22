@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 
 	"github.com/gen2brain/raylib-go/raylib"
 )
@@ -35,43 +35,44 @@ type Particle struct {
 	Radius           float32
 	CollisionDamping float32
 	Color            rl.Color
+	Id               int
 }
 
-func NewParticle(pos, vel Vector3, radius float32, color rl.Color) Particle {
-	return Particle{
+func NewParticle(pos, vel Vector3, radius float32, color rl.Color, id int) *Particle {
+	return &Particle{
 		Pos:              pos,
 		Vel:              vel,
 		Radius:           radius,
 		CollisionDamping: 0.8,
 		Color:            color,
+		Id:               id,
 	}
 }
 
 func (self *Particle) Update(bounds *Bounds) {
-	dt := rl.GetFrameTime()
-	self.Vel.Y -= GRAVITY * dt
+	self.Vel.Y -= GRAVITY * rl.GetFrameTime()
 	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
 
-	if self.Pos.Y <= bounds.Bottom {
+	if self.Pos.Y < bounds.YMin {
 		self.Pos.Y = bounds.Pos.Y + (bounds.Height/2)*GetSign(self.Pos.Y)
 		self.Vel.Y *= -1 * self.CollisionDamping
-	} else if self.Pos.Y >= bounds.Top {
+	} else if self.Pos.Y > bounds.YMax {
 		self.Pos.Y = bounds.Pos.Y - (bounds.Height/2)*GetSign(self.Pos.Y)
 		self.Vel.Y *= -1 * self.CollisionDamping
 	}
 
-	if self.Pos.X <= bounds.XLeast {
+	if self.Pos.X < bounds.XMin {
 		self.Pos.X = bounds.Pos.X + (bounds.Width/2)*GetSign(self.Pos.X)
 		self.Vel.X *= -1 * self.CollisionDamping
-	} else if self.Pos.X >= bounds.XMost {
+	} else if self.Pos.X > bounds.XMax {
 		self.Pos.X = bounds.Pos.X - (bounds.Width/2)*GetSign(self.Pos.X)
 		self.Vel.X *= -1 * self.CollisionDamping
 	}
 
-	if self.Pos.Z <= bounds.ZLeast {
+	if self.Pos.Z < bounds.ZMin {
 		self.Pos.Z = bounds.Pos.Z + (bounds.Length/2)*GetSign(self.Pos.Z)
 		self.Vel.Z *= -1 * self.CollisionDamping
-	} else if self.Pos.Z >= bounds.ZMost {
+	} else if self.Pos.Z > bounds.ZMax {
 		self.Pos.Z = bounds.Pos.Z - (bounds.Length/2)*GetSign(self.Pos.Z)
 		self.Vel.Z *= -1 * self.CollisionDamping
 	}
@@ -79,32 +80,41 @@ func (self *Particle) Update(bounds *Bounds) {
 	rl.DrawSphere(self.Pos, self.Radius, self.Color)
 }
 
+func (self *Particle) Collision() {}
+
 type Bounds struct {
 	Pos    Vector3
 	Width  float32
 	Height float32
 	Length float32
 
-	Bottom float32
-	Top    float32
-	XLeast float32
-	XMost  float32
-	ZLeast float32
-	ZMost  float32
+	YMin float32
+	YMax float32
+	XMin float32
+	XMax float32
+	ZMin float32
+	ZMax float32
 }
 
 func NewBounds(pos Vector3, width, height, length float32) Bounds {
+	fmt.Print()
 	return Bounds{
 		Pos:    pos,
 		Width:  width,
 		Height: height,
 		Length: length,
 
-		Bottom: pos.Y - height/2,
-		Top:    pos.Y + height/2,
-		XLeast: pos.X - width/2,
-		XMost:  pos.X + width/2,
-		ZLeast: pos.Z - length/2,
-		ZMost:  pos.Z + length/2,
+		YMin: pos.Y - height/2,
+		YMax: pos.Y + height/2,
+		XMin: pos.X - width/2,
+		XMax: pos.X + width/2,
+		ZMin: pos.Z - length/2,
+		ZMax: pos.Z + length/2,
 	}
+}
+
+type Grid struct {
+	Width  float32
+	Height float32
+	Length float32
 }
