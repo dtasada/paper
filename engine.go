@@ -8,8 +8,9 @@ import (
 
 type Vector2 = rl.Vector2
 type Vector3 = rl.Vector3
+type GridCell = []Particle
 
-const GRAVITY float32 = 9.81
+const GRAVITY float32 = 1
 
 func Vector3MultiplyValue(vec Vector3, val float32) Vector3 {
 	return rl.NewVector3(vec.X*val, vec.Y*val, vec.Z*val)
@@ -36,9 +37,12 @@ type Particle struct {
 	CollisionDamping float32
 	Color            rl.Color
 	Id               int
+	Model            rl.Model
 }
 
-func NewParticle(pos, vel Vector3, radius float32, color rl.Color, id int) *Particle {
+func NewParticle(pos, vel Vector3, radius float32, color rl.Color, id int, shader rl.Shader) *Particle {
+	model := rl.LoadModelFromMesh(rl.GenMeshSphere(radius, 32, 32))
+	model.Materials.Shader = shader
 	return &Particle{
 		Pos:              pos,
 		Vel:              vel,
@@ -46,35 +50,48 @@ func NewParticle(pos, vel Vector3, radius float32, color rl.Color, id int) *Part
 		CollisionDamping: 0.8,
 		Color:            color,
 		Id:               id,
+		Model:            model,
 	}
 }
 
-func (self *Particle) Update(bounds *Bounds) {
+func (self *Particle) Update(bounds *Bounds, particles *[]*Particle) {
 	self.Vel.Y -= GRAVITY * rl.GetFrameTime()
 	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
 
-	if self.Pos.Y < bounds.YMin {
+	/* Bound checking */
+	if self.Pos.Y <= bounds.YMin {
 		self.Pos.Y = bounds.Pos.Y + (bounds.Height/2)*GetSign(self.Pos.Y)
 		self.Vel.Y *= -1 * self.CollisionDamping
-	} else if self.Pos.Y > bounds.YMax {
+	} else if self.Pos.Y >= bounds.YMax {
 		self.Pos.Y = bounds.Pos.Y - (bounds.Height/2)*GetSign(self.Pos.Y)
 		self.Vel.Y *= -1 * self.CollisionDamping
 	}
 
-	if self.Pos.X < bounds.XMin {
+	if self.Pos.X <= bounds.XMin {
 		self.Pos.X = bounds.Pos.X + (bounds.Width/2)*GetSign(self.Pos.X)
 		self.Vel.X *= -1 * self.CollisionDamping
-	} else if self.Pos.X > bounds.XMax {
+	} else if self.Pos.X >= bounds.XMax {
 		self.Pos.X = bounds.Pos.X - (bounds.Width/2)*GetSign(self.Pos.X)
 		self.Vel.X *= -1 * self.CollisionDamping
 	}
 
-	if self.Pos.Z < bounds.ZMin {
+	if self.Pos.Z <= bounds.ZMin {
 		self.Pos.Z = bounds.Pos.Z + (bounds.Length/2)*GetSign(self.Pos.Z)
 		self.Vel.Z *= -1 * self.CollisionDamping
-	} else if self.Pos.Z > bounds.ZMax {
+	} else if self.Pos.Z >= bounds.ZMax {
 		self.Pos.Z = bounds.Pos.Z - (bounds.Length/2)*GetSign(self.Pos.Z)
 		self.Vel.Z *= -1 * self.CollisionDamping
+	}
+
+	/* Collision with other particles */
+	for _, particle := range *particles {
+		if self != particle {
+			if distance := rl.Vector3Distance(self.Pos, particle.Pos); distance < self.Radius+particle.Radius {
+				compensationDistance := self.Radius + particle.Radius - distance
+				self.Pos = rl.Vector3SubtractValue(self.Pos, compensationDistance/2.0)
+				particle.Pos = rl.Vector3AddValue(particle.Pos, compensationDistance/2.0)
+			}
+		}
 	}
 
 	rl.DrawSphere(self.Pos, self.Radius, self.Color)
@@ -114,7 +131,9 @@ func NewBounds(pos Vector3, width, height, length float32) Bounds {
 }
 
 type Grid struct {
-	Width  float32
-	Height float32
-	Length float32
+	CellWidth  float32
+	CellHeight float32
+	CellLength float32
+
+	Content [][][]GridCell
 }
