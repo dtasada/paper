@@ -33,25 +33,40 @@ func main() {
 		Projection: rl.CameraPerspective,
 	}
 
-	bounds := NewBounds(rl.NewVector3(0, 0, 0), 100, 100, 100)
-	// grid := Grid{100, 100, 100}
+	container := NewContainer(rl.NewVector3(0, 0, 0), 100, 100, 100)
 
 	particles := []*Particle{}
-	particleCount := 1024
 
-	for i := 0; i < particleCount; i++ {
-		particles = append(particles, NewParticle(
-			rl.NewVector3(
-				float32(rand.Intn(int(bounds.Width))-int(bounds.Width)/2),
-				float32(rand.Intn(int(bounds.Height))-int(bounds.Height/2)),
-				float32(rand.Intn(int(bounds.Length))-int(bounds.Length/2)),
-			),
-			rl.Vector3Zero(),
-			1,
-			rl.SkyBlue,
-			i,
-			lightShader,
-		))
+	// Generate particles
+	for i := 1; i <= container.Grid.ZCount; i++ {
+		container.Grid.Content = append(container.Grid.Content, [][][]*Particle{})
+		axisZ := &container.Grid.Content[len(container.Grid.Content)-1]
+		for j := 1; j <= container.Grid.YCount; j++ {
+			*axisZ = append(*axisZ, [][]*Particle{})
+			axisY := &(*axisZ)[len(*axisZ)-1]
+			for k := 1; k <= container.Grid.XCount; k++ {
+				if rand.Intn(10) == 1 {
+					*axisY = append(*axisY, []*Particle{})
+					cell := &(*axisY)[len(*axisY)-1]
+					pos := rl.NewVector3(
+						rand.Float32()*container.Width-container.Width/2,
+						rand.Float32()*container.Height-container.Height/2,
+						rand.Float32()*container.Length-container.Length/2,
+					)
+					p := NewParticle(
+						pos,
+						rl.Vector3Zero(),
+						1,
+						rl.SkyBlue,
+						i,
+						lightShader,
+					)
+					particles = append(particles, &p) // add to particle arraylist
+					fmt.Println("content:", container.Grid.Content)
+					*cell = append(*cell, &p) // add to bounds.Grid index
+				}
+			}
+		}
 	}
 
 	for !rl.WindowShouldClose() {
@@ -70,7 +85,7 @@ func main() {
 
 		/* Rendering Logic here */
 		for _, particle := range particles {
-			particle.Update(&bounds, &particles)
+			particle.Update(&container, &particles)
 			fmt.Println("i:", particle.Id, "pos:", particle.Pos)
 		}
 
@@ -85,7 +100,7 @@ func main() {
 		}
 		_ = lights
 
-		rl.DrawCubeWires(bounds.Pos, bounds.Width, bounds.Height, bounds.Length, rl.Red)
+		rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
 
 		rl.EndMode3D()
 
