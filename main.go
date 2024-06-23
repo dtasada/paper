@@ -5,6 +5,8 @@ import (
 	"math/rand"
 
 	"github.com/gen2brain/raylib-go/raylib"
+
+	"github.com/dtasada/paper/src"
 )
 
 func main() {
@@ -21,8 +23,8 @@ func main() {
 	shaderValue := []float32{0.1, 0.1, 0.1, 1.0}
 	rl.SetShaderValue(lightShader, ambientLoc, shaderValue, rl.ShaderUniformVec4)
 
-	lights := []Light{
-		NewLight(LightTypePoint, rl.NewVector3(0, 0, 0), rl.NewVector3(0, -25, 0), rl.Yellow, lightShader),
+	lights := []src.Light{
+		src.NewLight(src.LightTypePoint, rl.NewVector3(0, 0, 0), rl.NewVector3(0, -25, 0), rl.Yellow, lightShader),
 	}
 
 	var camera rl.Camera3D = rl.Camera3D{
@@ -33,85 +35,93 @@ func main() {
 		Projection: rl.CameraPerspective,
 	}
 
-	container := NewContainer(rl.NewVector3(0, 0, 0), 100, 100, 100)
+	container := src.NewContainer(
+		rl.NewVector3(0, 0, 0),
+		rl.NewVector3(100, 100, 100),
+		rl.NewVector3(10, 10, 10),
+	)
 
-	particles := []*Particle{}
+	particles := []*src.Particle{}
 
-	// Generate particles
-	for i := 1; i <= container.Grid.ZCount; i++ {
-		container.Grid.Content = append(container.Grid.Content, [][][]*Particle{})
-		axisZ := &container.Grid.Content[len(container.Grid.Content)-1]
-		for j := 1; j <= container.Grid.YCount; j++ {
-			*axisZ = append(*axisZ, [][]*Particle{})
-			axisY := &(*axisZ)[len(*axisZ)-1]
-			for k := 1; k <= container.Grid.XCount; k++ {
+	/* Generate particles */
+	for z := 0; z <= container.Grid.Planes; z++ {
+		container.Grid.Content = append(container.Grid.Content, src.Plane{})
+		plane := &container.Grid.Content[z]
+		for y := 0; y <= container.Grid.Rows; y++ {
+			*plane = append(*plane, src.Row{})
+			row := &(*plane)[y]
+			for x := 0; x <= container.Grid.Columns; x++ {
+				*row = append(*row, src.GridCell{})
+				cell := &(*row)[x]
 				if rand.Intn(10) == 1 {
-					*axisY = append(*axisY, []*Particle{})
-					cell := &(*axisY)[len(*axisY)-1]
 					pos := rl.NewVector3(
 						rand.Float32()*container.Width-container.Width/2,
 						rand.Float32()*container.Height-container.Height/2,
 						rand.Float32()*container.Length-container.Length/2,
 					)
-					p := NewParticle(
+					p := src.NewParticle(
 						pos,
 						rl.Vector3Zero(),
 						1,
 						rl.SkyBlue,
-						i,
 						lightShader,
 					)
+
 					particles = append(particles, &p) // add to particle arraylist
-					fmt.Println("content:", container.Grid.Content)
-					*cell = append(*cell, &p) // add to bounds.Grid index
+					*cell = append(*cell, &p)         // add to bounds.Grid index
+					fmt.Println("particle:", p, "xyz:", x, y, z)
 				}
 			}
 		}
 	}
+	// container.Grid.PrintContent()
 
 	for !rl.WindowShouldClose() {
-		rl.UpdateCamera(&camera, rl.CameraFree)
-		rl.SetShaderValue(
-			lightShader,
-			*lightShader.Locs,
-			[]float32{camera.Position.X, camera.Position.Y, camera.Position.Z},
-			rl.ShaderUniformVec3,
-		)
+		{ /* Pre-render logic here */
+			rl.UpdateCamera(&camera, rl.CameraFree)
+			rl.SetShaderValue(
+				lightShader,
+				*lightShader.Locs,
+				[]float32{camera.Position.X, camera.Position.Y, camera.Position.Z},
+				rl.ShaderUniformVec3,
+			)
+		}
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
-		rl.BeginMode3D(camera)
-
-		/* Rendering Logic here */
-		for _, particle := range particles {
-			particle.Update(&container, &particles)
-			fmt.Println("i:", particle.Id, "pos:", particle.Pos)
-		}
-
-		for _, light := range lights {
-			light.UpdateValues()
-
-			if light.Enabled == 1 {
-				rl.DrawSphere(light.Position, 0.2, light.Color)
-			} else {
-				rl.DrawSphereWires(light.Position, 0.2, 8, 8, rl.Fade(light.Color, 0.3))
+		{ /* 3D Rendering here */
+			rl.BeginMode3D(camera)
+			for _, particle := range particles {
+				particle.Update(&container, &particles)
 			}
+
+			for _, light := range lights {
+				light.UpdateValues()
+
+				if light.Enabled == 1 {
+					rl.DrawSphere(light.Position, 0.2, light.Color)
+				} else {
+					rl.DrawSphereWires(light.Position, 0.2, 8, 8, rl.Fade(light.Color, 0.3))
+				}
+			}
+			_ = lights
+
+			rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
+			rl.EndMode3D()
 		}
-		_ = lights
-
-		rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
-
-		rl.EndMode3D()
 
 		rl.DrawFPS(12, 12)
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(lightShader)
-	for _, particle := range particles {
-		rl.UnloadModel(particle.Model)
+	/* Cleanup */
+	{
+		rl.UnloadShader(lightShader)
+		for _, particle := range particles {
+			rl.UnloadModel(particle.Model)
+		}
+		rl.CloseWindow()
 	}
-	rl.CloseWindow()
 }
