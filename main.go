@@ -40,7 +40,7 @@ func main() {
 		Position:   rl.NewVector3(0, 0, 0),
 		Target:     rl.NewVector3(-1, -1, -1),
 		Up:         rl.NewVector3(0, 1, 0), // Asserts Y to be the vertical axis
-		Fovy:       100.0,
+		Fovy:       120.0,
 		Projection: rl.CameraPerspective,
 	}
 
@@ -54,11 +54,14 @@ func main() {
 
 	/* Generate particles */
 	for z := -container.Grid.Planes / 2; z <= container.Grid.Planes/2; z++ {
-		container.Grid.Content[z] = src.Plane{}
+		zi := z * int(container.CellSize)
+		container.Grid.Content[zi] = src.Plane{}
 		for y := -container.Grid.Rows / 2; y <= container.Grid.Rows/2; y++ {
-			container.Grid.Content[z][y] = src.Row{}
+			yi := y * int(container.CellSize)
+			container.Grid.Content[zi][yi] = src.Row{}
 			for x := -container.Grid.Columns / 2; x <= container.Grid.Columns/2; x++ {
-				container.Grid.Content[z][y][x] = src.GridCell{}
+				xi := x * int(container.CellSize)
+				container.Grid.Content[zi][yi][xi] = src.GridCell{}
 				/* if rand.Intn(100000) == 1 */
 				if len(particles) < 3 {
 					pos := rl.NewVector3(
@@ -74,8 +77,8 @@ func main() {
 						lightShader,
 					)
 
-					particles = append(particles, &p)                                             // add to particle arraylist
-					container.Grid.Content[z][y][x] = append(container.Grid.Content[z][y][x], &p) // add to bounds.Grid index
+					particles = append(particles, &p)                                                   // add to particle arraylist
+					container.Grid.Content[zi][yi][xi] = append(container.Grid.Content[zi][yi][xi], &p) // add to bounds.Grid index
 				}
 			}
 		}
@@ -124,6 +127,25 @@ func main() {
 			_ = lights
 
 			rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
+
+			/* for z, plane := range container.Grid.Content {
+				for y, row := range plane {
+					for x := range row {
+						rl.DrawCubeWires(
+							rl.NewVector3(
+								float32(x)+container.CellSize/2,
+								float32(y)+container.CellSize/2,
+								float32(z)+container.CellSize/2,
+							),
+							container.CellSize,
+							container.CellSize,
+							container.CellSize,
+							rl.NewColor(uint8(x), uint8(y), uint8(z), 255),
+						)
+					}
+				}
+			} */
+
 			rl.EndMode3D()
 		}
 

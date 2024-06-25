@@ -25,11 +25,11 @@ type Bounds struct {
 }
 
 type Container struct {
-	Pos         Vector3
-	Width       float32
-	Height      float32
-	Length      float32
-	CellsToSize float32 // Amount of cells per rl coordinate
+	Pos      Vector3
+	Width    float32
+	Height   float32
+	Length   float32
+	CellSize float32 // Amount of raylib coordinate units per cell
 
 	Bounds Bounds
 	Grid   Grid
@@ -45,11 +45,11 @@ func NewContainer(pos, size Vector3, cellsToSize float32) Container {
 	planes := int(length / cellsToSize)
 
 	return Container{
-		Pos:         pos,
-		Width:       width,
-		Height:      height,
-		Length:      length,
-		CellsToSize: cellsToSize,
+		Pos:      pos,
+		Width:    width,
+		Height:   height,
+		Length:   length,
+		CellSize: cellsToSize,
 
 		Bounds: Bounds{
 			YMin: pos.Y - height/2,
@@ -64,7 +64,7 @@ func NewContainer(pos, size Vector3, cellsToSize float32) Container {
 			columns,
 			rows,
 			planes,
-			map[int]map[int]map[int]GridCell{},
+			map[int]Plane{},
 		},
 	}
 }
@@ -72,29 +72,40 @@ func NewContainer(pos, size Vector3, cellsToSize float32) Container {
 /* Find collision between a particle and any particle in its contiguous cells */
 func (self *Container) FindCollisions(particle *Particle) {
 	cell := Vector3Int{ // find particle's corresponding cell
-		floorToZero(particle.Pos.X),
-		floorToZero(particle.Pos.Y),
-		floorToZero(particle.Pos.Z),
+		int(f32(FloorTens(particle.Pos.X)) - self.CellSize/2.0),
+		int(f32(FloorTens(particle.Pos.Y)) - self.CellSize/2.0),
+		int(f32(FloorTens(particle.Pos.Z)) - self.CellSize/2.0),
 	}
+	rl.DrawCubeWires(
+		rl.NewVector3(
+			f32(cell.X),
+			f32(cell.Y),
+			f32(cell.Z),
+		),
+		self.CellSize,
+		self.CellSize,
+		self.CellSize,
+		rl.Green,
+	)
 
 	// if statements are to prevent checking non-existing would-be "edge-adjacent" cells
 	targetCell := Vector3Int{}
-	for dx := -1; dx <= 1; dx++ {
-		if targetCell.X = cell.X + dx; targetCell.X >= 0 && targetCell.X <= self.Grid.Rows {
-			for dy := -1; dy <= 1; dy++ {
-				if targetCell.Y = cell.Y + dy; targetCell.Y >= 0 && targetCell.Y <= self.Grid.Columns {
-					for dz := -1; dz <= 1; dz++ {
-						if targetCell.Z = cell.Z + dz; targetCell.Z >= 0 && targetCell.Z <= self.Grid.Planes {
-							pretty.Println("asfdkjasdfhjfasdhjfasdhjfasdhj")
+	d := int(self.CellSize)
+	for dx := -d; dx <= d; dx += d {
+		if targetCell.X = cell.X + dx; targetCell.X >= int(self.Bounds.XMin) && targetCell.X <= int(self.Bounds.XMax) {
+			for dy := -d; dy <= d; dy += d {
+				if targetCell.Y = cell.Y + dy; targetCell.Y >= int(self.Bounds.YMin) && targetCell.Y <= int(self.Bounds.YMax) {
+					for dz := -d; dz <= d; dz += d {
+						if targetCell.Z = cell.Z + dz; targetCell.Z >= int(self.Bounds.ZMin) && targetCell.Z <= int(self.Bounds.ZMax) {
 							rl.DrawCubeWires(
 								rl.NewVector3(
-									f32(targetCell.X*self.Grid.Rows)-self.Width/2,
-									f32(targetCell.Y*self.Grid.Columns)-self.Height/2,
-									f32(targetCell.Z*self.Grid.Planes)-self.Length/2,
+									f32(targetCell.X),
+									f32(targetCell.Y),
+									f32(targetCell.Z),
 								),
-								self.CellsToSize,
-								self.CellsToSize,
-								self.CellsToSize,
+								self.CellSize,
+								self.CellSize,
+								self.CellSize,
 								rl.Green,
 							)
 							self.SolveCollision(particle, targetCell)
@@ -109,6 +120,7 @@ func (self *Container) FindCollisions(particle *Particle) {
 /* Solves collision given cells */
 func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
 	cell := self.Grid.Content[cellPos.Z][cellPos.Y][cellPos.X]
+	pretty.Println("cell:", cell)
 
 	for _, pb := range cell {
 		if pa != pb {

@@ -17,9 +17,9 @@ type Vector3Int struct {
 }
 
 // so many dimensions is confusing so i made aliases
-type GridCell = []*Particle
-type Row = map[int]GridCell
-type Plane = map[int]Row
+type GridCell []*Particle
+type Row map[int]GridCell
+type Plane map[int]Row
 
 const GRAVITY float32 = 9.81 / 2
 
@@ -30,6 +30,16 @@ func InvertColor(c rl.Color) rl.Color {
 		255-c.G,
 		255-c.B,
 		255-c.A,
+	)
+}
+
+/* Returns color with random RGBA values */
+func RandomColor() rl.Color {
+	return rl.NewColor(
+		uint8(rl.GetRandomValue(0, 255)),
+		uint8(rl.GetRandomValue(0, 255)),
+		uint8(rl.GetRandomValue(0, 255)),
+		uint8(rl.GetRandomValue(0, 255)),
 	)
 }
 
@@ -51,14 +61,20 @@ func Vector3ToInt(vec Vector3) Vector3Int {
 	}
 }
 
-func Vector3MultiplyValue(vec Vector3, val float32) Vector3 {
-	return rl.NewVector3(vec.X*val, vec.Y*val, vec.Z*val)
+func Vector3MultiplyValue(vec Vector3, mult float32) Vector3 {
+	return rl.NewVector3(vec.X*mult, vec.Y*mult, vec.Z*mult)
 }
 
+func Vector3IntMultiplyValue(vec Vector3Int, mult int) Vector3Int {
+	return Vector3Int{vec.X * mult, vec.Y * mult, vec.Z * mult}
+}
+
+/* Converts 3D vector to 2D vector by disregarding Z value  */
 func Vector3to2(vec rl.Vector3) rl.Vector2 {
 	return rl.NewVector2(vec.X, vec.Y)
 }
 
+/* Returns sign of value. -1 if negative, 0 if 0, and 1 if positive */
 func GetSign(val float32) float32 {
 	if val > 0 {
 		return 1
@@ -69,7 +85,8 @@ func GetSign(val float32) float32 {
 	}
 }
 
-func floorToZero(val float32) int {
+/* Floors value, but rounds negative numbers up */
+func FloorToZero(val float32) int {
 	if val > 0 {
 		return int(math.Floor(float64(val)))
 	} else if val < 0 {
@@ -79,6 +96,7 @@ func floorToZero(val float32) int {
 	}
 }
 
-func Exists[T any](arr []T, index int) bool {
-	return (len(arr) > index)
+/* Rounds value to tens */
+func FloorTens(val float32) int {
+	return int(FloorToZero(val/10)) * 10
 }
