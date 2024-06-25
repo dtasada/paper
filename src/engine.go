@@ -21,7 +21,7 @@ type GridCell = []*Particle
 type Row = map[int]GridCell
 type Plane = map[int]Row
 
-const GRAVITY float32 = 1
+const GRAVITY float32 = 9.81 / 2
 
 /* Returns the inverted color */
 func InvertColor(c rl.Color) rl.Color {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/kr/pretty"
 )
 
 type Grid struct {
@@ -39,9 +40,9 @@ func NewContainer(pos, size Vector3, cellsToSize float32) Container {
 	height := size.Y
 	length := size.Z
 
-	columns := int(cellsToSize * width)
-	rows := int(cellsToSize * height)
-	planes := int(cellsToSize * length)
+	columns := int(width / cellsToSize)
+	rows := int(height / cellsToSize)
+	planes := int(length / cellsToSize)
 
 	return Container{
 		Pos:         pos,
@@ -84,7 +85,7 @@ func (self *Container) FindCollisions(particle *Particle) {
 				if targetCell.Y = cell.Y + dy; targetCell.Y >= 0 && targetCell.Y <= self.Grid.Columns {
 					for dz := -1; dz <= 1; dz++ {
 						if targetCell.Z = cell.Z + dz; targetCell.Z >= 0 && targetCell.Z <= self.Grid.Planes {
-							self.SolveCollision(particle, targetCell)
+							pretty.Println("asfdkjasdfhjfasdhjfasdhjfasdhj")
 							rl.DrawCubeWires(
 								rl.NewVector3(
 									f32(targetCell.X*self.Grid.Rows)-self.Width/2,
@@ -96,6 +97,7 @@ func (self *Container) FindCollisions(particle *Particle) {
 								self.CellsToSize,
 								rl.Green,
 							)
+							self.SolveCollision(particle, targetCell)
 						}
 					}
 				}

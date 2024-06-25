@@ -34,27 +34,27 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
 
 	/* Bound checking */
-	if self.Pos.Y <= container.Bounds.YMin+self.Radius {
-		self.Pos.Y = container.Bounds.YMin + self.Radius
+	if bottomBorder := container.Bounds.YMin + self.Radius; self.Pos.Y <= bottomBorder {
+		self.Pos.Y = bottomBorder
 		self.Vel.Y *= -1 * self.CollisionDamping
-	} else if self.Pos.Y >= container.Bounds.YMax-self.Radius {
-		self.Pos.Y = container.Bounds.YMax - self.Radius
+	} else if topBorder := container.Bounds.YMax - self.Radius; self.Pos.Y >= topBorder {
+		self.Pos.Y = topBorder
 		self.Vel.Y *= -1 * self.CollisionDamping
 	}
 
-	if self.Pos.X <= container.Bounds.XMin+self.Radius {
-		self.Pos.X = container.Bounds.XMin + self.Radius
+	if leftBorder := container.Bounds.XMin + self.Radius; self.Pos.X <= leftBorder {
+		self.Pos.X = leftBorder
 		self.Vel.X *= -1 * self.CollisionDamping
-	} else if self.Pos.X >= container.Bounds.XMax-self.Radius {
-		self.Pos.X = container.Bounds.XMax - self.Radius
+	} else if rightBorder := container.Bounds.XMax - self.Radius; self.Pos.X >= rightBorder {
+		self.Pos.X = rightBorder
 		self.Vel.X *= -1 * self.CollisionDamping
 	}
 
-	if self.Pos.Z <= container.Bounds.ZMin+self.Radius {
-		self.Pos.Z = container.Bounds.ZMin + self.Radius
+	if shallowBorder := container.Bounds.ZMin + self.Radius; self.Pos.Z <= shallowBorder {
+		self.Pos.Z = shallowBorder
 		self.Vel.Z *= -1 * self.CollisionDamping
-	} else if self.Pos.Z >= container.Bounds.ZMax-self.Radius {
-		self.Pos.Z = container.Bounds.ZMax - self.Radius
+	} else if deepBorder := container.Bounds.ZMax - self.Radius; self.Pos.Z >= deepBorder {
+		self.Pos.Z = deepBorder
 		self.Vel.Z *= -1 * self.CollisionDamping
 	}
 

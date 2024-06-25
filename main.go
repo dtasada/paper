@@ -13,16 +13,16 @@ import (
 func main() {
 	fmt.Println("Initializing raylib...")
 
-	/* Set raylib options */
+	/* Init raylib */
+	rl.InitWindow(1280, 720, "paper")
+	rl.SetExitKey(0)
+	rl.DisableCursor()
+	rl.SetTargetFPS(60)
+
+	/* Raylib flags */
 	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.SetConfigFlags(rl.FlagMsaa4xHint) // Enable 4x MSAA if available
 	rl.SetConfigFlags(rl.FlagWindowResizable)
-	rl.SetTargetFPS(60)
-	rl.SetExitKey(0)
-
-	/* Init raylb window */
-	rl.InitWindow(1280, 720, "paper")
-	rl.DisableCursor()
 
 	/* Shader setup */
 	lightShader := rl.LoadShader("./resources/shaders/lighting.vs", "./resources/shaders/lighting.fs")
@@ -37,8 +37,8 @@ func main() {
 
 	/* Logic setup (camera, container and particle arraylist) */
 	camera := rl.Camera3D{
-		Position:   rl.NewVector3(-10, -25, 0),
-		Target:     rl.NewVector3(0, 0, 1),
+		Position:   rl.NewVector3(0, 0, 0),
+		Target:     rl.NewVector3(-1, -1, -1),
 		Up:         rl.NewVector3(0, 1, 0), // Asserts Y to be the vertical axis
 		Fovy:       100.0,
 		Projection: rl.CameraPerspective,
@@ -59,8 +59,8 @@ func main() {
 			container.Grid.Content[z][y] = src.Row{}
 			for x := -container.Grid.Columns / 2; x <= container.Grid.Columns/2; x++ {
 				container.Grid.Content[z][y][x] = src.GridCell{}
-				/* if rand.Intn(100000) == 1 { */
-				if len(particles) <= 10 {
+				/* if rand.Intn(100000) == 1 */
+				if len(particles) < 3 {
 					pos := rl.NewVector3(
 						rand.Float32()*container.Width-container.Width/2,
 						rand.Float32()*container.Height-container.Height/2,
@@ -69,7 +69,7 @@ func main() {
 					p := src.NewParticle(
 						pos,
 						rl.Vector3Zero(),
-						1,
+						4,
 						rl.SkyBlue,
 						lightShader,
 					)
@@ -80,7 +80,8 @@ func main() {
 			}
 		}
 	}
-	pretty.Println(container.Grid.Content)
+	pretty.Println()
+	// pretty.Println(container.Grid.Content)
 
 	/* Main loop */
 	for !rl.WindowShouldClose() {
