@@ -18,8 +18,8 @@ type Vector3Int struct {
 
 // so many dimensions is confusing so i made aliases
 type GridCell = []*Particle
-type Row = []GridCell
-type Plane = []Row
+type Row = map[int]GridCell
+type Plane = map[int]Row
 
 const GRAVITY float32 = 1
 

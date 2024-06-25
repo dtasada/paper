@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/kr/pretty"
 
 	"github.com/dtasada/paper/src"
 )
@@ -46,23 +47,20 @@ func main() {
 	container := src.NewContainer(
 		rl.NewVector3(0, 0, 0),
 		rl.NewVector3(100, 100, 100),
-		rl.NewVector3(100, 100, 100),
+		10,
 	)
 
 	particles := []*src.Particle{}
 
 	/* Generate particles */
-	for z := 0; z <= container.Grid.Planes; z++ {
-		container.Grid.Content = append(container.Grid.Content, src.Plane{})
-		plane := &container.Grid.Content[z]
-		for y := 0; y <= container.Grid.Rows; y++ {
-			*plane = append(*plane, src.Row{})
-			row := &(*plane)[y]
-			for x := 0; x <= container.Grid.Columns; x++ {
-				*row = append(*row, src.GridCell{})
-				cell := &(*row)[x]
-				// if rand.Intn(100000) == 1 {
-				if len(particles) == 0 {
+	for z := -container.Grid.Planes / 2; z <= container.Grid.Planes/2; z++ {
+		container.Grid.Content[z] = src.Plane{}
+		for y := -container.Grid.Rows / 2; y <= container.Grid.Rows/2; y++ {
+			container.Grid.Content[z][y] = src.Row{}
+			for x := -container.Grid.Columns / 2; x <= container.Grid.Columns/2; x++ {
+				container.Grid.Content[z][y][x] = src.GridCell{}
+				/* if rand.Intn(100000) == 1 { */
+				if len(particles) <= 10 {
 					pos := rl.NewVector3(
 						rand.Float32()*container.Width-container.Width/2,
 						rand.Float32()*container.Height-container.Height/2,
@@ -76,13 +74,13 @@ func main() {
 						lightShader,
 					)
 
-					particles = append(particles, &p) // add to particle arraylist
-					*cell = append(*cell, &p)         // add to bounds.Grid index
+					particles = append(particles, &p)                                             // add to particle arraylist
+					container.Grid.Content[z][y][x] = append(container.Grid.Content[z][y][x], &p) // add to bounds.Grid index
 				}
 			}
 		}
 	}
-	// container.Grid.PrintContent()
+	pretty.Println(container.Grid.Content)
 
 	/* Main loop */
 	for !rl.WindowShouldClose() {
