@@ -83,18 +83,34 @@ func NewContainer(pos, size, gridDensity Vector3) Container {
 /* Find collision between a particle and any particle in its contiguous cells */
 func (self *Container) FindCollisions(particle *Particle) {
 	cell := Vector3Int{ // find particle's corresponding cell
-		int(floorToZero((particle.Pos.X + self.Width/2) / f32(self.Grid.Columns))),
-		int(floorToZero((particle.Pos.Y + self.Height/2) / f32(self.Grid.Rows))),
-		int(floorToZero((particle.Pos.Z + self.Length/2) / f32(self.Grid.Planes))),
+		int(floorToZero((particle.Pos.X + self.Width/2.0) / f32(self.Grid.Columns))),
+		int(floorToZero((particle.Pos.Y + self.Height/2.0) / f32(self.Grid.Rows))),
+		int(floorToZero((particle.Pos.Z + self.Length/2.0) / f32(self.Grid.Planes))),
 	}
 
+	// if statements are to prevent checking non-existing would-be "edge-adjacent" cells
+	targetCell := Vector3Int{}
 	for dx := -1; dx <= 1; dx++ {
-		for dy := -1; dy <= 1; dy++ {
-			for dz := -1; dz <= 1; dz++ {
-				self.SolveCollision(
-					particle,
-					Vector3Int{cell.X + dx, cell.Y + dy, cell.Z + dz},
-				)
+		if targetCell.X = cell.X + dx; targetCell.X >= 0 && targetCell.X <= self.Grid.Rows {
+			for dy := -1; dy <= 1; dy++ {
+				if targetCell.Y = cell.Y + dy; targetCell.Y >= 0 && targetCell.Y <= self.Grid.Columns {
+					for dz := -1; dz <= 1; dz++ {
+						if targetCell.Z = cell.Z + dz; targetCell.Z >= 0 && targetCell.Z <= self.Grid.Planes {
+							self.SolveCollision(particle, targetCell)
+							/* rl.DrawCubeWires(
+								rl.NewVector3(
+									f32(targetCell.X*self.Grid.Rows)-self.Width/2,
+									f32(targetCell.Y*self.Grid.Columns)-self.Height/2,
+									f32(targetCell.Z*self.Grid.Planes)-self.Length/2,
+								),
+								particle.Radius,
+								particle.Radius,
+								particle.Radius,
+								rl.Green,
+							) */
+						}
+					}
+				}
 			}
 		}
 	}
@@ -102,16 +118,14 @@ func (self *Container) FindCollisions(particle *Particle) {
 
 /* Solves collision given cells */
 func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
-	fmt.Println("cell:", cellPos)
 	cell := self.Grid.Content[cellPos.Z][cellPos.Y][cellPos.X]
 
 	for _, pb := range cell {
 		if pa != pb {
 			if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-				fmt.Println("!!!!!!!!!...")
 				compensationDistance := pa.Radius + pb.Radius - rl.Vector3Distance(pa.Pos, pb.Pos)
-				pa.Pos = rl.Vector3SubtractValue(pa.Pos, compensationDistance/2.0)
-				pb.Pos = rl.Vector3AddValue(pb.Pos, compensationDistance/2.0)
+				pa.Pos = rl.Vector3SubtractValue(pa.Pos, compensationDistance*pa.CollisionDamping*pb.CollisionDamping/2.0)
+				pb.Pos = rl.Vector3AddValue(pb.Pos, compensationDistance*pb.CollisionDamping*pa.CollisionDamping/2.0)
 			}
 		}
 	}

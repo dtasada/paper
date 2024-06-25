@@ -12,11 +12,18 @@ import (
 func main() {
 	fmt.Println("Initializing raylib...")
 
-	rl.InitWindow(1280, 720, "paper")
+	/* Set raylib options */
+	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.SetConfigFlags(rl.FlagMsaa4xHint) // Enable 4x MSAA if available
+	rl.SetConfigFlags(rl.FlagWindowResizable)
 	rl.SetTargetFPS(60)
+	rl.SetExitKey(0)
+
+	/* Init raylb window */
+	rl.InitWindow(1280, 720, "paper")
 	rl.DisableCursor()
 
+	/* Shader setup */
 	lightShader := rl.LoadShader("./resources/shaders/lighting.vs", "./resources/shaders/lighting.fs")
 	*lightShader.Locs = rl.GetShaderLocation(lightShader, "viewPos")
 	ambientLoc := rl.GetShaderLocation(lightShader, "ambient")
@@ -27,7 +34,8 @@ func main() {
 		src.NewLight(src.LightTypePoint, rl.NewVector3(0, 0, 0), rl.NewVector3(0, -25, 0), rl.Yellow, lightShader),
 	}
 
-	var camera rl.Camera3D = rl.Camera3D{
+	/* Logic setup (camera, container and particle arraylist) */
+	camera := rl.Camera3D{
 		Position:   rl.NewVector3(-10, -25, 0),
 		Target:     rl.NewVector3(0, 0, 1),
 		Up:         rl.NewVector3(0, 1, 0), // Asserts Y to be the vertical axis
@@ -38,7 +46,7 @@ func main() {
 	container := src.NewContainer(
 		rl.NewVector3(0, 0, 0),
 		rl.NewVector3(100, 100, 100),
-		rl.NewVector3(10, 10, 10),
+		rl.NewVector3(100, 100, 100),
 	)
 
 	particles := []*src.Particle{}
@@ -53,7 +61,8 @@ func main() {
 			for x := 0; x <= container.Grid.Columns; x++ {
 				*row = append(*row, src.GridCell{})
 				cell := &(*row)[x]
-				if rand.Intn(10) == 1 {
+				// if rand.Intn(100000) == 1 {
+				if len(particles) == 0 {
 					pos := rl.NewVector3(
 						rand.Float32()*container.Width-container.Width/2,
 						rand.Float32()*container.Height-container.Height/2,
@@ -69,13 +78,13 @@ func main() {
 
 					particles = append(particles, &p) // add to particle arraylist
 					*cell = append(*cell, &p)         // add to bounds.Grid index
-					fmt.Println("particle:", p, "xyz:", x, y, z)
 				}
 			}
 		}
 	}
 	// container.Grid.PrintContent()
 
+	/* Main loop */
 	for !rl.WindowShouldClose() {
 		{ /* Pre-render logic here */
 			rl.UpdateCamera(&camera, rl.CameraFree)
@@ -85,6 +94,14 @@ func main() {
 				[]float32{camera.Position.X, camera.Position.Y, camera.Position.Z},
 				rl.ShaderUniformVec3,
 			)
+
+			if rl.IsKeyPressed(rl.KeyEscape) {
+				if rl.IsCursorHidden() {
+					rl.EnableCursor()
+				} else {
+					rl.DisableCursor()
+				}
+			}
 		}
 
 		rl.BeginDrawing()

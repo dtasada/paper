@@ -60,6 +60,6 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 
 	container.FindCollisions(self)
 
-	rl.DrawSphere(self.Pos, self.Radius, self.Color)
-	rl.DrawSphereWires(self.Pos, self.Radius, 32, 32, InvertColor(self.Color))
+	rl.DrawModel(self.Model, self.Pos, 1, self.Color)
+	// rl.DrawModelWires(self.Model, self.Pos, 1, InvertColor(self.Color))
 }

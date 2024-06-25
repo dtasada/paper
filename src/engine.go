@@ -1,3 +1,4 @@
+/* package src: base engine functions structs and constants */
 package src
 
 import (
@@ -15,7 +16,7 @@ type Vector3Int struct {
 	X, Y, Z int
 }
 
-// so many dimesnsions is confusing so i made aliases
+// so many dimensions is confusing so i made aliases
 type GridCell = []*Particle
 type Row = []GridCell
 type Plane = []Row
