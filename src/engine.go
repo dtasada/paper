@@ -17,8 +17,8 @@ type Vector3Int struct {
 }
 
 // so many dimensions is confusing so i made aliases
-type GridCell []*Particle
-type Row map[int]GridCell
+type Cell []*Particle
+type Row map[int]Cell
 type Plane map[int]Row
 
 const GRAVITY float32 = 9.81 / 2

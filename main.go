@@ -61,7 +61,7 @@ func main() {
 			container.Grid.Content[zi][yi] = src.Row{}
 			for x := -container.Grid.Columns / 2; x <= container.Grid.Columns/2; x++ {
 				xi := x * int(container.CellSize)
-				container.Grid.Content[zi][yi][xi] = src.GridCell{}
+				container.Grid.Content[zi][yi][xi] = src.Cell{}
 				/* if rand.Intn(100000) == 1 */
 				if len(particles) < 3 {
 					pos := rl.NewVector3(

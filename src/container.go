@@ -2,6 +2,7 @@ package src
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/gen2brain/raylib-go/raylib"
 	"github.com/kr/pretty"
@@ -71,11 +72,7 @@ func NewContainer(pos, size Vector3, cellsToSize float32) Container {
 
 /* Find collision between a particle and any particle in its contiguous cells */
 func (self *Container) FindCollisions(particle *Particle) {
-	cell := Vector3Int{ // find particle's corresponding cell
-		int(f32(FloorTens(particle.Pos.X)) - self.CellSize/2.0),
-		int(f32(FloorTens(particle.Pos.Y)) - self.CellSize/2.0),
-		int(f32(FloorTens(particle.Pos.Z)) - self.CellSize/2.0),
-	}
+	cell := self.GetParticleCell(particle)
 	rl.DrawCubeWires(
 		rl.NewVector3(
 			f32(cell.X),
@@ -97,7 +94,7 @@ func (self *Container) FindCollisions(particle *Particle) {
 				if targetCell.Y = cell.Y + dy; targetCell.Y >= int(self.Bounds.YMin) && targetCell.Y <= int(self.Bounds.YMax) {
 					for dz := -d; dz <= d; dz += d {
 						if targetCell.Z = cell.Z + dz; targetCell.Z >= int(self.Bounds.ZMin) && targetCell.Z <= int(self.Bounds.ZMax) {
-							rl.DrawCubeWires(
+							/* rl.DrawCubeWires(
 								rl.NewVector3(
 									f32(targetCell.X),
 									f32(targetCell.Y),
@@ -107,7 +104,7 @@ func (self *Container) FindCollisions(particle *Particle) {
 								self.CellSize,
 								self.CellSize,
 								rl.Green,
-							)
+							) */
 							self.SolveCollision(particle, targetCell)
 						}
 					}
@@ -120,7 +117,7 @@ func (self *Container) FindCollisions(particle *Particle) {
 /* Solves collision given cells */
 func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
 	cell := self.Grid.Content[cellPos.Z][cellPos.Y][cellPos.X]
-	pretty.Println("cell:", cell)
+	pretty.Print()
 
 	for _, pb := range cell {
 		if pa != pb {
@@ -131,5 +128,23 @@ func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
 				pb.Pos = rl.Vector3AddValue(pb.Pos, compensationDistance*pb.CollisionDamping*pa.CollisionDamping/2.0)
 			}
 		}
+	}
+}
+
+func (self *Container) DelParticleFromCell(particle *Particle) {
+	cell := self.GetParticleCell(particle)
+	for i, p := range self.Grid.Content[cell.Z][cell.Y][cell.X] {
+		if particle == p {
+			self.Grid.Content[cell.Z][cell.Y][cell.X] = slices.Delete(self.Grid.Content[cell.Z][cell.Y][cell.X], i, i+1)
+		}
+	}
+}
+
+/* Returns a particle's corresponding cell */
+func (self *Container) GetParticleCell(particle *Particle) Vector3Int {
+	return Vector3Int{
+		int(f32(FloorTens(particle.Pos.X)) - self.CellSize/2.0),
+		int(f32(FloorTens(particle.Pos.Y)) - self.CellSize/2.0),
+		int(f32(FloorTens(particle.Pos.Z)) - self.CellSize/2.0),
 	}
 }

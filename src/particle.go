@@ -1,7 +1,11 @@
 package src
 
 import (
+	// "fmt"
+	"slices"
+
 	"github.com/gen2brain/raylib-go/raylib"
+	// "github.com/kr/pretty"
 )
 
 type Particle struct {
@@ -33,7 +37,7 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	self.Vel.Z -= GRAVITY * dt
 	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
 
-	/* Bound checking */
+	/* Bounds checking */
 	if bottomBorder := container.Bounds.YMin + self.Radius; self.Pos.Y <= bottomBorder {
 		self.Pos.Y = bottomBorder
 		self.Vel.Y *= -1 * self.CollisionDamping
@@ -56,6 +60,14 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	} else if deepBorder := container.Bounds.ZMax - self.Radius; self.Pos.Z >= deepBorder {
 		self.Pos.Z = deepBorder
 		self.Vel.Z *= -1 * self.CollisionDamping
+	}
+
+	// Keep particle in the right cell
+	// If particle not in cell's range, move particle to the right cell
+	cell := container.GetParticleCell(self)
+	if !slices.Contains(container.Grid.Content[cell.Z][cell.Y][cell.X], self) {
+		container.DelParticleFromCell(self)
+		container.Grid.Content[cell.Z][cell.Y][cell.X] = append(container.Grid.Content[cell.Z][cell.Y][cell.X], self)
 	}
 
 	container.FindCollisions(self)
