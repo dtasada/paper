@@ -32,8 +32,6 @@ func NewParticle(pos, vel Vector3, radius float32, color rl.Color, shader rl.Sha
 func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	dt := rl.GetFrameTime()
 	self.Vel.Y -= GRAVITY * dt
-	// self.Vel.X -= GRAVITY * dt
-	// self.Vel.Z -= GRAVITY * dt
 	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
 
 	/* Bounds checking */

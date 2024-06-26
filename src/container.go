@@ -103,15 +103,16 @@ func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
 			if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
 				axis := rl.Vector3Subtract(pa.Pos, pb.Pos)
 				norm := rl.Vector3Normalize(axis)
-				compensationDistance := pa.Radius + pb.Radius - rl.Vector3Length(axis)
-				norm = Vector3MultiplyValue(norm, compensationDistance/2)
-				pa.Pos = rl.Vector3Add(pa.Pos, norm)
-				pb.Pos = rl.Vector3Subtract(pb.Pos, norm)
+				dist := pa.Radius + pb.Radius - rl.Vector3Length(axis)
+				norm = Vector3MultiplyValue(norm, dist/2)
+				pa.Pos = rl.Vector3Add(pa.Pos, Vector3MultiplyValue(norm, pa.CollisionDamping))
+				pb.Pos = rl.Vector3Subtract(pb.Pos, Vector3MultiplyValue(norm, pb.CollisionDamping))
 			}
 		}
 	}
 }
 
+/* Deletes a given particle from its corresponding cell */
 func (self *Container) DelParticleFromCell(particle *Particle) {
 	cell := self.GetParticleCell(particle)
 	for i, p := range self.Grid.Content[cell.Z][cell.Y][cell.X] {

@@ -72,7 +72,7 @@ func main() {
 					p := src.NewParticle(
 						pos,
 						rl.Vector3Zero(),
-						8,
+						1,
 						rl.SkyBlue,
 						lightShader,
 					)
