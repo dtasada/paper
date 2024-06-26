@@ -10,6 +10,8 @@ import (
 	"github.com/dtasada/paper/src"
 )
 
+var particleCount int = 100
+
 func main() {
 	fmt.Println("Initializing raylib...")
 
@@ -47,7 +49,7 @@ func main() {
 	container := src.NewContainer(
 		rl.NewVector3(0, 0, 0),
 		rl.NewVector3(100, 100, 100),
-		10,
+		1,
 	)
 
 	particles := []*src.Particle{}
@@ -62,8 +64,7 @@ func main() {
 			for x := -container.Grid.Columns / 2; x <= container.Grid.Columns/2; x++ {
 				xi := x * int(container.CellSize)
 				container.Grid.Content[zi][yi][xi] = src.Cell{}
-				/* if rand.Intn(100000) == 1 */
-				if len(particles) < 100 {
+				if len(particles) < particleCount {
 					pos := rl.NewVector3(
 						rand.Float32()*container.Width-container.Width/2,
 						rand.Float32()*container.Height-container.Height/2,
@@ -128,28 +129,12 @@ func main() {
 
 			rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
 
-			/* for z, plane := range container.Grid.Content {
-				for y, row := range plane {
-					for x := range row {
-						rl.DrawCubeWires(
-							rl.NewVector3(
-								float32(x)+container.CellSize/2,
-								float32(y)+container.CellSize/2,
-								float32(z)+container.CellSize/2,
-							),
-							container.CellSize,
-							container.CellSize,
-							container.CellSize,
-							rl.NewColor(uint8(x), uint8(y), uint8(z), 255),
-						)
-					}
-				}
-			} */
-
 			rl.EndMode3D()
 		}
 
-		rl.DrawFPS(12, 12)
+		rl.DrawFPS(12, 12+24*0)
+		rl.DrawText(fmt.Sprint("Camera up", camera.Up), 12, 12+24*1, 22, rl.Green)
+		rl.DrawText(fmt.Sprint("Particle count:", particleCount), 12, 12+24*2, 22, rl.Green)
 
 		rl.EndDrawing()
 	}

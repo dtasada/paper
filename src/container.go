@@ -105,8 +105,16 @@ func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
 				norm := rl.Vector3Normalize(axis)
 				dist := pa.Radius + pb.Radius - rl.Vector3Length(axis)
 				norm = Vector3MultiplyValue(norm, dist/2)
-				pa.Pos = rl.Vector3Add(pa.Pos, Vector3MultiplyValue(norm, pa.CollisionDamping))
-				pb.Pos = rl.Vector3Subtract(pb.Pos, Vector3MultiplyValue(norm, pb.CollisionDamping))
+
+				pa.Pos = rl.Vector3Add(pa.Pos, norm)
+				pb.Pos = rl.Vector3Subtract(pb.Pos, norm)
+
+				pa.Vel = Vector3MultiplyValue(pa.Vel, -1*pa.CollisionDamping)
+				pb.Vel = Vector3MultiplyValue(pb.Vel, -1*pb.CollisionDamping)
+
+				// flipped values?
+				// pa.Vel = Vector3MultiplyValue(pb.Vel, -1*pa.CollisionDamping)
+				// pb.Vel = Vector3MultiplyValue(pa.Vel, -1*pb.CollisionDamping)
 			}
 		}
 	}
