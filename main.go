@@ -63,7 +63,7 @@ func main() {
 				xi := x * int(container.CellSize)
 				container.Grid.Content[zi][yi][xi] = src.Cell{}
 				/* if rand.Intn(100000) == 1 */
-				if len(particles) < 3 {
+				if len(particles) < 100 {
 					pos := rl.NewVector3(
 						rand.Float32()*container.Width-container.Width/2,
 						rand.Float32()*container.Height-container.Height/2,
@@ -72,7 +72,7 @@ func main() {
 					p := src.NewParticle(
 						pos,
 						rl.Vector3Zero(),
-						4,
+						8,
 						rl.SkyBlue,
 						lightShader,
 					)

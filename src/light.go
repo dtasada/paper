@@ -19,8 +19,8 @@ const (
 type Light struct {
 	Shader    rl.Shader
 	LightType LightType
-	Position  rl.Vector3
-	Target    rl.Vector3
+	Position  Vector3
+	Target    Vector3
 	Color     rl.Color
 	Enabled   int32
 	// shader locations
@@ -37,7 +37,7 @@ var lightCount = 0
 
 func NewLight(
 	lightType LightType,
-	position, target rl.Vector3,
+	position, target Vector3,
 	color rl.Color,
 	shader rl.Shader,
 ) Light {

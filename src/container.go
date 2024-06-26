@@ -1,7 +1,6 @@
 package src
 
 import (
-	"fmt"
 	"slices"
 
 	"github.com/gen2brain/raylib-go/raylib"
@@ -73,17 +72,7 @@ func NewContainer(pos, size Vector3, cellsToSize float32) Container {
 /* Find collision between a particle and any particle in its contiguous cells */
 func (self *Container) FindCollisions(particle *Particle) {
 	cell := self.GetParticleCell(particle)
-	rl.DrawCubeWires(
-		rl.NewVector3(
-			f32(cell.X),
-			f32(cell.Y),
-			f32(cell.Z),
-		),
-		self.CellSize,
-		self.CellSize,
-		self.CellSize,
-		rl.Green,
-	)
+	// self.DrawCell(cell, rl.Green)
 
 	// if statements are to prevent checking non-existing would-be "edge-adjacent" cells
 	targetCell := Vector3Int{}
@@ -94,17 +83,7 @@ func (self *Container) FindCollisions(particle *Particle) {
 				if targetCell.Y = cell.Y + dy; targetCell.Y >= int(self.Bounds.YMin) && targetCell.Y <= int(self.Bounds.YMax) {
 					for dz := -d; dz <= d; dz += d {
 						if targetCell.Z = cell.Z + dz; targetCell.Z >= int(self.Bounds.ZMin) && targetCell.Z <= int(self.Bounds.ZMax) {
-							/* rl.DrawCubeWires(
-								rl.NewVector3(
-									f32(targetCell.X),
-									f32(targetCell.Y),
-									f32(targetCell.Z),
-								),
-								self.CellSize,
-								self.CellSize,
-								self.CellSize,
-								rl.Green,
-							) */
+							// self.DrawCell(targetCell, rl.Green)
 							self.SolveCollision(particle, targetCell)
 						}
 					}
@@ -122,10 +101,12 @@ func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
 	for _, pb := range cell {
 		if pa != pb {
 			if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-				fmt.Println("collide!", rl.GetTime())
-				compensationDistance := pa.Radius + pb.Radius - rl.Vector3Distance(pa.Pos, pb.Pos)
-				pa.Pos = rl.Vector3SubtractValue(pa.Pos, compensationDistance*pa.CollisionDamping*pb.CollisionDamping/2.0)
-				pb.Pos = rl.Vector3AddValue(pb.Pos, compensationDistance*pb.CollisionDamping*pa.CollisionDamping/2.0)
+				axis := rl.Vector3Subtract(pa.Pos, pb.Pos)
+				norm := rl.Vector3Normalize(axis)
+				compensationDistance := pa.Radius + pb.Radius - rl.Vector3Length(axis)
+				norm = Vector3MultiplyValue(norm, compensationDistance/2)
+				pa.Pos = rl.Vector3Add(pa.Pos, norm)
+				pb.Pos = rl.Vector3Subtract(pb.Pos, norm)
 			}
 		}
 	}
@@ -147,4 +128,18 @@ func (self *Container) GetParticleCell(particle *Particle) Vector3Int {
 		int(f32(FloorTens(particle.Pos.Y)) - self.CellSize/2.0),
 		int(f32(FloorTens(particle.Pos.Z)) - self.CellSize/2.0),
 	}
+}
+
+func (self *Container) DrawCell(cell Vector3Int, color rl.Color) {
+	rl.DrawCubeWires(
+		rl.NewVector3(
+			f32(cell.X),
+			f32(cell.Y),
+			f32(cell.Z),
+		),
+		self.CellSize,
+		self.CellSize,
+		self.CellSize,
+		color,
+	)
 }

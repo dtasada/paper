@@ -1,7 +1,6 @@
 package src
 
 import (
-	// "fmt"
 	"slices"
 
 	"github.com/gen2brain/raylib-go/raylib"
@@ -9,8 +8,8 @@ import (
 )
 
 type Particle struct {
-	Pos              rl.Vector3
-	Vel              rl.Vector3
+	Pos              Vector3
+	Vel              Vector3
 	Radius           float32
 	CollisionDamping float32
 	Color            rl.Color
@@ -33,8 +32,8 @@ func NewParticle(pos, vel Vector3, radius float32, color rl.Color, shader rl.Sha
 func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	dt := rl.GetFrameTime()
 	self.Vel.Y -= GRAVITY * dt
-	self.Vel.X -= GRAVITY * dt
-	self.Vel.Z -= GRAVITY * dt
+	// self.Vel.X -= GRAVITY * dt
+	// self.Vel.Z -= GRAVITY * dt
 	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
 
 	/* Bounds checking */
@@ -67,7 +66,13 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	cell := container.GetParticleCell(self)
 	if !slices.Contains(container.Grid.Content[cell.Z][cell.Y][cell.X], self) {
 		container.DelParticleFromCell(self)
-		container.Grid.Content[cell.Z][cell.Y][cell.X] = append(container.Grid.Content[cell.Z][cell.Y][cell.X], self)
+		if container.Grid.Content[cell.Z] == nil {
+			container.Grid.Content[cell.Z] = Plane{}
+		}
+		if container.Grid.Content[cell.Z][cell.Y] == nil {
+			container.Grid.Content[cell.Z][cell.Y] = Row{}
+		}
+		container.Grid.Content[cell.Z][cell.Y][cell.X] = append(container.Grid.Content[cell.Z][cell.Y][cell.X], self) // add to bounds.Grid index
 	}
 
 	container.FindCollisions(self)

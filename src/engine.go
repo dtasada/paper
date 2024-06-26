@@ -17,11 +17,11 @@ type Vector3Int struct {
 }
 
 // so many dimensions is confusing so i made aliases
-type Cell []*Particle
-type Row map[int]Cell
-type Plane map[int]Row
+type Cell = []*Particle
+type Row = map[int]Cell
+type Plane = map[int]Row
 
-const GRAVITY float32 = 9.81 / 2
+const GRAVITY float32 = 9.81
 
 /* Returns the inverted color */
 func InvertColor(c rl.Color) rl.Color {
@@ -59,6 +59,10 @@ func Vector3ToInt(vec Vector3) Vector3Int {
 		int(vec.Y),
 		int(vec.Z),
 	}
+}
+
+func Vector3DivideValue(vec Vector3, div float32) Vector3 {
+	return rl.NewVector3(vec.X/div, vec.Y/div, vec.Z/div)
 }
 
 func Vector3MultiplyValue(vec Vector3, mult float32) Vector3 {
