@@ -121,8 +121,7 @@ func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
 }
 
 /* Deletes a given particle from its corresponding cell */
-func (self *Container) DelParticleFromCell(particle *Particle) {
-	cell := self.GetParticleCell(particle)
+func (self *Container) DelParticleFromCell(particle *Particle, cell Vector3Int) {
 	for i, p := range self.Grid.Content[cell.Z][cell.Y][cell.X] {
 		if particle == p {
 			self.Grid.Content[cell.Z][cell.Y][cell.X] = slices.Delete(self.Grid.Content[cell.Z][cell.Y][cell.X], i, i+1)
@@ -133,19 +132,15 @@ func (self *Container) DelParticleFromCell(particle *Particle) {
 /* Returns a particle's corresponding cell */
 func (self *Container) GetParticleCell(particle *Particle) Vector3Int {
 	return Vector3Int{
-		int(f32(FloorTens(particle.Pos.X)) - self.CellSize/2.0),
-		int(f32(FloorTens(particle.Pos.Y)) - self.CellSize/2.0),
-		int(f32(FloorTens(particle.Pos.Z)) - self.CellSize/2.0),
+		int(f32(particle.Pos.X) - self.CellSize/2.0),
+		int(f32(particle.Pos.Y) - self.CellSize/2.0),
+		int(f32(particle.Pos.Z) - self.CellSize/2.0),
 	}
 }
 
 func (self *Container) DrawCell(cell Vector3Int, color rl.Color) {
 	rl.DrawCubeWires(
-		rl.NewVector3(
-			f32(cell.X),
-			f32(cell.Y),
-			f32(cell.Z),
-		),
+		Vector3IntToVector3(cell),
 		self.CellSize,
 		self.CellSize,
 		self.CellSize,

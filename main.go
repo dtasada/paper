@@ -5,7 +5,6 @@ import (
 	"math/rand"
 
 	"github.com/gen2brain/raylib-go/raylib"
-	"github.com/kr/pretty"
 
 	"github.com/dtasada/paper/src"
 )
@@ -19,7 +18,7 @@ func main() {
 	rl.InitWindow(1280, 720, "paper")
 	rl.SetExitKey(0)
 	rl.DisableCursor()
-	rl.SetTargetFPS(60)
+	rl.SetTargetFPS(src.TARGET_FPS)
 
 	/* Raylib flags */
 	rl.SetTraceLogLevel(rl.LogWarning)
@@ -49,7 +48,7 @@ func main() {
 	container := src.NewContainer(
 		rl.NewVector3(0, 0, 0),
 		rl.NewVector3(100, 100, 100),
-		1,
+		4,
 	)
 
 	particles := []*src.Particle{}
@@ -65,16 +64,15 @@ func main() {
 				xi := x * int(container.CellSize)
 				container.Grid.Content[zi][yi][xi] = src.Cell{}
 				if len(particles) < particleCount {
-					pos := rl.NewVector3(
-						rand.Float32()*container.Width-container.Width/2,
-						rand.Float32()*container.Height-container.Height/2,
-						rand.Float32()*container.Length-container.Length/2,
-					)
 					p := src.NewParticle(
-						pos,
+						rl.NewVector3(
+							rand.Float32()*container.Width-container.Width/2,
+							rand.Float32()*container.Height-container.Height/2,
+							rand.Float32()*container.Length-container.Length/2,
+						),
 						rl.Vector3Zero(),
-						1,
-						rl.SkyBlue,
+						container.CellSize,
+						src.RandomColor(),
 						lightShader,
 					)
 
@@ -84,8 +82,6 @@ func main() {
 			}
 		}
 	}
-	pretty.Println()
-	// pretty.Println(container.Grid.Content)
 
 	/* Main loop */
 	for !rl.WindowShouldClose() {

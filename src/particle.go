@@ -1,10 +1,7 @@
 package src
 
 import (
-	"slices"
-
 	"github.com/gen2brain/raylib-go/raylib"
-	// "github.com/kr/pretty"
 )
 
 type Particle struct {
@@ -23,17 +20,19 @@ func NewParticle(pos, vel Vector3, radius float32, color rl.Color, shader rl.Sha
 		Pos:              pos,
 		Vel:              vel,
 		Radius:           radius,
-		CollisionDamping: 0.8,
+		CollisionDamping: 0.1,
 		Color:            color,
 		Model:            model,
 	}
 }
 
 func (self *Particle) Update(container *Container, particles *[]*Particle) {
-	dt := rl.GetFrameTime()
-	self.Vel.Y -= GRAVITY * dt
-	self.Vel.X -= GRAVITY * dt
-	self.Vel.Z -= GRAVITY * dt
+	currentCell := container.GetParticleCell(self)
+	// container.DrawCell(currentCell, rl.White)
+
+	self.Vel.Y -= GRAVITY
+	self.Vel.X -= GRAVITY
+	self.Vel.Z -= GRAVITY
 	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
 
 	/* Bounds checking */
@@ -61,23 +60,26 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 		self.Vel.Z *= -1 * self.CollisionDamping
 	}
 
-	// Keep particle in the right cell
-	// If particle not in cell's range
-	// move particle to the right cell
-	cell := container.GetParticleCell(self)
-	if !slices.Contains(container.Grid.Content[cell.Z][cell.Y][cell.X], self) {
-		container.DelParticleFromCell(self)
-		if container.Grid.Content[cell.Z] == nil {
-			container.Grid.Content[cell.Z] = Plane{}
-		}
-		if container.Grid.Content[cell.Z][cell.Y] == nil {
-			container.Grid.Content[cell.Z][cell.Y] = Row{}
-		}
-		container.Grid.Content[cell.Z][cell.Y][cell.X] = append(container.Grid.Content[cell.Z][cell.Y][cell.X], self) // add to bounds.Grid index
-	}
-
+	self.CorrectCell(container, currentCell)
 	container.FindCollisions(self)
 
 	rl.DrawModel(self.Model, self.Pos, 1, self.Color)
 	// rl.DrawModelWires(self.Model, self.Pos, 1, InvertColor(self.Color))
+}
+
+func (self *Particle) CorrectCell(container *Container, currentCell Vector3Int) {
+	newCell := container.GetParticleCell(self) // get current cell
+	if currentCell != newCell {                // if cell doesn't contain particle anymore
+		container.DelParticleFromCell(self, currentCell) // delete self from old cell
+
+		// container cell might be empty? so making sure cell exists
+		if container.Grid.Content[newCell.Z] == nil {
+			container.Grid.Content[newCell.Z] = Plane{}
+		}
+		if container.Grid.Content[newCell.Z][newCell.Y] == nil {
+			container.Grid.Content[newCell.Z][newCell.Y] = Row{}
+		}
+
+		container.Grid.Content[newCell.Z][newCell.Y][newCell.X] = append(container.Grid.Content[newCell.Z][newCell.Y][newCell.X], self) // add self to bounds.Grid index
+	}
 }

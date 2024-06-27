@@ -21,7 +21,8 @@ type Cell = []*Particle
 type Row = map[int]Cell
 type Plane = map[int]Row
 
-const GRAVITY float32 = 9.81
+const GRAVITY float32 = 9.81 / 400
+const TARGET_FPS int32 = 60
 
 /* Returns the inverted color */
 func InvertColor(c rl.Color) rl.Color {
@@ -49,6 +50,14 @@ func NewVector3FromInt(x, y, z int) Vector3 {
 		float32(x),
 		float32(y),
 		float32(z),
+	)
+}
+
+func Vector3IntToVector3(vec Vector3Int) Vector3 {
+	return rl.NewVector3(
+		float32(vec.X),
+		float32(vec.Y),
+		float32(vec.Z),
 	)
 }
 
