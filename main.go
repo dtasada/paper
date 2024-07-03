@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	"strconv"
 
-	"github.com/gen2brain/raylib-go/raylib"
+	rg "github.com/gen2brain/raylib-go/raygui"
+	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/dtasada/paper/src"
 )
@@ -13,6 +14,9 @@ var particleCount int = 100
 
 func main() {
 	fmt.Println("Initializing raylib...")
+
+	/* Init raygui */
+	rg.SetStyle(rg.DEFAULT, rg.TEXT_SIZE, 20)
 
 	/* Init raylib */
 	rl.InitWindow(1280, 720, "paper")
@@ -53,40 +57,15 @@ func main() {
 
 	particles := []*src.Particle{}
 
-	/* Generate particles */
-	for z := -container.Grid.Planes / 2; z <= container.Grid.Planes/2; z++ {
-		zi := z * int(container.CellSize)
-		container.Grid.Content[zi] = src.Plane{}
-		for y := -container.Grid.Rows / 2; y <= container.Grid.Rows/2; y++ {
-			yi := y * int(container.CellSize)
-			container.Grid.Content[zi][yi] = src.Row{}
-			for x := -container.Grid.Columns / 2; x <= container.Grid.Columns/2; x++ {
-				xi := x * int(container.CellSize)
-				container.Grid.Content[zi][yi][xi] = src.Cell{}
-				if len(particles) < particleCount {
-					p := src.NewParticle(
-						rl.NewVector3(
-							rand.Float32()*container.Width-container.Width/2,
-							rand.Float32()*container.Height-container.Height/2,
-							rand.Float32()*container.Length-container.Length/2,
-						),
-						rl.Vector3Zero(),
-						container.CellSize,
-						src.RandomColor(),
-						lightShader,
-					)
-
-					particles = append(particles, &p)                                                   // add to particle arraylist
-					container.Grid.Content[zi][yi][xi] = append(container.Grid.Content[zi][yi][xi], &p) // add to bounds.Grid index
-				}
-			}
-		}
-	}
-
 	/* Main loop */
 	for !rl.WindowShouldClose() {
 		{ /* Pre-render logic here */
-			rl.UpdateCamera(&camera, rl.CameraFree)
+			if rl.IsCursorHidden() {
+				rl.UpdateCamera(&camera, rl.CameraFree)
+			} else if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+				rl.DisableCursor()
+			}
+
 			rl.SetShaderValue(
 				lightShader,
 				*lightShader.Locs,
@@ -129,14 +108,39 @@ func main() {
 		}
 
 		rl.DrawFPS(12, 12+24*0)
-		rl.DrawText(fmt.Sprint("Camera up", camera.Up), 12, 12+24*1, 22, rl.Green)
-		rl.DrawText(fmt.Sprint("Particle count:", particleCount), 12, 12+24*2, 22, rl.Green)
+
+		for _, particle := range particles {
+			particle.Radius = rg.Slider(
+				src.RectTopLeft(30, 80, 240, 20),
+				" Particle radius",
+				strconv.FormatFloat(float64(particle.Radius), 'f', 2, 64),
+				particle.Radius,
+				0,
+				container.CellSize, // particle can only be as big as one cell
+			)
+
+			particleCount = src.Floor(
+				rg.Slider(
+					src.RectTopLeft(30, 110, 240, 20),
+					"Particle count",
+					strconv.Itoa(particleCount),
+					float32(particleCount),
+					0,
+					200,
+				),
+			)
+		}
+
+		if len(particles) > particleCount {
+			particles = particles[1:]
+		} else if len(particles) < particleCount {
+			src.CreateParticle(&container, &particles, lightShader)
+		}
 
 		rl.EndDrawing()
 	}
 
-	/* Cleanup */
-	{
+	{ /* Cleanup */
 		rl.UnloadShader(lightShader)
 		for _, particle := range particles {
 			rl.UnloadModel(particle.Model)

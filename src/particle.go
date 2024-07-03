@@ -1,6 +1,8 @@
 package src
 
 import (
+	"math/rand"
+
 	"github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -13,17 +15,38 @@ type Particle struct {
 	Model            rl.Model
 }
 
-func NewParticle(pos, vel Vector3, radius float32, color rl.Color, shader rl.Shader) Particle {
+func NewParticle(pos, vel Vector3, radius, collisionDamping float32, color rl.Color, shader rl.Shader) Particle {
 	model := rl.LoadModelFromMesh(rl.GenMeshSphere(radius, 32, 32))
 	model.Materials.Shader = shader
 	return Particle{
 		Pos:              pos,
 		Vel:              vel,
 		Radius:           radius,
-		CollisionDamping: 0.1,
+		CollisionDamping: collisionDamping,
 		Color:            color,
 		Model:            model,
 	}
+}
+
+func CreateParticle(container *Container, particles *[]*Particle, lightShader rl.Shader) {
+	p := NewParticle(
+		rl.NewVector3(
+			rand.Float32()*container.Width-container.Width/2,
+			rand.Float32()*container.Height-container.Height/2,
+			rand.Float32()*container.Length-container.Length/2,
+		),
+		rl.Vector3Zero(),
+		container.CellSize,
+		0.0,
+		RandomColor(),
+		lightShader,
+	)
+
+	(*particles) = append(*particles, &p) // add to particle arraylist
+	z := RoundToCellSize(float32(rand.Intn(container.Grid.Planes)-container.Grid.Planes/2), container.CellSize)
+	y := RoundToCellSize(float32(rand.Intn(container.Grid.Columns)-container.Grid.Columns/2), container.CellSize)
+	x := RoundToCellSize(float32(rand.Intn(container.Grid.Rows)-container.Grid.Rows/2), container.CellSize)
+	container.Grid.Content[z][y][x] = append(container.Grid.Content[z][y][x], &p) // add to bounds.Grid index
 }
 
 func (self *Particle) Update(container *Container, particles *[]*Particle) {

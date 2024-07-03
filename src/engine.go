@@ -87,6 +87,16 @@ func Vector3to2(vec rl.Vector3) rl.Vector2 {
 	return rl.NewVector2(vec.X, vec.Y)
 }
 
+/* Returns a rectangle width top-left at x and y */
+func RectTopLeft(x, y, width, height float32) rl.Rectangle {
+	return rl.NewRectangle(
+		x+width/2,
+		y+height/2,
+		width,
+		height,
+	)
+}
+
 /* Returns sign of value. -1 if negative, 0 if 0, and 1 if positive */
 func GetSign(val float32) float32 {
 	if val > 0 {
@@ -98,18 +108,23 @@ func GetSign(val float32) float32 {
 	}
 }
 
+/* math.Floor but without all the Go float bs */
+func Floor(val float32) int {
+	return int(math.Floor(float64(val)))
+}
+
 /* Floors value, but rounds negative numbers up */
 func FloorToZero(val float32) int {
 	if val > 0 {
-		return int(math.Floor(float64(val)))
+		return Floor(-val)
 	} else if val < 0 {
-		return -int(math.Floor(float64(-val)))
+		return -Floor(-val)
 	} else {
 		return 0
 	}
 }
 
-/* Rounds value to tens */
-func FloorTens(val float32) int {
-	return int(FloorToZero(val/10)) * 10
+/* Rounds value the nearest cell */
+func RoundToCellSize(val float32, cellSize float32) int {
+	return int(FloorToZero(val/cellSize)) * Floor(cellSize)
 }

@@ -35,21 +35,43 @@ type Container struct {
 	Grid   Grid
 }
 
-func NewContainer(pos, size Vector3, cellsToSize float32) Container {
+func NewContainer(pos, size Vector3, cellSize float32) Container {
 	width := size.X
 	height := size.Y
 	length := size.Z
 
-	columns := int(width / cellsToSize)
-	rows := int(height / cellsToSize)
-	planes := int(length / cellsToSize)
+	columns := int(width / cellSize)
+	rows := int(height / cellSize)
+	planes := int(length / cellSize)
+
+	grid := Grid{
+		columns,
+		rows,
+		planes,
+		map[int]Plane{},
+	}
+
+	count := 0
+	for z := -grid.Planes / 2; z <= grid.Planes/2; z++ {
+		zi := z * int(cellSize)
+		grid.Content[zi] = Plane{}
+		count += 1
+		for y := -grid.Rows / 2; y <= grid.Rows/2; y++ {
+			yi := y * int(cellSize)
+			grid.Content[zi][yi] = Row{}
+			for x := -grid.Columns / 2; x <= grid.Columns/2; x++ {
+				xi := x * int(cellSize)
+				grid.Content[zi][yi][xi] = Cell{}
+			}
+		}
+	}
 
 	return Container{
 		Pos:      pos,
 		Width:    width,
 		Height:   height,
 		Length:   length,
-		CellSize: cellsToSize,
+		CellSize: cellSize,
 
 		Bounds: Bounds{
 			YMin: pos.Y - height/2,
@@ -60,12 +82,7 @@ func NewContainer(pos, size Vector3, cellsToSize float32) Container {
 			ZMax: pos.Z + length/2,
 		},
 
-		Grid: Grid{
-			columns,
-			rows,
-			planes,
-			map[int]Plane{},
-		},
+		Grid: grid,
 	}
 }
 
