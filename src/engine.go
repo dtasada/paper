@@ -21,8 +21,11 @@ type Cell = []*Particle
 type Row = map[int]Cell
 type Plane = map[int]Row
 
-const GRAVITY float32 = 9.81 / 400
-const TARGET_FPS int32 = 60
+var Gravity float32 = 1 // gravity in G (9.81 m/s^2)
+var TargetFPS int32 = 60
+var Sensitivity float32 = 0.0035
+
+var Caskaydia rl.Font
 
 /* Returns the inverted color */
 func InvertColor(c rl.Color) rl.Color {
@@ -95,6 +98,10 @@ func RectTopLeft(x, y, width, height float32) rl.Rectangle {
 		width,
 		height,
 	)
+}
+
+func DrawText(text string, x, y float32, fontSize float32, tint rl.Color) {
+	rl.DrawTextEx(Caskaydia, text, rl.NewVector2(x, y), fontSize, 1, tint)
 }
 
 /* Returns sign of value. -1 if negative, 0 if 0, and 1 if positive */

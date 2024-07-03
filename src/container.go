@@ -16,12 +16,19 @@ type Grid struct {
 }
 
 type Bounds struct {
-	YMin float32
-	YMax float32
 	XMin float32
 	XMax float32
+	YMin float32
+	YMax float32
 	ZMin float32
 	ZMax float32
+
+	XMinModel rl.Model
+	XMaxModel rl.Model
+	YMinModel rl.Model
+	YMaxModel rl.Model
+	ZMinModel rl.Model
+	ZMaxModel rl.Model
 }
 
 type Container struct {
@@ -35,7 +42,7 @@ type Container struct {
 	Grid   Grid
 }
 
-func NewContainer(pos, size Vector3, cellSize float32) Container {
+func NewContainer(pos, size Vector3, cellSize float32, shader rl.Shader) Container {
 	width := size.X
 	height := size.Y
 	length := size.Z
@@ -66,6 +73,29 @@ func NewContainer(pos, size Vector3, cellSize float32) Container {
 		}
 	}
 
+	bounds := Bounds{
+		YMin: pos.Y - height/2,
+		YMax: pos.Y + height/2,
+		XMin: pos.X - width/2,
+		XMax: pos.X + width/2,
+		ZMin: pos.Z - length/2,
+		ZMax: pos.Z + length/2,
+
+		XMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(0.1, height, length)),
+		XMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(0.1, height, length)),
+		YMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, 0.1, length)),
+		YMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, 0.1, length)),
+		ZMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, height, 0.1)),
+		ZMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, height, 0.1)),
+	}
+
+	bounds.XMinModel.Materials.Shader = shader
+	bounds.XMaxModel.Materials.Shader = shader
+	bounds.YMinModel.Materials.Shader = shader
+	bounds.YMaxModel.Materials.Shader = shader
+	bounds.ZMinModel.Materials.Shader = shader
+	bounds.ZMaxModel.Materials.Shader = shader
+
 	return Container{
 		Pos:      pos,
 		Width:    width,
@@ -73,14 +103,7 @@ func NewContainer(pos, size Vector3, cellSize float32) Container {
 		Length:   length,
 		CellSize: cellSize,
 
-		Bounds: Bounds{
-			YMin: pos.Y - height/2,
-			YMax: pos.Y + height/2,
-			XMin: pos.X - width/2,
-			XMax: pos.X + width/2,
-			ZMin: pos.Z - length/2,
-			ZMax: pos.Z + length/2,
-		},
+		Bounds: bounds,
 
 		Grid: grid,
 	}
@@ -163,4 +186,14 @@ func (self *Container) DrawCell(cell Vector3Int, color rl.Color) {
 		self.CellSize,
 		color,
 	)
+}
+
+func (self *Container) DrawBounds() {
+	// rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
+	rl.DrawModel(self.Bounds.XMinModel, rl.NewVector3(self.Bounds.XMin, 0, 0), 1, rl.Blue)
+	rl.DrawModel(self.Bounds.XMaxModel, rl.NewVector3(self.Bounds.XMax, 0, 0), 1, rl.Blue)
+	rl.DrawModel(self.Bounds.YMinModel, rl.NewVector3(0, self.Bounds.YMin, 0), 1, rl.Blue)
+	rl.DrawModel(self.Bounds.YMaxModel, rl.NewVector3(0, self.Bounds.YMax, 0), 1, rl.Blue)
+	rl.DrawModel(self.Bounds.ZMinModel, rl.NewVector3(0, 0, self.Bounds.ZMin), 1, rl.Blue)
+	rl.DrawModel(self.Bounds.ZMaxModel, rl.NewVector3(0, 0, self.Bounds.ZMax), 1, rl.Blue)
 }

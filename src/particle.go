@@ -53,9 +53,10 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	currentCell := container.GetParticleCell(self)
 	// container.DrawCell(currentCell, rl.White)
 
-	self.Vel.Y -= GRAVITY
-	self.Vel.X -= GRAVITY
-	self.Vel.Z -= GRAVITY
+	dt := rl.GetFrameTime()
+	self.Vel.Y -= Gravity * dt
+	self.Vel.X -= Gravity * dt
+	self.Vel.Z -= Gravity * dt
 	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
 
 	/* Bounds checking */
