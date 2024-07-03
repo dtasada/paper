@@ -15,9 +15,6 @@ var particleCount int = 100
 func main() {
 	fmt.Println("Initializing raylib...")
 
-	/* Init raygui */
-	rg.SetStyle(rg.DEFAULT, rg.TEXT_SIZE, 20)
-
 	/* Init raylib */
 	rl.InitWindow(1280, 720, "paper")
 	rl.SetExitKey(0)
@@ -62,8 +59,6 @@ func main() {
 		{ /* Pre-render logic here */
 			if rl.IsCursorHidden() {
 				rl.UpdateCamera(&camera, rl.CameraFree)
-			} else if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-				rl.DisableCursor()
 			}
 
 			rl.SetShaderValue(
@@ -109,9 +104,10 @@ func main() {
 
 		rl.DrawFPS(12, 12+24*0)
 
+		rg.SetStyle(rg.DEFAULT, rg.TEXT_SIZE, 20)
 		for _, particle := range particles {
 			particle.Radius = rg.Slider(
-				src.RectTopLeft(30, 80, 240, 20),
+				src.RectTopLeft(30, 40, 240, 20),
 				" Particle radius",
 				strconv.FormatFloat(float64(particle.Radius), 'f', 2, 64),
 				particle.Radius,
@@ -121,7 +117,7 @@ func main() {
 
 			particleCount = src.Floor(
 				rg.Slider(
-					src.RectTopLeft(30, 110, 240, 20),
+					src.RectTopLeft(30, 70, 240, 20),
 					"Particle count",
 					strconv.Itoa(particleCount),
 					float32(particleCount),
