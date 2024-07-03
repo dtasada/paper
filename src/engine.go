@@ -3,6 +3,7 @@ package src
 
 import (
 	"math"
+	"math/rand"
 
 	"github.com/gen2brain/raylib-go/raylib"
 )
@@ -83,6 +84,14 @@ func Vector3MultiplyValue(vec Vector3, mult float32) Vector3 {
 
 func Vector3IntMultiplyValue(vec Vector3Int, mult int) Vector3Int {
 	return Vector3Int{vec.X * mult, vec.Y * mult, vec.Z * mult}
+}
+
+func Vector3Random(amplitude float32) Vector3 {
+	return rl.NewVector3(
+		rand.Float32()*amplitude*(float32(rand.Intn(3)-1)),
+		rand.Float32()*amplitude*(float32(rand.Intn(3)-1)),
+		rand.Float32()*amplitude*(float32(rand.Intn(3)-1)),
+	)
 }
 
 /* Converts 3D vector to 2D vector by disregarding Z value  */

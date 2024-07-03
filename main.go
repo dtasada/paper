@@ -70,11 +70,6 @@ func main() {
 	shaderValue := []float32{0.1, 0.1, 0.1, 1.0}
 	rl.SetShaderValue(lightShader, ambientLoc, shaderValue, rl.ShaderUniformVec4)
 
-	lights := []src.Light{
-		src.NewLight(src.LightTypePoint, rl.NewVector3(0, 0, 0), rl.NewVector3(0, -25, 0), rl.Yellow, 0.1, lightShader),
-		src.NewLight(src.LightTypePoint, rl.NewVector3(-25, -25, 0), rl.NewVector3(0, -25, 0), rl.Yellow, 0.6, lightShader),
-	}
-
 	/* Logic setup (camera, container and particle arraylist) */
 	camera := rl.Camera3D{
 		Position:   rl.NewVector3(0, 0, 0),
@@ -91,6 +86,8 @@ func main() {
 		lightShader,
 	)
 
+	light := src.NewLight(src.LightTypePoint, camera.Position, camera.Target, rl.Yellow, 0.5, lightShader)
+
 	particles := []*src.Particle{}
 
 	/* Main loop */
@@ -98,6 +95,8 @@ func main() {
 		{ /* Pre-render logic here */
 			if rl.IsCursorHidden() {
 				handleMovement(&camera)
+				light.Position = camera.Target
+				light.Target = camera.Target
 			}
 
 			rl.SetShaderValue(
@@ -125,11 +124,13 @@ func main() {
 
 				for _, particle := range particles {
 					particle.Update(&container, &particles)
+
+					if rl.IsMouseButtonPressed(rl.MouseButtonRight) {
+						particle.Vel = src.Vector3Random(5)
+					}
 				}
 
-				for _, light := range lights {
-					light.Update()
-				}
+				light.Update()
 
 				container.DrawBounds()
 
@@ -181,8 +182,16 @@ func main() {
 						10,
 						480,
 					))
-					rl.DrawRectangle(312, 100, 3, 3, rl.Red)
 					rl.SetTargetFPS(src.TargetFPS)
+
+					light.Intensity = rg.Slider(
+						rl.NewRectangle(12+11*15, 60+24*4, 240, 20),
+						"Light intensity",
+						fmt.Sprintf("%.2f", light.Intensity),
+						light.Intensity,
+						0.0,
+						2.0,
+					)
 				}
 			} /* 2D Rendering */
 

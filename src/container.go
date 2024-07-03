@@ -190,10 +190,11 @@ func (self *Container) DrawCell(cell Vector3Int, color rl.Color) {
 
 func (self *Container) DrawBounds() {
 	// rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
-	rl.DrawModel(self.Bounds.XMinModel, rl.NewVector3(self.Bounds.XMin, 0, 0), 1, rl.Blue)
-	rl.DrawModel(self.Bounds.XMaxModel, rl.NewVector3(self.Bounds.XMax, 0, 0), 1, rl.Blue)
-	rl.DrawModel(self.Bounds.YMinModel, rl.NewVector3(0, self.Bounds.YMin, 0), 1, rl.Blue)
-	rl.DrawModel(self.Bounds.YMaxModel, rl.NewVector3(0, self.Bounds.YMax, 0), 1, rl.Blue)
-	rl.DrawModel(self.Bounds.ZMinModel, rl.NewVector3(0, 0, self.Bounds.ZMin), 1, rl.Blue)
-	rl.DrawModel(self.Bounds.ZMaxModel, rl.NewVector3(0, 0, self.Bounds.ZMax), 1, rl.Blue)
+	color := rl.Blue
+	rl.DrawModel(self.Bounds.XMinModel, rl.NewVector3(self.Bounds.XMin, 0, 0), 1, color)
+	rl.DrawModel(self.Bounds.XMaxModel, rl.NewVector3(self.Bounds.XMax, 0, 0), 1, color)
+	rl.DrawModel(self.Bounds.YMinModel, rl.NewVector3(0, self.Bounds.YMin, 0), 1, color)
+	rl.DrawModel(self.Bounds.YMaxModel, rl.NewVector3(0, self.Bounds.YMax, 0), 1, color)
+	rl.DrawModel(self.Bounds.ZMinModel, rl.NewVector3(0, 0, self.Bounds.ZMin), 1, color)
+	rl.DrawModel(self.Bounds.ZMaxModel, rl.NewVector3(0, 0, self.Bounds.ZMax), 1, color)
 }
