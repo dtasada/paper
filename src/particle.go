@@ -34,10 +34,10 @@ func CreateParticle(container *Container, particles *[]*Particle, lightShader rl
 			rand.Float32()*container.Width-container.Width/2,
 			rand.Float32()*container.Height-container.Height/2,
 			rand.Float32()*container.Length-container.Length/2,
-		),
+		), // random position in grid
 		rl.Vector3Zero(),
-		container.CellSize,
-		0.0,
+		container.CellSize/2,
+		0.1,
 		RandomColor(),
 		lightShader,
 	)
@@ -50,51 +50,61 @@ func CreateParticle(container *Container, particles *[]*Particle, lightShader rl
 }
 
 func (self *Particle) Update(container *Container, particles *[]*Particle) {
-	currentCell := container.GetParticleCell(self)
-	// container.DrawCell(currentCell, rl.White)
+	oldCell := container.GetParticleCell(self)
 
 	dt := rl.GetFrameTime()
 	self.Vel.Y -= Gravity * dt
 	self.Vel.X -= Gravity * dt
 	self.Vel.Z -= Gravity * dt
-	self.Pos = rl.Vector3Add(self.Pos, self.Vel)
+
+	targetPos := rl.Vector3Add(self.Pos, Vector3MultiplyValue(self.Vel, dt))
+	self.Pos = targetPos
+	// TODO: CHECK FOR OBSTACLES BETWEEN FRAMES
 
 	/* Bounds checking */
 	if bottomBorder := container.Bounds.YMin + self.Radius; self.Pos.Y <= bottomBorder {
 		self.Pos.Y = bottomBorder
-		self.Vel.Y *= -1 * self.CollisionDamping
+		self.Vel.Y *= -1 * self.CollisionDamping * dt
 	} else if topBorder := container.Bounds.YMax - self.Radius; self.Pos.Y >= topBorder {
 		self.Pos.Y = topBorder
-		self.Vel.Y *= -1 * self.CollisionDamping
+		self.Vel.Y *= -1 * self.CollisionDamping * dt
 	}
 
 	if leftBorder := container.Bounds.XMin + self.Radius; self.Pos.X <= leftBorder {
 		self.Pos.X = leftBorder
-		self.Vel.X *= -1 * self.CollisionDamping
+		self.Vel.X *= -1 * self.CollisionDamping * dt
 	} else if rightBorder := container.Bounds.XMax - self.Radius; self.Pos.X >= rightBorder {
 		self.Pos.X = rightBorder
-		self.Vel.X *= -1 * self.CollisionDamping
+		self.Vel.X *= -1 * self.CollisionDamping * dt
 	}
 
 	if shallowBorder := container.Bounds.ZMin + self.Radius; self.Pos.Z <= shallowBorder {
 		self.Pos.Z = shallowBorder
-		self.Vel.Z *= -1 * self.CollisionDamping
+		self.Vel.Z *= -1 * self.CollisionDamping * dt
 	} else if deepBorder := container.Bounds.ZMax - self.Radius; self.Pos.Z >= deepBorder {
 		self.Pos.Z = deepBorder
-		self.Vel.Z *= -1 * self.CollisionDamping
+		self.Vel.Z *= -1 * self.CollisionDamping * dt
 	}
 
-	self.CorrectCell(container, currentCell)
-	container.FindCollisions(self)
+	self.CorrectCell(container, oldCell)
+
+	/* Find collision between a particle and any particle in its contiguous cells */
+	container.ForAdjacentCells(self, container.SolveCollision)
+
+	if ShowParticleCells {
+		container.DrawCell(container.GetParticleCell(self), rl.White)
+	}
 
 	rl.DrawModel(self.Model, self.Pos, 1, self.Color)
 	// rl.DrawModelWires(self.Model, self.Pos, 1, InvertColor(self.Color))
 }
 
-func (self *Particle) CorrectCell(container *Container, currentCell Vector3Int) {
+/* Move particle to its new correct cell */
+func (self *Particle) CorrectCell(container *Container, oldCell Vector3Int) {
 	newCell := container.GetParticleCell(self) // get current cell
-	if currentCell != newCell {                // if cell doesn't contain particle anymore
-		container.DelParticleFromCell(self, currentCell) // delete self from old cell
+
+	if oldCell != newCell { // if cell doesn't contain particle anymore
+		container.DelParticleFromCell(self, oldCell) // delete self from old cell
 
 		// container cell might be empty? so making sure cell exists
 		if container.Grid.Content[newCell.Z] == nil {

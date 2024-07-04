@@ -18,11 +18,13 @@ func handleMovement(camera *rl.Camera3D) {
 	rl.CameraYaw(camera, -mouseDelta.X*src.Sensitivity, 0)
 	rl.CameraPitch(camera, -mouseDelta.Y*src.Sensitivity, 0, 0, 0)
 
+	dt := rl.GetFrameTime()
+
 	var movementSpeed float32
 	if rl.IsKeyDown(rl.KeyLeftShift) {
-		movementSpeed = 0.8
+		movementSpeed = 50 * dt
 	} else {
-		movementSpeed = 0.4
+		movementSpeed = 25 * dt
 	}
 
 	if rl.IsKeyDown(rl.KeyW) {
@@ -82,7 +84,7 @@ func main() {
 	container := src.NewContainer(
 		rl.NewVector3(0, 0, 0),
 		rl.NewVector3(100, 100, 100),
-		4,
+		5,
 		lightShader,
 	)
 
@@ -126,7 +128,7 @@ func main() {
 					particle.Update(&container, &particles)
 
 					if rl.IsMouseButtonPressed(rl.MouseButtonRight) {
-						particle.Vel = src.Vector3Random(5)
+						particle.Vel = src.Vector3Random(10)
 					}
 				}
 
@@ -144,57 +146,65 @@ func main() {
 				rg.SetStyle(rg.DEFAULT, rg.TEXT_SIZE, 20)
 				rg.SetStyle(rg.DEFAULT, rg.TEXT_COLOR_NORMAL, int64(rl.ColorToInt(rl.White)))
 
-				for _, particle := range particles {
-					particle.Radius = rg.Slider(
-						rl.NewRectangle(12+11*15, 60+24*0, 240, 20),
-						"Particle radius",
-						strconv.FormatFloat(float64(particle.Radius), 'f', 2, 64),
-						particle.Radius,
-						0,
-						container.CellSize, // particle can only be as big as one cell
-					)
+				particleCount = src.Floor(
+					rg.Slider(
+						rl.NewRectangle(12+11*15, 60+24*1, 240, 20),
+						"Particle count ",
+						strconv.Itoa(particleCount),
+						float32(particleCount),
+						1,
+						200,
+					),
+				)
 
-					particleCount = src.Floor(
-						rg.Slider(
-							rl.NewRectangle(12+11*15, 60+24*1, 240, 20),
-							"Particle count ",
-							strconv.Itoa(particleCount),
-							float32(particleCount),
-							1,
-							200,
-						),
-					)
+				src.Gravity = rg.Slider(
+					rl.NewRectangle(12+11*15, 60+24*2, 240, 20),
+					"Gravity        ",
+					fmt.Sprintf("%.2f m/s^2", src.Gravity),
+					src.Gravity,
+					0,
+					100,
+				)
 
-					src.Gravity = rg.Slider(
-						rl.NewRectangle(12+11*15, 60+24*2, 240, 20),
-						"Gravity        ",
-						fmt.Sprintf("%.2f g", src.Gravity),
-						src.Gravity,
-						0,
-						10,
-					)
+				src.TargetFPS = int32(rg.Slider(
+					rl.NewRectangle(12+11*15, 60+24*3, 240, 20),
+					"Target FPS     ",
+					strconv.Itoa(int(src.TargetFPS)),
+					float32(src.TargetFPS),
+					10,
+					480,
+				))
+				rl.SetTargetFPS(src.TargetFPS)
 
-					src.TargetFPS = int32(rg.Slider(
-						rl.NewRectangle(12+11*15, 60+24*3, 240, 20),
-						"Target FPS     ",
-						strconv.Itoa(int(src.TargetFPS)),
-						float32(src.TargetFPS),
-						10,
-						480,
-					))
-					rl.SetTargetFPS(src.TargetFPS)
+				light.Intensity = rg.Slider(
+					rl.NewRectangle(12+11*15, 60+24*4, 240, 20),
+					"Light intensity",
+					fmt.Sprintf("%.2f", light.Intensity),
+					light.Intensity,
+					0.0,
+					2.0,
+				)
 
-					light.Intensity = rg.Slider(
-						rl.NewRectangle(12+11*15, 60+24*4, 240, 20),
-						"Light intensity",
-						fmt.Sprintf("%.2f", light.Intensity),
-						light.Intensity,
-						0.0,
-						2.0,
-					)
-				}
+				src.ShowCollisionGrid = rg.CheckBox(
+					rl.NewRectangle(8, 60+24*5, 20, 20),
+					"Collision grid ",
+					src.ShowCollisionGrid,
+				)
+
+				src.ShowCollisionLines = rg.CheckBox(
+					rl.NewRectangle(8, 60+24*6, 20, 20),
+					"Collision lines",
+					src.ShowCollisionLines,
+				)
+
+				src.ShowParticleCells = rg.CheckBox(
+					rl.NewRectangle(8, 60+24*7, 20, 20),
+					"Particle cells ",
+					src.ShowParticleCells,
+				)
 			} /* 2D Rendering */
 
+			/* Generate or remove particles */
 			if len(particles) > particleCount {
 				particles = particles[1:]
 			} else if len(particles) < particleCount {

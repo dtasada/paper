@@ -4,7 +4,6 @@ import (
 	"slices"
 
 	"github.com/gen2brain/raylib-go/raylib"
-	"github.com/kr/pretty"
 )
 
 type Grid struct {
@@ -109,22 +108,29 @@ func NewContainer(pos, size Vector3, cellSize float32, shader rl.Shader) Contain
 	}
 }
 
-/* Find collision between a particle and any particle in its contiguous cells */
-func (self *Container) FindCollisions(particle *Particle) {
-	cell := self.GetParticleCell(particle)
-	// self.DrawCell(cell, rl.Green)
-
-	// if statements are to prevent checking non-existing would-be "edge-adjacent" cells
+/* f is a function to run over every adjacent cell to a given particle */
+func (self *Container) ForAdjacentCells(pa *Particle, f func(*Particle, *Particle)) {
+	cell := self.GetParticleCell(pa)
 	targetCell := Vector3Int{}
 	d := int(self.CellSize)
+
+	// if statements are to prevent checking non-existing would-be "edge-adjacent" cells
 	for dx := -d; dx <= d; dx += d {
 		if targetCell.X = cell.X + dx; targetCell.X >= int(self.Bounds.XMin) && targetCell.X <= int(self.Bounds.XMax) {
 			for dy := -d; dy <= d; dy += d {
 				if targetCell.Y = cell.Y + dy; targetCell.Y >= int(self.Bounds.YMin) && targetCell.Y <= int(self.Bounds.YMax) {
 					for dz := -d; dz <= d; dz += d {
 						if targetCell.Z = cell.Z + dz; targetCell.Z >= int(self.Bounds.ZMin) && targetCell.Z <= int(self.Bounds.ZMax) {
-							// self.DrawCell(targetCell, rl.Green)
-							self.SolveCollision(particle, targetCell)
+							if ShowCollisionGrid {
+								self.DrawCell(targetCell, rl.Green)
+							}
+
+							/* Iterate over cell */
+							for _, pb := range self.Grid.Content[targetCell.Z][targetCell.Y][targetCell.X] {
+								if pa != pb {
+									f(pa, pb)
+								}
+							}
 						}
 					}
 				}
@@ -134,29 +140,24 @@ func (self *Container) FindCollisions(particle *Particle) {
 }
 
 /* Solves collision given cells */
-func (self *Container) SolveCollision(pa *Particle, cellPos Vector3Int) {
-	cell := self.Grid.Content[cellPos.Z][cellPos.Y][cellPos.X]
-	pretty.Print()
+func (self *Container) SolveCollision(pa *Particle, pb *Particle) {
+	if ShowCollisionLines {
+		rl.DrawLine3D(pa.Pos, pb.Pos, rl.Red)
+	}
 
-	for _, pb := range cell {
-		if pa != pb {
-			if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-				axis := rl.Vector3Subtract(pa.Pos, pb.Pos)
-				norm := rl.Vector3Normalize(axis)
-				dist := pa.Radius + pb.Radius - rl.Vector3Length(axis)
-				norm = Vector3MultiplyValue(norm, dist/2)
+	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
+		axis := rl.Vector3Subtract(pa.Pos, pb.Pos)
+		norm := rl.Vector3Normalize(axis)
+		dist := pa.Radius + pb.Radius - rl.Vector3Length(axis)
+		norm = Vector3MultiplyValue(norm, dist/2)
 
-				pa.Pos = rl.Vector3Add(pa.Pos, norm)
-				pb.Pos = rl.Vector3Subtract(pb.Pos, norm)
+		dt := rl.GetFrameTime()
 
-				pa.Vel = Vector3MultiplyValue(pa.Vel, -1*pa.CollisionDamping)
-				pb.Vel = Vector3MultiplyValue(pb.Vel, -1*pb.CollisionDamping)
+		pa.Pos = rl.Vector3Add(pa.Pos, Vector3MultiplyValue(norm, dt))
+		pb.Pos = rl.Vector3Subtract(pb.Pos, Vector3MultiplyValue(norm, dt))
 
-				// flipped values?
-				// pa.Vel = Vector3MultiplyValue(pb.Vel, -1*pa.CollisionDamping)
-				// pb.Vel = Vector3MultiplyValue(pa.Vel, -1*pb.CollisionDamping)
-			}
-		}
+		pa.Vel = Vector3MultiplyValue(pa.Vel, -1*pa.CollisionDamping*dt)
+		pb.Vel = Vector3MultiplyValue(pb.Vel, -1*pb.CollisionDamping*dt)
 	}
 }
 
@@ -172,9 +173,9 @@ func (self *Container) DelParticleFromCell(particle *Particle, cell Vector3Int) 
 /* Returns a particle's corresponding cell */
 func (self *Container) GetParticleCell(particle *Particle) Vector3Int {
 	return Vector3Int{
-		int(f32(particle.Pos.X) - self.CellSize/2.0),
-		int(f32(particle.Pos.Y) - self.CellSize/2.0),
-		int(f32(particle.Pos.Z) - self.CellSize/2.0),
+		RoundToCellSize(particle.Pos.X, self.CellSize),
+		RoundToCellSize(particle.Pos.Y, self.CellSize),
+		RoundToCellSize(particle.Pos.Z, self.CellSize),
 	}
 }
 

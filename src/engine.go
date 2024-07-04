@@ -22,9 +22,13 @@ type Cell = []*Particle
 type Row = map[int]Cell
 type Plane = map[int]Row
 
-var Gravity float32 = 1 // gravity in G (9.81 m/s^2)
+var Gravity float32 = 9.81 // gravity in m/s^2
 var TargetFPS int32 = 60
 var Sensitivity float32 = 0.0035
+
+var ShowCollisionGrid bool = false
+var ShowCollisionLines bool = false
+var ShowParticleCells bool = false
 
 var Caskaydia rl.Font
 
@@ -88,9 +92,9 @@ func Vector3IntMultiplyValue(vec Vector3Int, mult int) Vector3Int {
 
 func Vector3Random(amplitude float32) Vector3 {
 	return rl.NewVector3(
-		rand.Float32()*amplitude*(float32(rand.Intn(3)-1)),
-		rand.Float32()*amplitude*(float32(rand.Intn(3)-1)),
-		rand.Float32()*amplitude*(float32(rand.Intn(3)-1)),
+		float32(rand.Intn(int(2*amplitude)))-amplitude,
+		float32(rand.Intn(int(2*amplitude)))-amplitude,
+		float32(rand.Intn(int(2*amplitude)))-amplitude,
 	)
 }
 
@@ -132,7 +136,7 @@ func Floor(val float32) int {
 /* Floors value, but rounds negative numbers up */
 func FloorToZero(val float32) int {
 	if val > 0 {
-		return Floor(-val)
+		return Floor(val)
 	} else if val < 0 {
 		return -Floor(-val)
 	} else {
@@ -142,5 +146,10 @@ func FloorToZero(val float32) int {
 
 /* Rounds value the nearest cell */
 func RoundToCellSize(val float32, cellSize float32) int {
-	return int(FloorToZero(val/cellSize)) * Floor(cellSize)
+	r := float32(math.Mod(float64(val), float64(cellSize)))
+	if r+r >= cellSize {
+		return FloorToZero(val + cellSize - r)
+	} else {
+		return FloorToZero(val - r)
+	}
 }
