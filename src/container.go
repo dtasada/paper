@@ -109,7 +109,7 @@ func NewContainer(pos, size Vector3, cellSize float32, shader rl.Shader) Contain
 }
 
 /* f is a function to run over every adjacent cell to a given particle */
-func (self *Container) ForAdjacentCells(pa *Particle, f func(*Particle, *Particle)) {
+func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Particle)) {
 	cell := self.GetParticleCell(pa)
 	targetCell := Vector3Int{}
 	d := int(self.CellSize)
@@ -151,13 +151,11 @@ func (self *Container) SolveCollision(pa *Particle, pb *Particle) {
 		dist := pa.Radius + pb.Radius - rl.Vector3Length(axis)
 		norm = Vector3MultiplyValue(norm, dist/2)
 
-		dt := rl.GetFrameTime()
+		pa.Pos = rl.Vector3Add(pa.Pos, norm)
+		pb.Pos = rl.Vector3Subtract(pb.Pos, norm)
 
-		pa.Pos = rl.Vector3Add(pa.Pos, Vector3MultiplyValue(norm, dt))
-		pb.Pos = rl.Vector3Subtract(pb.Pos, Vector3MultiplyValue(norm, dt))
-
-		pa.Vel = Vector3MultiplyValue(pa.Vel, -1*pa.CollisionDamping*dt)
-		pb.Vel = Vector3MultiplyValue(pb.Vel, -1*pb.CollisionDamping*dt)
+		pa.Vel = Vector3MultiplyValue(pa.Vel, -1*pa.CollisionDamping)
+		pb.Vel = Vector3MultiplyValue(pb.Vel, -1*pb.CollisionDamping)
 	}
 }
 

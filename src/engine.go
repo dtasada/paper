@@ -22,13 +22,16 @@ type Cell = []*Particle
 type Row = map[int]Cell
 type Plane = map[int]Row
 
-var Gravity float32 = 9.81 // gravity in m/s^2
+var GravityMultiplier float32 = 250
+var Gravity float32 = 1 / GravityMultiplier // gravity in m/s^2
 var TargetFPS int32 = 60
 var Sensitivity float32 = 0.0035
+var MovementSpeed float32 = 1.0
 
 var ShowCollisionGrid bool = false
 var ShowCollisionLines bool = false
 var ShowParticleCells bool = false
+var ShowCellModels bool = true
 
 var Caskaydia rl.Font
 
