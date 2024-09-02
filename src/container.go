@@ -146,16 +146,21 @@ func (self *Container) SolveCollision(pa *Particle, pb *Particle) {
 	}
 
 	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-		axis := rl.Vector3Subtract(pa.Pos, pb.Pos)
-		norm := rl.Vector3Normalize(axis)
-		dist := pa.Radius + pb.Radius - rl.Vector3Length(axis)
-		norm = Vector3MultiplyValue(norm, dist/2)
+		// Formula from (hakenberg.de)[http://www.hakenberg.de/diffgeo/collision_resolution.htm]
+		normal := rl.Vector3Normalize(rl.Vector3Subtract(pb.Pos, pa.Pos))
+		rv := rl.Vector3DotProduct(rl.Vector3Subtract(pb.Vel, pa.Vel), normal)
+		var impulseScalar float32
+		if rv > 0 {
+			impulseScalar = 0
+		} else {
+			restitution := (pa.CollisionDamping + pb.CollisionDamping) / 2
+			invMassSum := (1 / pa.Mass) + (1 / pb.Mass)
+			impulseScalar = -(1 + restitution) * rv / invMassSum
+		}
+		impulse := Vector3MultiplyValue(normal, impulseScalar)
 
-		pa.Pos = rl.Vector3Add(pa.Pos, norm)
-		pb.Pos = rl.Vector3Subtract(pb.Pos, norm)
-
-		pa.Vel = Vector3MultiplyValue(pa.Vel, -1*pa.CollisionDamping)
-		pb.Vel = Vector3MultiplyValue(pb.Vel, -1*pb.CollisionDamping)
+		pa.Vel = rl.Vector3Subtract(pa.Vel, Vector3DivideValue(impulse, pa.Mass))
+		pb.Vel = rl.Vector3Add(pb.Vel, Vector3DivideValue(impulse, pb.Mass))
 	}
 }
 

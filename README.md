@@ -6,3 +6,7 @@
 
 ## Todo
 * Make grid checking multithreaded
+
+## Documentation:
+(Wikipedia)[https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional]
+(hakenberg.de)[http://www.hakenberg.de/diffgeo/collision_resolution.htm]

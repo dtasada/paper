@@ -10,18 +10,20 @@ type Particle struct {
 	Pos              Vector3
 	Vel              Vector3
 	Radius           float32
+	Mass             float32
 	CollisionDamping float32
 	Color            rl.Color
 	Model            rl.Model
 }
 
-func NewParticle(pos, vel Vector3, radius, collisionDamping float32, color rl.Color, shader rl.Shader) Particle {
+func NewParticle(pos, vel Vector3, radius, mass, collisionDamping float32, color rl.Color, shader rl.Shader) Particle {
 	model := rl.LoadModelFromMesh(rl.GenMeshSphere(radius, 32, 32))
 	model.Materials.Shader = shader
 	return Particle{
 		Pos:              pos,
 		Vel:              vel,
 		Radius:           radius,
+		Mass:             mass,
 		CollisionDamping: collisionDamping,
 		Color:            color,
 		Model:            model,
@@ -37,6 +39,7 @@ func CreateParticle(container *Container, particles *[]*Particle, lightShader rl
 		), // random position in grid
 		rl.Vector3Zero(),
 		container.CellSize/2,
+		(container.CellSize/2)*(container.CellSize/2),
 		0.0,
 		RandomColor(),
 		lightShader,
@@ -53,8 +56,6 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	oldCell := container.GetParticleCell(self)
 
 	self.Vel.Y -= Gravity
-	self.Vel.X -= Gravity
-	self.Vel.Z -= Gravity
 
 	targetPos := rl.Vector3Add(self.Pos, self.Vel)
 	self.Pos = targetPos
