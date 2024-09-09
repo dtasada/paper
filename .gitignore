@@ -1,5 +1,6 @@
 /target
 
-Article*
-!Article.pdf
-!Article.tex
+Article/*
+!Article/Article.tex
+!Article/references.bib
+!Article/Article.pdf

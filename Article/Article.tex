@@ -1,0 +1,136 @@
+\documentclass[a4paper,12pt]{report}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bibentry}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyphenat}
+\usepackage{indentfirst}
+\usepackage{titlesec}
+\usepackage{url}
+\usepackage[normalem]{ulem}
+\usepackage[backend=biber, style=apa]{biblatex}
+\usepackage[
+colorlinks=true,
+linkcolor=blue,
+urlcolor=cyan,
+citecolor=blue,
+]{hyperref} % For hyperlinks
+
+\addbibresource{references.bib}
+\geometry{margin=1in}
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing{\chapter}{0pt}{0pt}{0pt}
+
+% Title and Author
+\title{Computational Fluid Dynamics With a Paper Airplane}
+\author{
+  Tasada, Daniel\\
+  \and
+  Tse, Nathan\\
+}
+\date{\today}
+
+\begin{document}
+
+% Title and abstract
+\maketitle
+\begin{abstract}
+	In this paper, we investigate the relationship between an airplane's shape and its performance.
+	Our results show that \dots
+\end{abstract}
+
+% Table of Contents
+\tableofcontents
+
+% Introduction
+\chapter{Introduction}
+This thesis covers the simulation of the aerodynamics of an airplane, using
+our own Computation Fluid Dynamics (or CFD) model.
+
+The goal is to calculate the ideal shape of an airplane for its aerodynamic performance.
+We aim to do this by creating a Machine Learning model, and feed it the results of the CFD,
+which should result in our final model.
+
+The thesis questions are the following:
+\begin{itemize}
+	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
+	\item{How do we dynamically generate 3D models?}
+	\item{How does an airplane's wing shape influence its performance?}
+\end{itemize}
+
+% Methodology
+\chapter{Execution}
+\section{Methodology}
+To achieve our goal, we've had first had to learn about particle dynamics.
+It took a while to get an understanding, but here's what we found:
+
+\subsection{The Math}
+\subsubsection{Particle collision}
+Part one of the fluid dynamics simulation is particle collision.
+Fluid dynamics, in essence is particle physics, where every air molecule is a "particle".
+We start with a container, and a bunch of air molecules, all of which interact with
+each other to create a fluid. This interaction is effectively the collisions between particles.
+It turns out that simulating  particle dynamics in two dimensions is pretty straightforward.
+But when you throw in that Z-axis, it gets a lot harder.
+The main article I used for this is \hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution} (\cite{hakenberg}).
+
+Here is a set of formulas necessary to perform the calculations that describe
+the behavior of a pair particle before and after their collision:
+
+The following variables are necessary to perform the calculations:
+\[
+\begin{array}{ll}
+    \text{Inertia tensor $I$ } (kg\cdot m^2): & L = \frac{L}{\omega}; \\
+    \text{Angular momentum $L$ } (kg\cdot m^2/s): & L = mvr; \\
+    \text{Angular velocity $\omega$ } (rad/s): & \omega = \frac{\Delta \theta}{\Delta t}; \\
+
+	\\
+
+	\text{Normal of contact } (n \in \mathbb{R}^3) \text{ in world coordinates away from body 1}; \\
+	\text{Point of contact } (r_i \in \mathbb{R}^3) \text{ in world coordinates with respect to $p_i$}; \\
+\end{array}
+\]
+
+Where $i$ represents one of two particles in a given collision:
+\[
+\begin{array}{ll}
+	\text{Velocity after collision} & \tilde{v}_i, \\ 
+	\text{Angular velocity after collision} & \tilde{\omega}_i, \\
+	\text{Constant} & \lambda, \\
+\end{array}
+\]
+
+The following formulas represent the relation between particles:
+\[
+\begin{array}{cc}
+	\tilde{v}_1 = v_1 - \frac{\lambda}{m_1} n; \\ 
+	\tilde{v}_2 = v_2 + \frac{\lambda}{m_2} n; \\
+	\tilde{\omega}_1 = \omega_1 - \Delta q_1; \\
+	\tilde{\omega}_2 = \omega_2 + \Delta q_2; \\
+
+	\text{where } q_i := I_i^{-1} \cdot R_i^{-1} \cdot (r_i\times n), \\
+	\text{and } \lambda = 2 \frac{n v_1 - n v_2 + \omega_1 I_1 q_1 - \omega_2 I_2 q_2}
+	{(\frac{1}{m_1} + \frac{1}{m_2})n^2 + q_1 I_1 q_1 + q_2 I_2} \\
+\end{array}
+\]
+
+\subsection{The Code}
+TODO: Explain container system, maybe show code samples
+
+% Results
+\chapter{Results}
+Present your experimental or theoretical results in this section. Use tables and figures to illustrate important points.
+
+% Conclusion
+\section{Conclusion}
+Summarize the main findings of the paper. Mention potential future work or research directions.
+
+% References
+\nocite{*}
+\printbibliography
+
+\end{document}

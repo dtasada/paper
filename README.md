@@ -36,4 +36,4 @@
     - Unit:                 rad/s
 
 ## Post-collision formulas:
-    - 
+    - m1v1
