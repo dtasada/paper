@@ -146,21 +146,6 @@ func (self *Container) SolveCollision(pa *Particle, pb *Particle) {
 	}
 
 	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-		// Formula from (hakenberg.de)[http://www.hakenberg.de/diffgeo/collision_resolution.htm]
-		normal := rl.Vector3Normalize(rl.Vector3Subtract(pb.Pos, pa.Pos))
-		rv := rl.Vector3DotProduct(rl.Vector3Subtract(pb.Vel, pa.Vel), normal)
-		var impulseScalar float32
-		if rv > 0 {
-			impulseScalar = 0
-		} else {
-			restitution := (pa.CollisionDamping + pb.CollisionDamping) / 2
-			invMassSum := (1 / pa.Mass) + (1 / pb.Mass)
-			impulseScalar = -(1 + restitution) * rv / invMassSum
-		}
-		impulse := Vector3MultiplyValue(normal, impulseScalar)
-
-		pa.Vel = rl.Vector3Subtract(pa.Vel, Vector3DivideValue(impulse, pa.Mass))
-		pb.Vel = rl.Vector3Add(pb.Vel, Vector3DivideValue(impulse, pb.Mass))
 	}
 }
 
