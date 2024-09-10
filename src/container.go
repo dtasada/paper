@@ -146,6 +146,8 @@ func (self *Container) SolveCollision(pa *Particle, pb *Particle) {
 	}
 
 	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
+		λ := calcLambda(pa, pb)
+		pa.Vel = rl.Vector3SubtractValue(pa.Vel)
 	}
 }
 

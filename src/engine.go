@@ -3,7 +3,6 @@ package src
 
 import (
 	"math"
-	"math/rand"
 
 	"github.com/gen2brain/raylib-go/raylib"
 )
@@ -15,6 +14,12 @@ type Vector2 = rl.Vector2
 type Vector3 = rl.Vector3
 type Vector3Int struct {
 	X, Y, Z int
+}
+
+type Matrix3x3 struct {
+	m11, m12, m13 float32
+	m21, m22, m23 float32
+	m31, m32, m33 float32
 }
 
 // so many dimensions is confusing so i made aliases
@@ -53,57 +58,6 @@ func RandomColor() rl.Color {
 		uint8(rl.GetRandomValue(0, 255)),
 		uint8(rl.GetRandomValue(0, 255)),
 	)
-}
-
-/* Returns a Vector3 from integers (used to save on type assertions) */
-func NewVector3FromInt(x, y, z int) Vector3 {
-	return rl.NewVector3(
-		float32(x),
-		float32(y),
-		float32(z),
-	)
-}
-
-func Vector3IntToVector3(vec Vector3Int) Vector3 {
-	return rl.NewVector3(
-		float32(vec.X),
-		float32(vec.Y),
-		float32(vec.Z),
-	)
-}
-
-/* Returns a Vector3Int from a Vector3 */
-func Vector3ToInt(vec Vector3) Vector3Int {
-	return Vector3Int{
-		int(vec.X),
-		int(vec.Y),
-		int(vec.Z),
-	}
-}
-
-func Vector3DivideValue(vec Vector3, div float32) Vector3 {
-	return rl.NewVector3(vec.X/div, vec.Y/div, vec.Z/div)
-}
-
-func Vector3MultiplyValue(vec Vector3, mult float32) Vector3 {
-	return rl.NewVector3(vec.X*mult, vec.Y*mult, vec.Z*mult)
-}
-
-func Vector3IntMultiplyValue(vec Vector3Int, mult int) Vector3Int {
-	return Vector3Int{vec.X * mult, vec.Y * mult, vec.Z * mult}
-}
-
-func Vector3Random(amplitude float32) Vector3 {
-	return rl.NewVector3(
-		float32(rand.Intn(int(2*amplitude)))-amplitude,
-		float32(rand.Intn(int(2*amplitude)))-amplitude,
-		float32(rand.Intn(int(2*amplitude)))-amplitude,
-	)
-}
-
-/* Converts 3D vector to 2D vector by disregarding Z value  */
-func Vector3to2(vec rl.Vector3) rl.Vector2 {
-	return rl.NewVector2(vec.X, vec.Y)
 }
 
 /* Returns a rectangle width top-left at x and y */

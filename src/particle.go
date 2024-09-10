@@ -9,6 +9,9 @@ import (
 type Particle struct {
 	Pos              Vector3
 	Vel              Vector3
+	AngVel           Vector3
+	Orientation      Matrix3x3
+	Inertia          Matrix3x3
 	Radius           float32
 	Mass             float32
 	CollisionDamping float32
