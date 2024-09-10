@@ -3,6 +3,7 @@ package src
 import (
 	"slices"
 
+	m "github.com/dtasada/paper/src/math"
 	"github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -31,7 +32,7 @@ type Bounds struct {
 }
 
 type Container struct {
-	Pos      Vector3
+	Pos      m.V3
 	Width    float32
 	Height   float32
 	Length   float32
@@ -41,7 +42,7 @@ type Container struct {
 	Grid   Grid
 }
 
-func NewContainer(pos, size Vector3, cellSize float32, shader rl.Shader) Container {
+func NewContainer(pos, size m.V3, cellSize float32, shader rl.Shader) Container {
 	width := size.X
 	height := size.Y
 	length := size.Z
@@ -111,7 +112,7 @@ func NewContainer(pos, size Vector3, cellSize float32, shader rl.Shader) Contain
 /* f is a function to run over every adjacent cell to a given particle */
 func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Particle)) {
 	cell := self.GetParticleCell(pa)
-	targetCell := Vector3Int{}
+	targetCell := m.V3Int{}
 	d := int(self.CellSize)
 
 	// if statements are to prevent checking non-existing would-be "edge-adjacent" cells
@@ -139,6 +140,36 @@ func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Par
 	}
 }
 
+func calcLambda(pa, pb *Particle) (m.V3, m.V3) {
+	// Getting requirements
+	d := rl.Vector3Distance(pa.Pos, pb.Pos)
+	between := rl.Vector3Subtract(pb.Pos, pa.Pos)
+	collisionNormal := rl.Vector3Normalize(between)
+	pointOfContactA := m.V3MultVal(between, pa.Radius/d)  // test point of contact
+	pointOfContactB := m.V3MultVal(between, -pb.Radius/d) // the minus sign is to flip the whole vector so it's pointing the other way
+
+	pa.Q = m.V3MultMatrix(
+		rl.Vector3CrossProduct(pointOfContactA, collisionNormal),
+		m.MatrixMult(m.MatrixInvert(pa.Inertia), m.MatrixInvert(pa.Orientation)),
+	)
+	pb.Q = m.V3MultMatrix(
+		rl.Vector3CrossProduct(pointOfContactB, collisionNormal),
+		m.MatrixMult(m.MatrixInvert(pb.Inertia), m.MatrixInvert(pb.Orientation)),
+	)
+
+	// Actual equations
+	nv1_nv2 := m.V3Mult(collisionNormal, rl.Vector3Subtract(pa.Vel, pb.Vel))
+	wiqA := m.V3MultMatrix(m.V3Mult(pa.AngVel, pa.Q), pa.Inertia)
+	wiqB := m.V3MultMatrix(m.V3Mult(pb.AngVel, pb.Q), pb.Inertia)
+	qiqA := m.V3Mult(pa.Q, pa.AngVel, pa.Q) // Check the Q*I*Q
+	qiB := m.V3Mult(pb.Q, pb.AngVel)
+	denumerator := m.V3Add(nv1_nv2, wiqA, m.V3MultVal(wiqB, -1))
+	denominator := m.V3Add(m.V3MultVal(m.V3Mult(collisionNormal, collisionNormal), (1/pa.Mass+1/pb.Mass)), qiqA, qiB)
+	λ := m.V3MultVal(rl.Vector3Divide(denumerator, denominator), 2)
+
+	return λ, collisionNormal
+}
+
 /* Solves collision given cells */
 func (self *Container) SolveCollision(pa *Particle, pb *Particle) {
 	if ShowCollisionLines {
@@ -146,13 +177,18 @@ func (self *Container) SolveCollision(pa *Particle, pb *Particle) {
 	}
 
 	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-		λ := calcLambda(pa, pb)
-		pa.Vel = rl.Vector3SubtractValue(pa.Vel)
+		paQBefore := pa.Q
+		pbQBefore := pb.Q
+		λ, n := calcLambda(pa, pb)
+		pa.Vel = m.V3Sub(pa.Vel, m.V3Mult(m.V3DivVal(λ, pa.Mass), n))
+		pb.Vel = m.V3Add(pb.Vel, m.V3Mult(m.V3DivVal(λ, pb.Mass), n))
+		pa.AngVel = m.V3Sub(pa.AngVel, m.V3Sub(paQBefore, pa.Q))
+		pb.AngVel = m.V3Add(pb.AngVel, m.V3Sub(pbQBefore, pb.Q))
 	}
 }
 
 /* Deletes a given particle from its corresponding cell */
-func (self *Container) DelParticleFromCell(particle *Particle, cell Vector3Int) {
+func (self *Container) DelParticleFromCell(particle *Particle, cell m.V3Int) {
 	for i, p := range self.Grid.Content[cell.Z][cell.Y][cell.X] {
 		if particle == p {
 			self.Grid.Content[cell.Z][cell.Y][cell.X] = slices.Delete(self.Grid.Content[cell.Z][cell.Y][cell.X], i, i+1)
@@ -161,17 +197,17 @@ func (self *Container) DelParticleFromCell(particle *Particle, cell Vector3Int) 
 }
 
 /* Returns a particle's corresponding cell */
-func (self *Container) GetParticleCell(particle *Particle) Vector3Int {
-	return Vector3Int{
+func (self *Container) GetParticleCell(particle *Particle) m.V3Int {
+	return m.V3Int{
 		RoundToCellSize(particle.Pos.X, self.CellSize),
 		RoundToCellSize(particle.Pos.Y, self.CellSize),
 		RoundToCellSize(particle.Pos.Z, self.CellSize),
 	}
 }
 
-func (self *Container) DrawCell(cell Vector3Int, color rl.Color) {
+func (self *Container) DrawCell(cell m.V3Int, color rl.Color) {
 	rl.DrawCubeWires(
-		Vector3IntToVector3(cell),
+		m.V3IntToV3(cell),
 		self.CellSize,
 		self.CellSize,
 		self.CellSize,

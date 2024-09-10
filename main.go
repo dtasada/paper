@@ -8,6 +8,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/dtasada/paper/src"
+	m "github.com/dtasada/paper/src/math"
 )
 
 var particleCount int = 100
@@ -135,7 +136,7 @@ func main() {
 					particle.Update(&container, &particles)
 
 					if rl.IsMouseButtonPressed(rl.MouseButtonRight) {
-						particle.Vel = src.Vector3Random(10)
+						particle.Vel = m.V3Random(10)
 					}
 				}
 
@@ -150,14 +151,14 @@ func main() {
 				src.DrawText(fmt.Sprint(rl.GetFPS(), " FPS"), 12, 12+24*0, 20, rl.White)
 				src.DrawText(fmt.Sprintf("X: %.2f; Y: %.2f; Z: %.2f", camera.Position.X, camera.Position.Y, camera.Position.Z), 12, 12+24*1, 20, rl.White)
 
-				particleCount = src.Floor(
+				particleCount = m.Floor(
 					rg.Slider(
 						rl.NewRectangle(12+11*15, 60+24*1, 240, 20),
 						"Particle count ",
 						strconv.Itoa(particleCount),
 						float32(particleCount),
 						1,
-						200,
+						1000,
 					),
 				)
 

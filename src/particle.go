@@ -3,15 +3,17 @@ package src
 import (
 	"math/rand"
 
+	m "github.com/dtasada/paper/src/math"
 	"github.com/gen2brain/raylib-go/raylib"
 )
 
 type Particle struct {
-	Pos              Vector3
-	Vel              Vector3
-	AngVel           Vector3
-	Orientation      Matrix3x3
-	Inertia          Matrix3x3
+	Pos              m.V3
+	Vel              m.V3
+	AngVel           m.V3
+	Q                m.V3 // idek lmao
+	Orientation      m.Matrix
+	Inertia          m.Matrix
 	Radius           float32
 	Mass             float32
 	CollisionDamping float32
@@ -19,12 +21,18 @@ type Particle struct {
 	Model            rl.Model
 }
 
-func NewParticle(pos, vel Vector3, radius, mass, collisionDamping float32, color rl.Color, shader rl.Shader) Particle {
+func NewParticle(
+	pos, vel m.V3,
+	radius, mass, collisionDamping float32,
+	color rl.Color,
+	shader rl.Shader,
+) Particle {
 	model := rl.LoadModelFromMesh(rl.GenMeshSphere(radius, 32, 32))
 	model.Materials.Shader = shader
 	return Particle{
 		Pos:              pos,
 		Vel:              vel,
+		AngVel:           rl.Vector3Zero(),
 		Radius:           radius,
 		Mass:             mass,
 		CollisionDamping: collisionDamping,
@@ -36,13 +44,13 @@ func NewParticle(pos, vel Vector3, radius, mass, collisionDamping float32, color
 func CreateParticle(container *Container, particles *[]*Particle, lightShader rl.Shader) {
 	p := NewParticle(
 		rl.NewVector3(
-			rand.Float32()*container.Width-container.Width/2,
-			rand.Float32()*container.Height-container.Height/2,
-			rand.Float32()*container.Length-container.Length/2,
+			container.Width*(rand.Float32()-0.5),
+			container.Height*(rand.Float32()-0.5),
+			container.Length*(rand.Float32()-0.5),
 		), // random position in grid
 		rl.Vector3Zero(),
 		container.CellSize/2,
-		(container.CellSize/2)*(container.CellSize/2),
+		m.Pow(container.CellSize/2, 2),
 		0.0,
 		RandomColor(),
 		lightShader,
@@ -58,10 +66,28 @@ func CreateParticle(container *Container, particles *[]*Particle, lightShader rl
 func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	oldCell := container.GetParticleCell(self)
 
-	self.Vel.Y -= Gravity
+	{ /* Update particle properties*/
+		self.Vel.Y -= Gravity
+		self.Pos = m.V3Add(self.Pos, self.Vel)
 
-	targetPos := rl.Vector3Add(self.Pos, self.Vel)
-	self.Pos = targetPos
+		theta := rl.Vector3Length(self.AngVel)
+		axis := rl.Vector3Normalize(self.AngVel)
+		K := m.NewMatrix(
+			0, -axis.Z, axis.Y,
+			axis.Z, 0, -axis.X,
+			-axis.Y, axis.X, 0,
+		)
+
+		identity := m.NewMatrix(
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1,
+		)
+
+		R := m.MatrixAdd(identity, m.MatrixMultVal(K, m.Sin(theta)), m.MatrixMultVal(m.MatrixMult(K, K), 1-m.Cos(theta)))
+
+		self.Orientation = m.MatrixMult(self.Orientation, R)
+	}
 
 	/* Bounds checking */
 	if bottomBorder := container.Bounds.YMin + self.Radius; self.Pos.Y <= bottomBorder {
@@ -101,14 +127,12 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 		rl.DrawModel(self.Model, self.Pos, 1, self.Color)
 	} else {
 		rl.DrawSphere(self.Pos, self.Radius*0.05, self.Color)
-		rl.DrawLine3D(self.Pos, rl.Vector3Add(self.Pos, self.Vel), self.Color)
+		rl.DrawLine3D(self.Pos, m.V3Add(self.Pos, self.Vel), self.Color)
 	}
-
-	// rl.DrawModelWires(self.Model, self.Pos, 1, InvertColor(self.Color))
 }
 
 /* Move particle to its new correct cell */
-func (self *Particle) CorrectCell(container *Container, oldCell Vector3Int) {
+func (self *Particle) CorrectCell(container *Container, oldCell m.V3Int) {
 	newCell := container.GetParticleCell(self) // get current cell
 
 	if oldCell != newCell { // if cell doesn't contain particle anymore

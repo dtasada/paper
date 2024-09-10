@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"unsafe"
 
+	m "github.com/dtasada/paper/src/math"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -19,8 +20,8 @@ const (
 type Light struct {
 	Shader    rl.Shader
 	LightType LightType
-	Position  Vector3
-	Target    Vector3
+	Position  m.V3
+	Target    m.V3
 	Color     rl.Color
 	Intensity float32
 	Enabled   int32
@@ -38,7 +39,7 @@ var lightCount = 0
 
 func NewLight(
 	lightType LightType,
-	position, target Vector3,
+	position, target m.V3,
 	color rl.Color,
 	intensity float32,
 	shader rl.Shader,
