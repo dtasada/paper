@@ -15,25 +15,3 @@
 ## Documentation:
 (Wikipedia)[https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional]
 (hakenberg.de)[http://www.hakenberg.de/diffgeo/collision_resolution.htm]
-
-## Variables
-    - Mass _m_:             R^+
-    - Position _p_:         R^3
-    - Orientation _R_:      SO(3)
-    - Velocity _v_:         R^3
-    - Angular velocity _ω_: R^3
-
-### Inertia (Wikipedia)[https://en.wikipedia.org/wiki/Moment_of_inertia]
-    - Inertia tensor _I_:   _I_ = L / ω  where L is angular momentum
-    - Unit:                 kg*m^2
-
-### Angular momentum (Wikipedia)[https://en.wikipedia.org/wiki/Angular_momentum]
-    - Angular momentum:     _L_ = mvr
-    - Unit:                kg*m^2/s
-
-### Angular velocity (Wikipedia)[https://en.wikipedia.org/wiki/Angular_velocity]
-    - Angular velocity:     ω = dθ / dt
-    - Unit:                 rad/s
-
-## Post-collision formulas:
-    - m1v1

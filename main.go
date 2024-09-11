@@ -11,7 +11,7 @@ import (
 	m "github.com/dtasada/paper/src/math"
 )
 
-var particleCount int = 100
+var particleCount int = 2
 
 /* Movement keys */
 func handleMovement(camera *rl.Camera3D) {
@@ -29,16 +29,16 @@ func handleMovement(camera *rl.Camera3D) {
 	}
 
 	if rl.IsKeyDown(rl.KeyW) {
-		rl.CameraMoveForward(camera, movementSpeed, 0)
+		rl.CameraMoveForward(camera, movementSpeed, 1)
 	}
 	if rl.IsKeyDown(rl.KeyA) {
-		rl.CameraMoveRight(camera, -movementSpeed, 0)
+		rl.CameraMoveRight(camera, -movementSpeed, 1)
 	}
 	if rl.IsKeyDown(rl.KeyS) {
-		rl.CameraMoveForward(camera, -movementSpeed, 0)
+		rl.CameraMoveForward(camera, -movementSpeed, 1)
 	}
 	if rl.IsKeyDown(rl.KeyD) {
-		rl.CameraMoveRight(camera, movementSpeed, 0)
+		rl.CameraMoveRight(camera, movementSpeed, 1)
 	}
 
 	if rl.IsKeyDown(rl.KeySpace) {
@@ -132,13 +132,16 @@ func main() {
 			{ /* 3D Rendering */
 				rl.BeginMode3D(camera)
 
+				i := 0
 				for _, particle := range particles {
 					particle.Update(&container, &particles)
 
 					if rl.IsMouseButtonPressed(rl.MouseButtonRight) {
 						particle.Vel = m.V3Random(10)
 					}
+					i++
 				}
+				fmt.Println("i:", i)
 
 				light.Update()
 

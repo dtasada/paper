@@ -1,10 +1,12 @@
 package src
 
 import (
+	"fmt"
 	"slices"
 
 	m "github.com/dtasada/paper/src/math"
 	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/kr/pretty"
 )
 
 type Grid struct {
@@ -128,7 +130,7 @@ func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Par
 
 							/* Iterate over cell */
 							for _, pb := range self.Grid.Content[targetCell.Z][targetCell.Y][targetCell.X] {
-								if pa != pb {
+								if pa != pb { // dont collide with itself
 									f(pa, pb)
 								}
 							}
@@ -161,7 +163,7 @@ func calcLambda(pa, pb *Particle) (m.V3, m.V3) {
 	nv1_nv2 := m.V3Mult(collisionNormal, rl.Vector3Subtract(pa.Vel, pb.Vel))
 	wiqA := m.V3MultMatrix(m.V3Mult(pa.AngVel, pa.Q), pa.Inertia)
 	wiqB := m.V3MultMatrix(m.V3Mult(pb.AngVel, pb.Q), pb.Inertia)
-	qiqA := m.V3Mult(pa.Q, pa.AngVel, pa.Q) // Check the Q*I*Q
+	qiqA := m.V3Mult(pa.Q, pa.AngVel) // Check the Q*I*Q
 	qiB := m.V3Mult(pb.Q, pb.AngVel)
 	denumerator := m.V3Add(nv1_nv2, wiqA, m.V3MultVal(wiqB, -1))
 	denominator := m.V3Add(m.V3MultVal(m.V3Mult(collisionNormal, collisionNormal), (1/pa.Mass+1/pb.Mass)), qiqA, qiB)
@@ -171,7 +173,8 @@ func calcLambda(pa, pb *Particle) (m.V3, m.V3) {
 }
 
 /* Solves collision given cells */
-func (self *Container) SolveCollision(pa *Particle, pb *Particle) {
+func (self *Container) SolveCollision(pa, pb *Particle) {
+	fmt.Println("solvecollision")
 	if ShowCollisionLines {
 		rl.DrawLine3D(pa.Pos, pb.Pos, rl.Red)
 	}

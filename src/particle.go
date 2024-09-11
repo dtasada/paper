@@ -70,48 +70,54 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 		self.Vel.Y -= Gravity
 		self.Pos = m.V3Add(self.Pos, self.Vel)
 
-		theta := rl.Vector3Length(self.AngVel)
-		axis := rl.Vector3Normalize(self.AngVel)
-		K := m.NewMatrix(
-			0, -axis.Z, axis.Y,
-			axis.Z, 0, -axis.X,
-			-axis.Y, axis.X, 0,
-		)
+		if theta := rl.Vector3Length(self.AngVel); theta != 0 {
+			axis := rl.Vector3Normalize(self.AngVel)
+			K := m.NewMatrix(
+				0, -axis.Z, axis.Y,
+				axis.Z, 0, -axis.X,
+				-axis.Y, axis.X, 0,
+			)
 
-		identity := m.NewMatrix(
-			1, 0, 0,
-			0, 1, 0,
-			0, 0, 1,
-		)
+			identity := m.NewMatrix(
+				1, 0, 0,
+				0, 1, 0,
+				0, 0, 1,
+			)
 
-		R := m.MatrixAdd(identity, m.MatrixMultVal(K, m.Sin(theta)), m.MatrixMultVal(m.MatrixMult(K, K), 1-m.Cos(theta)))
+			R := m.MatrixAdd(
+				identity,
+				m.MatrixMultVal(K, m.Sin(theta)),
+				m.MatrixMultVal(m.MatrixMult(K, K), 1-m.Cos(theta)),
+			)
 
-		self.Orientation = m.MatrixMult(self.Orientation, R)
+			self.Orientation = m.MatrixMult(self.Orientation, R)
+		}
 	}
 
-	/* Bounds checking */
-	if bottomBorder := container.Bounds.YMin + self.Radius; self.Pos.Y <= bottomBorder {
-		self.Pos.Y = bottomBorder
-		self.Vel.Y = self.Pos.Y
-	} else if topBorder := container.Bounds.YMax - self.Radius; self.Pos.Y >= topBorder {
-		self.Pos.Y = topBorder
-		self.Vel.Y = self.Pos.Y
-	}
+	{ /* Bounds checking */
+		if bottomBorder := container.Bounds.YMin + self.Radius; self.Pos.Y <= bottomBorder {
+			self.Pos.Y = bottomBorder
+			self.Vel.Y *= -self.CollisionDamping
+		} else if topBorder := container.Bounds.YMax - self.Radius; self.Pos.Y >= topBorder {
+			self.Pos.Y = topBorder
+			self.Vel.Y *= -self.CollisionDamping
+		}
 
-	if leftBorder := container.Bounds.XMin + self.Radius; self.Pos.X <= leftBorder {
-		self.Pos.X = leftBorder
-		self.Vel.X = self.Pos.X
-	} else if rightBorder := container.Bounds.XMax - self.Radius; self.Pos.X >= rightBorder {
-		self.Pos.X = rightBorder
-		self.Vel.X = self.Pos.X
-	}
+		if leftBorder := container.Bounds.XMin + self.Radius; self.Pos.X <= leftBorder {
+			self.Pos.X = leftBorder
+			self.Vel.X *= -self.CollisionDamping
+		} else if rightBorder := container.Bounds.XMax - self.Radius; self.Pos.X >= rightBorder {
+			self.Pos.X = rightBorder
+			self.Vel.X *= -self.CollisionDamping
+		}
 
-	if shallowBorder := container.Bounds.ZMin + self.Radius; self.Pos.Z <= shallowBorder {
-		self.Pos.Z = shallowBorder
-		self.Vel.Z = 0
-	} else if deepBorder := container.Bounds.ZMax - self.Radius; self.Pos.Z >= deepBorder {
-		self.Pos.Z = deepBorder
-		self.Vel.Z = self.Pos.Z
+		if shallowBorder := container.Bounds.ZMin + self.Radius; self.Pos.Z <= shallowBorder {
+			self.Pos.Z = shallowBorder
+			self.Vel.Z *= -self.CollisionDamping
+		} else if deepBorder := container.Bounds.ZMax - self.Radius; self.Pos.Z >= deepBorder {
+			self.Pos.Z = deepBorder
+			self.Vel.Z *= -self.CollisionDamping
+		}
 	}
 
 	self.CorrectCell(container, oldCell)
@@ -119,15 +125,17 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	/* Find collision between a particle and any particle in its contiguous cells */
 	container.ForAdjacentParticles(self, container.SolveCollision)
 
-	if ShowParticleCells {
-		container.DrawCell(container.GetParticleCell(self), rl.White)
-	}
+	{ /* Render */
+		if ShowParticleCells {
+			container.DrawCell(container.GetParticleCell(self), rl.White)
+		}
 
-	if ShowCellModels {
-		rl.DrawModel(self.Model, self.Pos, 1, self.Color)
-	} else {
-		rl.DrawSphere(self.Pos, self.Radius*0.05, self.Color)
-		rl.DrawLine3D(self.Pos, m.V3Add(self.Pos, self.Vel), self.Color)
+		if ShowCellModels {
+			rl.DrawModel(self.Model, self.Pos, 1, self.Color)
+		} else {
+			rl.DrawSphere(self.Pos, self.Radius*0.05, self.Color)
+			rl.DrawLine3D(self.Pos, m.V3Add(self.Pos, self.Vel), self.Color)
+		}
 	}
 }
 
