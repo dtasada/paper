@@ -2,64 +2,121 @@ package math
 
 import "github.com/gen2brain/raylib-go/raylib"
 
-type Matrix struct {
-	M11, M12, M13 float32
-	M21, M22, M23 float32
-	M31, M32, M33 float32
-}
+type Matrix = rl.Matrix
 
-func NewMatrix(
-	M11, M12, M13 float32,
-	M21, M22, M23 float32,
-	M31, M32, M33 float32,
-) Matrix {
-	return Matrix{
-		M11, M12, M13,
-		M21, M22, M23,
-		M31, M32, M33,
-	}
-}
+func MatrixAdd(matrices ...Matrix) Matrix { return sequential(matrices, rl.MatrixAdd) }
 
-func MatrixAdd(matrices ...Matrix) Matrix {
-	return sequential(matrices, func(ma, mb Matrix) Matrix {
-		return Matrix{
-			ma.M11 + mb.M11, ma.M12 + mb.M12, ma.M13 + mb.M13,
-			ma.M21 + mb.M21, ma.M22 + mb.M22, ma.M23 + mb.M23,
-			ma.M31 + mb.M31, ma.M32 + mb.M32, ma.M33 + mb.M33,
-		}
-	})
-}
+func MatrixSub(matrices ...Matrix) Matrix { return sequential(matrices, rl.MatrixSubtract) }
 
-func MatrixMult(matrices ...Matrix) Matrix {
-	return sequential(matrices, func(ma, mb Matrix) Matrix {
-		return Matrix{
-			ma.M11*mb.M11 + ma.M12*mb.M21 + ma.M13*mb.M31, ma.M11*mb.M12 + ma.M12*mb.M22 + ma.M13*mb.M32, ma.M11*mb.M13 + ma.M12*mb.M23 + ma.M13*mb.M33,
-			ma.M21*mb.M11 + ma.M22*mb.M21 + ma.M23*mb.M31, ma.M21*mb.M12 + ma.M22*mb.M22 + ma.M23*mb.M32, ma.M21*mb.M13 + ma.M22*mb.M23 + ma.M23*mb.M33,
-			ma.M31*mb.M11 + ma.M32*mb.M21 + ma.M33*mb.M31, ma.M31*mb.M12 + ma.M32*mb.M22 + ma.M33*mb.M32, ma.M31*mb.M13 + ma.M32*mb.M23 + ma.M33*mb.M33,
-		}
-	})
-}
+func MatrixMult(matrices ...Matrix) Matrix { return sequential(matrices, rl.MatrixMultiply) }
 
 func MatrixMultVal(m Matrix, mult float32) Matrix {
-	return Matrix{
-		m.M11*mult + m.M12*mult + m.M13*mult, m.M11*mult + m.M12*mult + m.M13*mult, m.M11*mult + m.M12*mult + m.M13*mult,
-		m.M21*mult + m.M22*mult + m.M23*mult, m.M21*mult + m.M22*mult + m.M23*mult, m.M21*mult + m.M22*mult + m.M23*mult,
-		m.M31*mult + m.M32*mult + m.M33*mult, m.M31*mult + m.M32*mult + m.M33*mult, m.M31*mult + m.M32*mult + m.M33*mult,
-	}
-}
-
-func MatrixInvert(m Matrix) Matrix {
-	return Matrix{
-		1 / m.M11, 1 / m.M12, 1 / m.M13,
-		1 / m.M21, 1 / m.M22, 1 / m.M23,
-		1 / m.M31, 1 / m.M32, 1 / m.M33,
-	}
-}
-
-func V3MultMatrix(v V3, m Matrix) V3 {
-	return rl.NewVector3(
-		m.M11*v.X+m.M12*v.Y+m.M13*v.Z,
-		m.M21*v.X+m.M22*v.Y+m.M23*v.Z,
-		m.M31*v.X+m.M32*v.Y+m.M33*v.Z,
+	return rl.NewMatrix(
+		mult*m.M0, mult*m.M4, mult*m.M8, mult*m.M12,
+		mult*m.M1, mult*m.M5, mult*m.M9, mult*m.M13,
+		mult*m.M2, mult*m.M6, mult*m.M10, mult*m.M14,
+		mult*m.M3, mult*m.M7, mult*m.M11, mult*m.M15,
 	)
+}
+
+func MatrixInvInertia(inertia Matrix) Matrix {
+	return rl.NewMatrix(
+		1/inertia.M0, 0, 0, 0,
+		0, 1/inertia.M5, 0, 0,
+		0, 0, 1/inertia.M10, 0,
+		0, 0, 0, 1,
+	)
+}
+
+func MatrixGlInverse(m Matrix) Matrix {
+	var inv Matrix
+	inv.M0 = m.M0
+	inv.M4 = m.M1
+	inv.M8 = m.M2
+	inv.M1 = m.M4
+	inv.M5 = m.M5
+	inv.M9 = m.M6
+	inv.M2 = m.M8
+	inv.M6 = m.M9
+	inv.M10 = m.M10
+	inv.M12 -= m.M12*inv.M0 + m.M13*inv.M4 + m.M14*inv.M8
+	inv.M13 -= m.M12*inv.M1 + m.M13*inv.M5 + m.M14*inv.M9
+	inv.M14 -= m.M12*inv.M2 + m.M13*inv.M6 + m.M14*inv.M10
+	inv.M15 = 1
+	return inv
+}
+
+func MatrixGlDerive(m Matrix) Matrix {
+	var r Matrix
+	r.M1 = m.M2
+	r.M2 = -m.M1
+	r.M4 = -m.M2
+	r.M6 = m.M0
+	r.M8 = m.M1
+	r.M9 = -m.M0
+	return r
+}
+
+func V3ToMatrix(vec V3) Matrix {
+	return rl.NewMatrix(
+		1, 0, 0, vec.X,
+		0, 1, 0, vec.Y,
+		0, 0, 1, vec.Z,
+		0, 0, 0, 1,
+	)
+}
+
+func MatrixBitAnd(va, vb Matrix) Matrix {
+	var r Matrix
+	r.M0 = vb.M2*va.M1 - vb.M1*va.M2
+	r.M1 = vb.M0*va.M2 - vb.M2*va.M0
+	r.M2 = vb.M1*va.M0 - vb.M0*va.M1
+	return r
+}
+
+func MatrixBitOr(va, vb Matrix) float32 {
+	var sum float32
+	for c1 := 0; c1 < 16; c1++ {
+		sum += *MatrixIndex(va, c1) * *MatrixIndex(vb, c1)
+	}
+	return sum
+}
+
+func MatrixIndex(m Matrix, index int) *float32 {
+	switch index {
+	case 0:
+		return &m.M0
+	case 1:
+		return &m.M1
+	case 2:
+		return &m.M2
+	case 3:
+		return &m.M3
+	case 4:
+		return &m.M4
+	case 5:
+		return &m.M5
+	case 6:
+		return &m.M6
+	case 7:
+		return &m.M7
+	case 8:
+		return &m.M8
+	case 9:
+		return &m.M9
+	case 10:
+		return &m.M10
+	case 11:
+		return &m.M11
+	case 12:
+		return &m.M12
+	case 13:
+		return &m.M13
+	case 14:
+		return &m.M14
+	case 15:
+		return &m.M15
+	default:
+		return nil
+	}
 }

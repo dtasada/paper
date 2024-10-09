@@ -1,23 +1,21 @@
 package math
 
-import (
-	"math"
-)
+import "math"
 
-/**
-* Abstract function that generates sequential arithmetic functions,
-* where passing it something like f = rl.Vector3Add calls f(list[n], list[n-1])
+/*
+ * Abstract function that generates sequential arithmetic functions,
+ * where passing it something like f = rl.Vector3Add calls f(list[n], list[n-1])
  */
 func sequential[T V3 | Matrix](list []T, f func(T, T) T) T {
-	var v T
+	var r T
 	for i, seq := range list {
 		if i == 0 {
-			v = seq
+			r = seq
 		} else {
-			v = f(v, seq)
+			r = f(r, seq)
 		}
 	}
-	return v
+	return r
 }
 
 /* Returns sign of value. -1 if negative, 0 if 0, and 1 if positive */

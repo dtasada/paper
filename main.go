@@ -80,7 +80,7 @@ func main() {
 	shaderValue := []float32{0.1, 0.1, 0.1, 1.0}
 	rl.SetShaderValue(lightShader, ambientLoc, shaderValue, rl.ShaderUniformVec4)
 
-	/* Logic setup (camera, container and particle arraylist) */
+	/* Logic setup (camera, container and particle slice) */
 	camera := rl.Camera3D{
 		Position:   rl.NewVector3(0, 0, 0),
 		Target:     rl.NewVector3(-4, -4, -4),
@@ -98,7 +98,8 @@ func main() {
 
 	light := src.NewLight(src.LightTypePoint, camera.Position, camera.Target, rl.Yellow, 0.5, lightShader)
 
-	particles := []*src.Particle{}
+	var particles []*src.Particle
+	// particles := []*src.Particle{}
 
 	/* Main loop */
 	for !rl.WindowShouldClose() {
@@ -132,20 +133,18 @@ func main() {
 			{ /* 3D Rendering */
 				rl.BeginMode3D(camera)
 
-				i := 0
 				for _, particle := range particles {
 					particle.Update(&container, &particles)
 
 					if rl.IsMouseButtonPressed(rl.MouseButtonRight) {
 						particle.Vel = m.V3Random(10)
 					}
-					i++
 				}
-				fmt.Println("i:", i)
 
 				light.Update()
 
 				container.DrawBounds()
+				// container.Print()
 
 				rl.EndMode3D()
 			} /* 3D Rendering */

@@ -1,7 +1,6 @@
 package src
 
 import (
-	"fmt"
 	"slices"
 
 	m "github.com/dtasada/paper/src/math"
@@ -130,7 +129,7 @@ func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Par
 
 							/* Iterate over cell */
 							for _, pb := range self.Grid.Content[targetCell.Z][targetCell.Y][targetCell.X] {
-								if pa != pb { // dont collide with itself
+								if pa != pb { // dont interact with itself
 									f(pa, pb)
 								}
 							}
@@ -142,51 +141,70 @@ func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Par
 	}
 }
 
-func calcLambda(pa, pb *Particle) (m.V3, m.V3) {
-	// Getting requirements
-	d := rl.Vector3Distance(pa.Pos, pb.Pos)
-	between := rl.Vector3Subtract(pb.Pos, pa.Pos)
-	collisionNormal := rl.Vector3Normalize(between)
-	pointOfContactA := m.V3MultVal(between, pa.Radius/d)  // test point of contact
-	pointOfContactB := m.V3MultVal(between, -pb.Radius/d) // the minus sign is to flip the whole vector so it's pointing the other way
+/* Helper function that calculates the lambda coefficient in SolveCollision */
+func calcLambda(pa, pb *Particle, normal m.V3) float32 {
+	var numerator float32
+	var denominator float32
 
-	pa.Q = m.V3MultMatrix(
-		rl.Vector3CrossProduct(pointOfContactA, collisionNormal),
-		m.MatrixMult(m.MatrixInvert(pa.Inertia), m.MatrixInvert(pa.Orientation)),
+	qa := m.MatrixMult(
+		m.MatrixInvInertia(pa.Inertia),
+		m.MatrixGlInverse(m.V3ToMatrix(pa.Pos)),
+		m.V3ToMatrix(m.V3BitAnd(pa.Lever, normal)),
 	)
-	pb.Q = m.V3MultMatrix(
-		rl.Vector3CrossProduct(pointOfContactB, collisionNormal),
-		m.MatrixMult(m.MatrixInvert(pb.Inertia), m.MatrixInvert(pb.Orientation)),
+	qb := m.MatrixMult(
+		m.MatrixInvInertia(pb.Inertia),
+		m.MatrixGlInverse(m.V3ToMatrix(pb.Pos)),
+		m.V3ToMatrix(m.V3BitAnd(pb.Lever, normal)),
 	)
 
-	// Actual equations
-	nv1_nv2 := m.V3Mult(collisionNormal, rl.Vector3Subtract(pa.Vel, pb.Vel))
-	wiqA := m.V3MultMatrix(m.V3Mult(pa.AngVel, pa.Q), pa.Inertia)
-	wiqB := m.V3MultMatrix(m.V3Mult(pb.AngVel, pb.Q), pb.Inertia)
-	qiqA := m.V3Mult(pa.Q, pa.AngVel) // Check the Q*I*Q
-	qiB := m.V3Mult(pb.Q, pb.AngVel)
-	denumerator := m.V3Add(nv1_nv2, wiqA, m.V3MultVal(wiqB, -1))
-	denominator := m.V3Add(m.V3MultVal(m.V3Mult(collisionNormal, collisionNormal), (1/pa.Mass+1/pb.Mass)), qiqA, qiB)
-	λ := m.V3MultVal(rl.Vector3Divide(denumerator, denominator), 2)
+	numerator -= m.V3BitOr(pa.Vel, normal)
+	numerator += m.V3BitOr(pb.Vel, normal)
+	numerator -= m.MatrixBitOr(m.MatrixMult(pa.Inertia, qa), m.V3ToMatrix(pa.AngVel))
+	numerator += m.MatrixBitOr(m.MatrixMult(pb.Inertia, qb), m.V3ToMatrix(pb.AngVel))
+	denominator += 1 / pa.Mass
+	denominator += 1 / pb.Mass
+	denominator += m.MatrixBitOr(m.MatrixMult(pa.Inertia, qa), qa)
+	denominator += m.MatrixBitOr(m.MatrixMult(pb.Inertia, qb), qb)
 
-	return λ, collisionNormal
+	return 2 * numerator / denominator
 }
 
 /* Solves collision given cells */
 func (self *Container) SolveCollision(pa, pb *Particle) {
-	fmt.Println("solvecollision")
 	if ShowCollisionLines {
 		rl.DrawLine3D(pa.Pos, pb.Pos, rl.Red)
 	}
 
 	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-		paQBefore := pa.Q
-		pbQBefore := pb.Q
-		λ, n := calcLambda(pa, pb)
-		pa.Vel = m.V3Sub(pa.Vel, m.V3Mult(m.V3DivVal(λ, pa.Mass), n))
-		pb.Vel = m.V3Add(pb.Vel, m.V3Mult(m.V3DivVal(λ, pb.Mass), n))
-		pa.AngVel = m.V3Sub(pa.AngVel, m.V3Sub(paQBefore, pa.Q))
-		pb.AngVel = m.V3Add(pb.AngVel, m.V3Sub(pbQBefore, pb.Q))
+		/* var pos1, pos2 m.V3
+		for c1 := 0; c1 < 3; c1++ {
+			*m.V3Index(pos1, c1) = *m.V3Index(pa.Pos, c1)
+			*m.V3Index(pos2, c1) = *m.V3Index(pb.Pos, c1)
+		}
+		pos1 = m.V3Sub(pos1, pos2)
+		pos1 = m.V3MultVal(pos1, 0.5)
+		pos2 = m.V3Add(pos2, pos1)
+		normal := rl.Vector3Normalize(pos1) */
+
+		normal := rl.Vector3Normalize(m.V3Sub(pa.Pos, pb.Pos))
+
+		λ := calcLambda(pa, pb, normal)
+		pa.Vel = m.V3Add(pa.Vel, m.V3MultVal(normal, (λ/pa.Mass)))
+		pb.Vel = m.V3Sub(pb.Vel, m.V3MultVal(normal, (λ/pb.Mass)))
+		pa.AngVel = m.V3AddMatrix(
+			pa.AngVel,
+			m.MatrixMultVal(
+				m.MatrixMult(m.MatrixInvInertia(pa.Inertia), m.MatrixGlInverse(m.V3ToMatrix(pa.Pos))),
+				m.V3BitOr(pa.Lever, normal)*λ,
+			),
+		)
+		pb.AngVel = m.V3SubMatrix(
+			pb.AngVel,
+			m.MatrixMultVal(
+				m.MatrixMult(m.MatrixInvInertia(pb.Inertia), m.MatrixGlInverse(m.V3ToMatrix(pb.Pos))),
+				m.V3BitOr(pb.Lever, normal)*λ,
+			),
+		)
 	}
 }
 
@@ -227,4 +245,40 @@ func (self *Container) DrawBounds() {
 	rl.DrawModel(self.Bounds.YMaxModel, rl.NewVector3(0, self.Bounds.YMax, 0), 1, color)
 	rl.DrawModel(self.Bounds.ZMinModel, rl.NewVector3(0, 0, self.Bounds.ZMin), 1, color)
 	rl.DrawModel(self.Bounds.ZMaxModel, rl.NewVector3(0, 0, self.Bounds.ZMax), 1, color)
+}
+
+func (self *Container) Print() {
+	out := map[int]Plane{}
+
+	for z, plane := range self.Grid.Content {
+		for y, row := range plane {
+			for x, cell := range row {
+				if len(cell) != 0 {
+					out[z] = Plane{}
+					out[z][y] = Row{}
+					out[z][y][x] = cell
+				}
+			}
+		}
+	}
+
+	for z, plane := range out {
+		pretty.Printf("%d: Plane {\n", z)
+		for y, row := range plane {
+			pretty.Printf("\t%d: Row {\n", y)
+			for x, cell := range row {
+				pretty.Printf("\t\t%d: Cell {\n", x)
+				for _, p := range cell {
+					pretty.Printf("\t\t\tParticle {\n")
+					pretty.Printf("\t\t\t\tPosition: %v, %v, %v\n", p.Pos.X, p.Pos.Y, p.Pos.Z)
+					pretty.Printf("\t\t\t\tVelocity: %v, %v, %v\n", p.Vel.X, p.Vel.Y, p.Vel.Z)
+					pretty.Printf("\t\t\t\tRadius: %v\n", p.Radius)
+					pretty.Printf("\t\t\t}\n")
+				}
+				pretty.Printf("\n\t\t}\n")
+			}
+			pretty.Printf("\n\t}\n")
+		}
+		pretty.Printf("}\n")
+	}
 }

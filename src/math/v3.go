@@ -72,3 +72,48 @@ func V3Random(amplitude float32) V3 {
 func V3ToV2(vec rl.Vector3) rl.Vector2 {
 	return rl.NewVector2(vec.X, vec.Y)
 }
+
+func V3BitAnd(va, vb V3) V3 {
+	return rl.NewVector3(
+		vb.Z*va.Y-vb.Y*va.Z,
+		vb.X*va.Z-vb.Z*va.X,
+		vb.Y*va.X-vb.X*va.Y,
+	)
+}
+
+func V3BitOr(va, vb V3) float32 {
+	var sum float32
+	for c1 := 0; c1 < 3; c1++ {
+		sum += *V3Index(va, c1) * *V3Index(vb, c1)
+	}
+	return sum
+}
+
+func V3Index(vec V3, index int) *float32 {
+	switch index {
+	case 0:
+		return &vec.X
+	case 1:
+		return &vec.Y
+	case 2:
+		return &vec.Z
+	default:
+		return nil
+	}
+}
+
+func V3AddMatrix(vec V3, matrix rl.Matrix) V3 {
+	return rl.NewVector3(
+		vec.X+matrix.M0,
+		vec.Y+matrix.M1,
+		vec.Z+matrix.M2,
+	)
+}
+
+func V3SubMatrix(vec V3, matrix rl.Matrix) V3 {
+	return rl.NewVector3(
+		vec.X-matrix.M0,
+		vec.Y-matrix.M1,
+		vec.Z-matrix.M2,
+	)
+}

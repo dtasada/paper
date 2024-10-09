@@ -11,9 +11,10 @@ type Particle struct {
 	Pos              m.V3
 	Vel              m.V3
 	AngVel           m.V3
-	Q                m.V3 // idek lmao
-	Orientation      m.Matrix
-	Inertia          m.Matrix
+	Lever            m.V3
+	Torque           m.V3
+	Orientation      rl.Matrix
+	Inertia          rl.Matrix
 	Radius           float32
 	Mass             float32
 	CollisionDamping float32
@@ -33,6 +34,10 @@ func NewParticle(
 		Pos:              pos,
 		Vel:              vel,
 		AngVel:           rl.Vector3Zero(),
+		Lever:            rl.Vector3Zero(),
+		Torque:           rl.Vector3Zero(),
+		Orientation:      rl.MatrixIdentity(),
+		Inertia:          rl.MatrixIdentity(),
 		Radius:           radius,
 		Mass:             mass,
 		CollisionDamping: collisionDamping,
@@ -48,7 +53,8 @@ func CreateParticle(container *Container, particles *[]*Particle, lightShader rl
 			container.Height*(rand.Float32()-0.5),
 			container.Length*(rand.Float32()-0.5),
 		), // random position in grid
-		rl.Vector3Zero(),
+		// rl.Vector3Zero(),
+		rl.NewVector3(0, 0, 0),
 		container.CellSize/2,
 		m.Pow(container.CellSize/2, 2),
 		0.0,
@@ -70,28 +76,36 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 		self.Vel.Y -= Gravity
 		self.Pos = m.V3Add(self.Pos, self.Vel)
 
-		if theta := rl.Vector3Length(self.AngVel); theta != 0 {
+		/* if theta := rl.Vector3Length(self.AngVel); theta != 0 {
 			axis := rl.Vector3Normalize(self.AngVel)
-			K := m.NewMatrix(
-				0, -axis.Z, axis.Y,
-				axis.Z, 0, -axis.X,
-				-axis.Y, axis.X, 0,
-			)
-
-			identity := m.NewMatrix(
-				1, 0, 0,
-				0, 1, 0,
-				0, 0, 1,
+			K := rl.NewMatrix(
+				0, -axis.Z, axis.Y, 0,
+				axis.Z, 0, -axis.X, 0,
+				-axis.Y, axis.X, 0, 0,
+				0, 0, 0, 1,
 			)
 
 			R := m.MatrixAdd(
-				identity,
+				rl.MatrixIdentity(),
 				m.MatrixMultVal(K, m.Sin(theta)),
-				m.MatrixMultVal(m.MatrixMult(K, K), 1-m.Cos(theta)),
+				m.MatrixMultVal(rl.MatrixMultiply(K, K), 1-m.Cos(theta)),
 			)
 
 			self.Orientation = m.MatrixMult(self.Orientation, R)
-		}
+		} */
+		self.AngVel = m.V3AddMatrix(
+			self.AngVel,
+			m.MatrixMult(
+				m.MatrixInvInertia(self.Inertia),
+				m.MatrixMult(
+					m.MatrixGlInverse(m.V3ToMatrix(self.Pos)),
+					m.MatrixSub(m.V3ToMatrix(self.Torque), m.MatrixGlDerive(m.V3ToMatrix(self.AngVel))),
+					self.Inertia,
+					m.V3ToMatrix(self.AngVel),
+				),
+			),
+		)
+
 	}
 
 	{ /* Bounds checking */
