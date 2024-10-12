@@ -1,10 +1,10 @@
-package src
+package engine
 
 import (
 	"fmt"
 	"unsafe"
 
-	m "github.com/dtasada/paper/src/math"
+	m "github.com/dtasada/paper/engine/math"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 

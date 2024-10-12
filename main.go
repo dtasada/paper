@@ -7,8 +7,8 @@ import (
 	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 
-	"github.com/dtasada/paper/src"
-	m "github.com/dtasada/paper/src/math"
+	e "github.com/dtasada/paper/engine"
+	m "github.com/dtasada/paper/engine/math"
 )
 
 var particleCount int = 2
@@ -16,16 +16,16 @@ var particleCount int = 2
 /* Movement keys */
 func handleMovement(camera *rl.Camera3D) {
 	mouseDelta := rl.GetMouseDelta()
-	rl.CameraYaw(camera, -mouseDelta.X*src.Sensitivity, 0)
-	rl.CameraPitch(camera, -mouseDelta.Y*src.Sensitivity, 0, 0, 0)
+	rl.CameraYaw(camera, -mouseDelta.X*e.Sensitivity, 0)
+	rl.CameraPitch(camera, -mouseDelta.Y*e.Sensitivity, 0, 0, 0)
 
 	var movementSpeed float32
 	if rl.IsKeyDown(rl.KeyLeftShift) {
-		movementSpeed = src.MovementSpeed * 2
+		movementSpeed = e.MovementSpeed * 2
 	} else if rl.IsKeyDown(rl.KeyC) {
-		movementSpeed = src.MovementSpeed / 2
+		movementSpeed = e.MovementSpeed / 2
 	} else {
-		movementSpeed = src.MovementSpeed
+		movementSpeed = e.MovementSpeed
 	}
 
 	if rl.IsKeyDown(rl.KeyW) {
@@ -52,15 +52,11 @@ func handleMovement(camera *rl.Camera3D) {
 func main() {
 	fmt.Println("Initializing raylib...")
 
-	screenWidth := 1280
-	screenHeight := 720
-	// screenCenter := rl.NewVector2(float32(rl.GetScreenWidth())/2, float32(rl.GetScreenHeight())/2)
-
 	/* Init raylib */
-	rl.InitWindow(int32(screenWidth), int32(screenHeight), "paper")
+	rl.InitWindow(1280, 720, "paper")
 	rl.SetExitKey(0)
 	rl.DisableCursor()
-	rl.SetTargetFPS(src.TargetFPS)
+	rl.SetTargetFPS(e.TargetFPS)
 
 	/* Raylib flags */
 	rl.SetTraceLogLevel(rl.LogWarning)
@@ -68,8 +64,8 @@ func main() {
 	rl.SetConfigFlags(rl.FlagWindowResizable)
 
 	/* Raygui setup */
-	src.Caskaydia = rl.LoadFont("./resources/fonts/CaskaydiaCoveNF.ttf")
-	rg.SetFont(src.Caskaydia)
+	e.Font = rl.LoadFont("./resources/fonts/CaskaydiaCoveNF.ttf")
+	rg.SetFont(e.Font)
 	rg.SetStyle(rg.DEFAULT, rg.TEXT_SIZE, 20)
 	rg.SetStyle(rg.DEFAULT, rg.TEXT_COLOR_NORMAL, int64(rl.ColorToInt(rl.White)))
 
@@ -89,16 +85,16 @@ func main() {
 		Projection: rl.CameraPerspective,
 	}
 
-	container := src.NewContainer(
+	container := e.NewContainer(
 		rl.NewVector3(0, 0, 0),
 		rl.NewVector3(100, 100, 100),
 		5,
 		lightShader,
 	)
 
-	light := src.NewLight(src.LightTypePoint, camera.Position, camera.Target, rl.Yellow, 0.5, lightShader)
+	light := e.NewLight(e.LightTypePoint, camera.Position, camera.Target, rl.Yellow, 0.5, lightShader)
 
-	var particles []*src.Particle
+	var particles []*e.Particle
 	// particles := []*src.Particle{}
 
 	/* Main loop */
@@ -144,14 +140,13 @@ func main() {
 				light.Update()
 
 				container.DrawBounds()
-				// container.Print()
 
 				rl.EndMode3D()
 			} /* 3D Rendering */
 
 			{ /* 2D Rendering */
-				src.DrawText(fmt.Sprint(rl.GetFPS(), " FPS"), 12, 12+24*0, 20, rl.White)
-				src.DrawText(fmt.Sprintf("X: %.2f; Y: %.2f; Z: %.2f", camera.Position.X, camera.Position.Y, camera.Position.Z), 12, 12+24*1, 20, rl.White)
+				e.DrawText(fmt.Sprint(rl.GetFPS(), " FPS"), 12, 12+24*0, 20, rl.White)
+				e.DrawText(fmt.Sprintf("X: %.2f; Y: %.2f; Z: %.2f", camera.Position.X, camera.Position.Y, camera.Position.Z), 12, 12+24*1, 20, rl.White)
 
 				particleCount = m.Floor(
 					rg.Slider(
@@ -164,24 +159,24 @@ func main() {
 					),
 				)
 
-				src.Gravity = rg.Slider(
+				e.Gravity = rg.Slider(
 					rl.NewRectangle(12+11*15, 60+24*2, 240, 20),
 					"Gravity        ",
-					fmt.Sprintf("%.2f g", src.Gravity*src.GravityMultiplier),
-					src.Gravity*src.GravityMultiplier,
+					fmt.Sprintf("%.2f g", e.Gravity*e.GravityMultiplier),
+					e.Gravity*e.GravityMultiplier,
 					0,
 					10,
-				) / src.GravityMultiplier
+				) / e.GravityMultiplier
 
-				src.TargetFPS = int32(rg.Slider(
+				e.TargetFPS = int32(rg.Slider(
 					rl.NewRectangle(12+11*15, 60+24*3, 240, 20),
 					"Target FPS     ",
-					strconv.Itoa(int(src.TargetFPS)),
-					float32(src.TargetFPS),
+					strconv.Itoa(int(e.TargetFPS)),
+					float32(e.TargetFPS),
 					10,
 					480,
 				))
-				rl.SetTargetFPS(src.TargetFPS)
+				rl.SetTargetFPS(e.TargetFPS)
 
 				light.Intensity = rg.Slider(
 					rl.NewRectangle(12+11*15, 60+24*4, 240, 20),
@@ -192,28 +187,34 @@ func main() {
 					2.0,
 				)
 
-				src.ShowCollisionGrid = rg.CheckBox(
+				e.ShowCollisionGrid = rg.CheckBox(
 					rl.NewRectangle(8, 60+24*5, 20, 20),
 					"Collision grid ",
-					src.ShowCollisionGrid,
+					e.ShowCollisionGrid,
 				)
 
-				src.ShowCollisionLines = rg.CheckBox(
+				e.ShowCollisionLines = rg.CheckBox(
 					rl.NewRectangle(8, 60+24*6, 20, 20),
 					"Collision lines",
-					src.ShowCollisionLines,
+					e.ShowCollisionLines,
 				)
 
-				src.ShowParticleCells = rg.CheckBox(
+				e.ShowParticleCells = rg.CheckBox(
 					rl.NewRectangle(8, 60+24*7, 20, 20),
 					"Particle cells ",
-					src.ShowParticleCells,
+					e.ShowParticleCells,
 				)
 
-				src.ShowCellModels = rg.CheckBox(
+				e.ShowCellModels = rg.CheckBox(
 					rl.NewRectangle(8, 60+24*8, 20, 20),
 					"Cell models    ",
-					src.ShowCellModels,
+					e.ShowCellModels,
+				)
+
+				e.ShowContainerWalls = rg.CheckBox(
+					rl.NewRectangle(8, 60+24*9, 20, 20),
+					"Container Walls",
+					e.ShowContainerWalls,
 				)
 			} /* 2D Rendering */
 
@@ -222,7 +223,7 @@ func main() {
 				rl.UnloadModel(particles[0].Model)
 				particles = particles[1:]
 			} else if len(particles) < particleCount {
-				src.CreateParticle(&container, &particles, lightShader)
+				e.CreateParticle(&container, &particles, lightShader)
 			}
 
 			rl.EndDrawing()
@@ -231,7 +232,7 @@ func main() {
 
 	{ /* Cleanup */
 		rl.UnloadShader(lightShader)
-		rl.UnloadFont(src.Caskaydia)
+		rl.UnloadFont(e.Font)
 		for _, particle := range particles {
 			rl.UnloadModel(particle.Model)
 		}

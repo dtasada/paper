@@ -1,9 +1,9 @@
-package src
+package engine
 
 import (
 	"slices"
 
-	m "github.com/dtasada/paper/src/math"
+	m "github.com/dtasada/paper/engine/math"
 	"github.com/gen2brain/raylib-go/raylib"
 	"github.com/kr/pretty"
 )
@@ -144,27 +144,24 @@ func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Par
 /* Helper function that calculates the lambda coefficient in SolveCollision */
 func calcLambda(pa, pb *Particle, normal m.V3) float32 {
 	var numerator, denominator float32
-
 	qa := m.MatrixMult(
 		m.MatrixInvInertia(pa.Inertia),
 		m.MatrixGlInverse(m.V3ToMatrix(pa.Pos)),
-		m.V3ToMatrix(m.V3BitAnd(pa.Lever, normal)),
+		m.MatrixBitAnd(m.V3ToMatrix(pa.Lever), m.V3ToMatrix(normal)),
 	)
 	qb := m.MatrixMult(
 		m.MatrixInvInertia(pb.Inertia),
 		m.MatrixGlInverse(m.V3ToMatrix(pb.Pos)),
-		m.V3ToMatrix(m.V3BitAnd(pb.Lever, normal)),
+		m.MatrixBitAnd(m.V3ToMatrix(pb.Lever), m.V3ToMatrix(normal)),
 	)
-
-	numerator -= m.V3BitOr(pa.Vel, normal)
-	numerator += m.V3BitOr(pb.Vel, normal)
+	numerator -= m.MatrixBitOr(m.V3ToMatrix(pa.Vel), m.V3ToMatrix(normal))
+	numerator += m.MatrixBitOr(m.V3ToMatrix(pb.Vel), m.V3ToMatrix(normal))
 	numerator -= m.MatrixBitOr(m.MatrixMult(pa.Inertia, qa), m.V3ToMatrix(pa.AngVel))
 	numerator += m.MatrixBitOr(m.MatrixMult(pb.Inertia, qb), m.V3ToMatrix(pb.AngVel))
 	denominator += 1 / pa.Mass
 	denominator += 1 / pb.Mass
 	denominator += m.MatrixBitOr(m.MatrixMult(pa.Inertia, qa), qa)
 	denominator += m.MatrixBitOr(m.MatrixMult(pb.Inertia, qb), qb)
-
 	return 2 * numerator / denominator
 }
 
@@ -175,15 +172,6 @@ func (self *Container) SolveCollision(pa, pb *Particle) {
 	}
 
 	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-		/* var pos1, pos2 m.V3
-		for c1 := 0; c1 < 3; c1++ {
-			*m.V3Index(pos1, c1) = *m.V3Index(pa.Pos, c1)
-			*m.V3Index(pos2, c1) = *m.V3Index(pb.Pos, c1)
-		}
-		pos1 = m.V3Sub(pos1, pos2)
-		pos1 = m.V3MultVal(pos1, 0.5)
-		pos2 = m.V3Add(pos2, pos1)
-		normal := rl.Vector3Normalize(pos1) */
 
 		normal := rl.Vector3Normalize(m.V3Sub(pa.Pos, pb.Pos))
 
@@ -238,12 +226,16 @@ func (self *Container) DrawCell(cell m.V3Int, color rl.Color) {
 func (self *Container) DrawBounds() {
 	// rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
 	color := rl.Blue
-	rl.DrawModel(self.Bounds.XMinModel, rl.NewVector3(self.Bounds.XMin, 0, 0), 1, color)
-	rl.DrawModel(self.Bounds.XMaxModel, rl.NewVector3(self.Bounds.XMax, 0, 0), 1, color)
-	rl.DrawModel(self.Bounds.YMinModel, rl.NewVector3(0, self.Bounds.YMin, 0), 1, color)
-	rl.DrawModel(self.Bounds.YMaxModel, rl.NewVector3(0, self.Bounds.YMax, 0), 1, color)
-	rl.DrawModel(self.Bounds.ZMinModel, rl.NewVector3(0, 0, self.Bounds.ZMin), 1, color)
-	rl.DrawModel(self.Bounds.ZMaxModel, rl.NewVector3(0, 0, self.Bounds.ZMax), 1, color)
+	if ShowContainerWalls {
+		rl.DrawModel(self.Bounds.XMinModel, rl.NewVector3(self.Bounds.XMin, 0, 0), 1, color)
+		rl.DrawModel(self.Bounds.XMaxModel, rl.NewVector3(self.Bounds.XMax, 0, 0), 1, color)
+		rl.DrawModel(self.Bounds.YMinModel, rl.NewVector3(0, self.Bounds.YMin, 0), 1, color)
+		rl.DrawModel(self.Bounds.YMaxModel, rl.NewVector3(0, self.Bounds.YMax, 0), 1, color)
+		rl.DrawModel(self.Bounds.ZMinModel, rl.NewVector3(0, 0, self.Bounds.ZMin), 1, color)
+		rl.DrawModel(self.Bounds.ZMaxModel, rl.NewVector3(0, 0, self.Bounds.ZMax), 1, color)
+	} else {
+		rl.DrawCubeWires(self.Pos, self.Width, self.Height, self.Length, color)
+	}
 }
 
 func (self *Container) Print() {

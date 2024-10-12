@@ -1,9 +1,9 @@
-package src
+package engine
 
 import (
 	"math/rand"
 
-	m "github.com/dtasada/paper/src/math"
+	m "github.com/dtasada/paper/engine/math"
 	"github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -73,7 +73,7 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	oldCell := container.GetParticleCell(self)
 
 	{ /* Update particle properties*/
-		self.Vel.Y -= Gravity
+		// self.Vel.Y -= Gravity
 		self.Pos = m.V3Add(self.Pos, self.Vel)
 
 		self.AngVel = m.V3AddMatrix(

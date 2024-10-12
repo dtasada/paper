@@ -1,15 +1,14 @@
-/* package src: base engine functions structs and constants */
-package src
+/* package engine: base engine functions structs and constants */
+package engine
 
 import (
 	"math"
 
-	m "github.com/dtasada/paper/src/math"
+	m "github.com/dtasada/paper/engine/math"
 	"github.com/gen2brain/raylib-go/raylib"
 )
 
-// so many dimensions is confusing so i made aliases
-type (
+type ( // so many dimensions is confusing so i made aliases
 	Cell  = []*Particle
 	Row   = map[int]Cell
 	Plane = map[int]Row
@@ -21,16 +20,17 @@ var (
 	Sensitivity       float32 = 0.0035
 	MovementSpeed     float32 = 1.0
 	TargetFPS         int32   = 60
+
+	Font rl.Font
 )
 
 var (
 	ShowCellModels     bool = true
 	ShowCollisionGrid  bool = false
 	ShowCollisionLines bool = false
+	ShowContainerWalls bool = true
 	ShowParticleCells  bool = false
 )
-
-var Caskaydia rl.Font
 
 /* Returns the inverted color */
 func InvertColor(c rl.Color) rl.Color {
@@ -63,7 +63,7 @@ func RectTopLeft(x, y, width, height float32) rl.Rectangle {
 }
 
 func DrawText(text string, x, y float32, fontSize float32, tint rl.Color) {
-	rl.DrawTextEx(Caskaydia, text, rl.NewVector2(x, y), fontSize, 1, tint)
+	rl.DrawTextEx(Font, text, rl.NewVector2(x, y), fontSize, 1, tint)
 }
 
 /* Rounds value the nearest cell */
