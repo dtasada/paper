@@ -110,7 +110,7 @@ func NewContainer(pos, size m.V3, cellSize float32, shader rl.Shader) Container 
 	}
 }
 
-/* f is a function to run over every adjacent cell to a given particle */
+/* Helper function that runs f over every particle adjacent to pa */
 func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Particle)) {
 	cell := self.GetParticleCell(pa)
 	targetCell := m.V3Int{}
@@ -143,8 +143,7 @@ func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Par
 
 /* Helper function that calculates the lambda coefficient in SolveCollision */
 func calcLambda(pa, pb *Particle, normal m.V3) float32 {
-	var numerator float32
-	var denominator float32
+	var numerator, denominator float32
 
 	qa := m.MatrixMult(
 		m.MatrixInvInertia(pa.Inertia),

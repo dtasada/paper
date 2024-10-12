@@ -76,23 +76,6 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 		self.Vel.Y -= Gravity
 		self.Pos = m.V3Add(self.Pos, self.Vel)
 
-		/* if theta := rl.Vector3Length(self.AngVel); theta != 0 {
-			axis := rl.Vector3Normalize(self.AngVel)
-			K := rl.NewMatrix(
-				0, -axis.Z, axis.Y, 0,
-				axis.Z, 0, -axis.X, 0,
-				-axis.Y, axis.X, 0, 0,
-				0, 0, 0, 1,
-			)
-
-			R := m.MatrixAdd(
-				rl.MatrixIdentity(),
-				m.MatrixMultVal(K, m.Sin(theta)),
-				m.MatrixMultVal(rl.MatrixMultiply(K, K), 1-m.Cos(theta)),
-			)
-
-			self.Orientation = m.MatrixMult(self.Orientation, R)
-		} */
 		self.AngVel = m.V3AddMatrix(
 			self.AngVel,
 			m.MatrixMult(
