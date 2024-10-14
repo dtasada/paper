@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"slices"
 
 	m "github.com/dtasada/paper/engine/math"
@@ -118,11 +119,14 @@ func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Par
 
 	// if statements are to prevent checking non-existing would-be "edge-adjacent" cells
 	for dx := -d; dx <= d; dx += d {
-		if targetCell.X = cell.X + dx; targetCell.X >= int(self.Bounds.XMin) && targetCell.X <= int(self.Bounds.XMax) {
+		if targetCell.X = cell.X + dx; targetCell.X >= int(self.Bounds.XMin) &&
+			targetCell.X <= int(self.Bounds.XMax) {
 			for dy := -d; dy <= d; dy += d {
-				if targetCell.Y = cell.Y + dy; targetCell.Y >= int(self.Bounds.YMin) && targetCell.Y <= int(self.Bounds.YMax) {
+				if targetCell.Y = cell.Y + dy; targetCell.Y >= int(self.Bounds.YMin) &&
+					targetCell.Y <= int(self.Bounds.YMax) {
 					for dz := -d; dz <= d; dz += d {
-						if targetCell.Z = cell.Z + dz; targetCell.Z >= int(self.Bounds.ZMin) && targetCell.Z <= int(self.Bounds.ZMax) {
+						if targetCell.Z = cell.Z + dz; targetCell.Z >= int(self.Bounds.ZMin) &&
+							targetCell.Z <= int(self.Bounds.ZMax) {
 							if ShowCollisionGrid {
 								self.DrawCell(targetCell, rl.Green)
 							}
@@ -172,7 +176,6 @@ func (self *Container) SolveCollision(pa, pb *Particle) {
 	}
 
 	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
-
 		normal := rl.Vector3Normalize(m.V3Sub(pa.Pos, pb.Pos))
 
 		λ := calcLambda(pa, pb, normal)
@@ -192,6 +195,10 @@ func (self *Container) SolveCollision(pa, pb *Particle) {
 				m.V3BitOr(pb.Lever, normal)*λ,
 			),
 		)
+	}
+
+	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
+		fmt.Println(rl.GetTime(), "Collision not resolved")
 	}
 }
 
@@ -226,6 +233,9 @@ func (self *Container) DrawCell(cell m.V3Int, color rl.Color) {
 func (self *Container) DrawBounds() {
 	// rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
 	color := rl.Blue
+	if !ContainParticles {
+		color = rl.Red
+	}
 	if ShowContainerWalls {
 		rl.DrawModel(self.Bounds.XMinModel, rl.NewVector3(self.Bounds.XMin, 0, 0), 1, color)
 		rl.DrawModel(self.Bounds.XMaxModel, rl.NewVector3(self.Bounds.XMax, 0, 0), 1, color)

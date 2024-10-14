@@ -92,7 +92,14 @@ func main() {
 		lightShader,
 	)
 
-	light := e.NewLight(e.LightTypePoint, camera.Position, camera.Target, rl.Yellow, 0.5, lightShader)
+	light := e.NewLight(
+		e.LightTypePoint,
+		camera.Position,
+		camera.Target,
+		rl.Yellow,
+		0.5,
+		lightShader,
+	)
 
 	var particles []*e.Particle
 	// particles := []*src.Particle{}
@@ -133,7 +140,15 @@ func main() {
 					particle.Update(&container, &particles)
 
 					if rl.IsMouseButtonPressed(rl.MouseButtonRight) {
-						particle.Vel = m.V3Random(10)
+						particle.Vel = m.V3Random(10 * e.ForceMult)
+					} else if rl.IsKeyReleased(rl.KeyP) {
+						particle.Vel = m.V3Add(
+							particle.Vel,
+							m.V3MultVal(
+								rl.Vector3Normalize(m.V3Sub(rl.Vector3Zero(), particle.Pos)),
+								particle.Mass*e.ForceMult,
+							),
+						)
 					}
 				}
 
@@ -187,34 +202,49 @@ func main() {
 					2.0,
 				)
 
+				e.ForceMult = rg.Slider(
+					rl.NewRectangle(12+11*15, 60+24*5, 240, 20),
+					"Force Mult     ",
+					fmt.Sprintf("%.2f", e.ForceMult),
+					light.Intensity,
+					0.0,
+					2.0,
+				)
+
 				e.ShowCollisionGrid = rg.CheckBox(
-					rl.NewRectangle(8, 60+24*5, 20, 20),
+					rl.NewRectangle(8, 60+24*6, 20, 20),
 					"Collision grid ",
 					e.ShowCollisionGrid,
 				)
 
 				e.ShowCollisionLines = rg.CheckBox(
-					rl.NewRectangle(8, 60+24*6, 20, 20),
+					rl.NewRectangle(8, 60+24*7, 20, 20),
 					"Collision lines",
 					e.ShowCollisionLines,
 				)
 
 				e.ShowParticleCells = rg.CheckBox(
-					rl.NewRectangle(8, 60+24*7, 20, 20),
+					rl.NewRectangle(8, 60+24*8, 20, 20),
 					"Particle cells ",
 					e.ShowParticleCells,
 				)
 
 				e.ShowCellModels = rg.CheckBox(
-					rl.NewRectangle(8, 60+24*8, 20, 20),
+					rl.NewRectangle(8, 60+24*9, 20, 20),
 					"Cell models    ",
 					e.ShowCellModels,
 				)
 
 				e.ShowContainerWalls = rg.CheckBox(
-					rl.NewRectangle(8, 60+24*9, 20, 20),
+					rl.NewRectangle(8, 60+24*10, 20, 20),
 					"Container Walls",
 					e.ShowContainerWalls,
+				)
+
+				e.ContainParticles = rg.CheckBox(
+					rl.NewRectangle(8, 60+24*11, 20, 20),
+					"Contain particles",
+					e.ContainParticles,
 				)
 			} /* 2D Rendering */
 

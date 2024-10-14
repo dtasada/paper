@@ -15,16 +15,18 @@ type ( // so many dimensions is confusing so i made aliases
 )
 
 var (
-	GravityMultiplier float32 = 250
+	GravityMultiplier float32 = 1e4
 	Gravity           float32 = 1 / GravityMultiplier // gravity in m/s^2
 	Sensitivity       float32 = 0.0035
 	MovementSpeed     float32 = 1.0
+	ForceMult         float32 = 1
 	TargetFPS         int32   = 60
 
 	Font rl.Font
 )
 
 var (
+	ContainParticles   bool = true
 	ShowCellModels     bool = true
 	ShowCollisionGrid  bool = false
 	ShowCollisionLines bool = false

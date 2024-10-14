@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"math"
 	"math/rand"
 
 	m "github.com/dtasada/paper/engine/math"
@@ -8,18 +9,12 @@ import (
 )
 
 type Particle struct {
-	Pos              m.V3
-	Vel              m.V3
-	AngVel           m.V3
-	Lever            m.V3
-	Torque           m.V3
-	Orientation      rl.Matrix
-	Inertia          rl.Matrix
-	Radius           float32
-	Mass             float32
-	CollisionDamping float32
-	Color            rl.Color
-	Model            rl.Model
+	Pos, Vel, AngVel      m.V3
+	Lever, Torque         m.V3
+	Orientation, Inertia  rl.Matrix
+	Radius, Mass, Damping float32
+	Color                 rl.Color
+	Model                 rl.Model
 }
 
 func NewParticle(
@@ -31,32 +26,33 @@ func NewParticle(
 	model := rl.LoadModelFromMesh(rl.GenMeshSphere(radius, 32, 32))
 	model.Materials.Shader = shader
 	return Particle{
-		Pos:              pos,
-		Vel:              vel,
-		AngVel:           rl.Vector3Zero(),
-		Lever:            rl.Vector3Zero(),
-		Torque:           rl.Vector3Zero(),
-		Orientation:      rl.MatrixIdentity(),
-		Inertia:          rl.MatrixIdentity(),
-		Radius:           radius,
-		Mass:             mass,
-		CollisionDamping: collisionDamping,
-		Color:            color,
-		Model:            model,
+		Pos:         pos,
+		Vel:         vel,
+		AngVel:      rl.Vector3Zero(),
+		Lever:       rl.Vector3Zero(),
+		Torque:      rl.Vector3Zero(),
+		Orientation: rl.MatrixIdentity(),
+		Inertia:     rl.MatrixIdentity(),
+		Radius:      radius,
+		Mass:        mass,
+		Damping:     collisionDamping,
+		Color:       color,
+		Model:       model,
 	}
 }
 
 func CreateParticle(container *Container, particles *[]*Particle, lightShader rl.Shader) {
+
 	p := NewParticle(
 		rl.NewVector3(
 			container.Width*(rand.Float32()-0.5),
 			container.Height*(rand.Float32()-0.5),
 			container.Length*(rand.Float32()-0.5),
 		), // random position in grid
-		// rl.Vector3Zero(),
-		rl.NewVector3(0, 0, 0),
+		rl.Vector3Zero(),
 		container.CellSize/2,
-		m.Pow(container.CellSize/2, 2),
+		// m.Pow(container.CellSize/2, 2),
+		m.Pow(3*container.CellSize/8*math.Pi, 1/3),
 		0.0,
 		RandomColor(),
 		lightShader,
@@ -73,7 +69,8 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 	oldCell := container.GetParticleCell(self)
 
 	{ /* Update particle properties*/
-		// self.Vel.Y -= Gravity
+		acc := self.Mass * Gravity
+		self.Vel.Y -= acc
 		self.Pos = m.V3Add(self.Pos, self.Vel)
 
 		self.AngVel = m.V3AddMatrix(
@@ -88,32 +85,31 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 				),
 			),
 		)
-
 	}
 
-	{ /* Bounds checking */
+	if ContainParticles { /* Bounds checking */
 		if bottomBorder := container.Bounds.YMin + self.Radius; self.Pos.Y <= bottomBorder {
 			self.Pos.Y = bottomBorder
-			self.Vel.Y *= -self.CollisionDamping
+			self.Vel.Y *= -self.Damping
 		} else if topBorder := container.Bounds.YMax - self.Radius; self.Pos.Y >= topBorder {
 			self.Pos.Y = topBorder
-			self.Vel.Y *= -self.CollisionDamping
+			self.Vel.Y *= -self.Damping
 		}
 
 		if leftBorder := container.Bounds.XMin + self.Radius; self.Pos.X <= leftBorder {
 			self.Pos.X = leftBorder
-			self.Vel.X *= -self.CollisionDamping
+			self.Vel.X *= -self.Damping
 		} else if rightBorder := container.Bounds.XMax - self.Radius; self.Pos.X >= rightBorder {
 			self.Pos.X = rightBorder
-			self.Vel.X *= -self.CollisionDamping
+			self.Vel.X *= -self.Damping
 		}
 
 		if shallowBorder := container.Bounds.ZMin + self.Radius; self.Pos.Z <= shallowBorder {
 			self.Pos.Z = shallowBorder
-			self.Vel.Z *= -self.CollisionDamping
+			self.Vel.Z *= -self.Damping
 		} else if deepBorder := container.Bounds.ZMax - self.Radius; self.Pos.Z >= deepBorder {
 			self.Pos.Z = deepBorder
-			self.Vel.Z *= -self.CollisionDamping
+			self.Vel.Z *= -self.Damping
 		}
 	}
 

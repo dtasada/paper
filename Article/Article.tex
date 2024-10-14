@@ -4,10 +4,12 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{bibentry}
+\usepackage{color}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{hyphenat}
 \usepackage{indentfirst}
+\usepackage{listings}
 \usepackage{titlesec}
 \usepackage{url}
 \usepackage[normalem]{ulem}
@@ -19,6 +21,25 @@ urlcolor=cyan,
 citecolor=blue,
 ]{hyperref} % For hyperlinks
 
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  language=Go,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
 \addbibresource{references.bib}
 \geometry{margin=1in}
 \titleformat{\chapter}[display]
@@ -120,6 +141,12 @@ The following formulas represent the relation between particles:
 \]
 
 \subsection{The Code}
+\subsubsection{The Structure}
+We decided to write the simulator in Go, for its simplicity and development ergonomics.
+We used \href{www.github.com/gen2brain/raylib-go/}{raylib} for the 3D rendering, as it's a simple and easy-to-use library.
+The \verb|github.com/dtasada/paper| package contains the main entry point of the program, which then
+uses the \verb|github.com/dtasada/paper/engine| package to perform the interactions between particles.
+
 TODO: Explain container system, maybe show code samples
 
 % Results
