@@ -66,7 +66,7 @@ func V3ToMatrix(vec V3) Matrix {
 	)
 }
 
-func MatrixBitAnd(va, vb Matrix) Matrix {
+func MatrixCross(va, vb Matrix) Matrix {
 	var r Matrix
 	r.M0 = vb.M2*va.M1 - vb.M1*va.M2
 	r.M1 = vb.M0*va.M2 - vb.M2*va.M0
@@ -74,7 +74,7 @@ func MatrixBitAnd(va, vb Matrix) Matrix {
 	return r
 }
 
-func MatrixBitOr(va, vb Matrix) float32 {
+func MatrixDot(va, vb Matrix) float32 {
 	var sum float32
 	for c1 := 0; c1 < 16; c1++ {
 		sum += *MatrixIndex(va, c1) * *MatrixIndex(vb, c1)

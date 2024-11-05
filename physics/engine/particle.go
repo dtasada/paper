@@ -42,7 +42,6 @@ func NewParticle(
 }
 
 func CreateParticle(container *Container, particles *[]*Particle, lightShader rl.Shader) {
-
 	p := NewParticle(
 		rl.NewVector3(
 			container.Width*(rand.Float32()-0.5),
@@ -51,17 +50,16 @@ func CreateParticle(container *Container, particles *[]*Particle, lightShader rl
 		), // random position in grid
 		rl.Vector3Zero(),
 		container.CellSize/2,
-		// m.Pow(container.CellSize/2, 2),
-		m.Pow(3*container.CellSize/8*math.Pi, 1/3),
+		m.Pow(3*container.CellSize/8*math.Pi, 1/3), // mass/radius ratio
 		0.0,
 		RandomColor(),
 		lightShader,
 	)
 
-	(*particles) = append(*particles, &p) // add to particle arraylist
-	z := RoundToCellSize(float32(rand.Intn(container.Grid.Planes)-container.Grid.Planes/2), container.CellSize)
-	y := RoundToCellSize(float32(rand.Intn(container.Grid.Columns)-container.Grid.Columns/2), container.CellSize)
-	x := RoundToCellSize(float32(rand.Intn(container.Grid.Rows)-container.Grid.Rows/2), container.CellSize)
+	(*particles) = append(*particles, &p) // add to particle slice
+	z := RoundToCellSize(rand.Intn(container.Grid.Planes)-container.Grid.Planes/2, container.CellSize)
+	y := RoundToCellSize(rand.Intn(container.Grid.Columns)-container.Grid.Columns/2, container.CellSize)
+	x := RoundToCellSize(rand.Intn(container.Grid.Rows)-container.Grid.Rows/2, container.CellSize)
 	container.Grid.Content[z][y][x] = append(container.Grid.Content[z][y][x], &p) // add to bounds.Grid index
 }
 
@@ -79,7 +77,10 @@ func (self *Particle) Update(container *Container, particles *[]*Particle) {
 				m.MatrixInvInertia(self.Inertia),
 				m.MatrixMult(
 					m.MatrixGlInverse(m.V3ToMatrix(self.Pos)),
-					m.MatrixSub(m.V3ToMatrix(self.Torque), m.MatrixGlDerive(m.V3ToMatrix(self.AngVel))),
+					m.MatrixSub(
+						m.V3ToMatrix(self.Torque),
+						m.MatrixGlDerive(m.V3ToMatrix(self.AngVel)),
+					),
 					self.Inertia,
 					m.V3ToMatrix(self.AngVel),
 				),

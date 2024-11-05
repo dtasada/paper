@@ -70,20 +70,20 @@ func main() {
 	rg.SetStyle(rg.DEFAULT, rg.TEXT_COLOR_NORMAL, int64(rl.ColorToInt(rl.White)))
 
 	/* Shader setup */
-	lightShader := rl.LoadShader("./resources/shaders/lighting.vs", "./resources/shaders/lighting.fs")
+	lightShader := rl.LoadShader("./resources/shaders/vertex.glsl", "./resources/shaders/fragment.glsl")
 	*lightShader.Locs = rl.GetShaderLocation(lightShader, "viewPos")
 	ambientLoc := rl.GetShaderLocation(lightShader, "ambient")
 	shaderValue := []float32{0.1, 0.1, 0.1, 1.0}
 	rl.SetShaderValue(lightShader, ambientLoc, shaderValue, rl.ShaderUniformVec4)
 
 	/* Logic setup (camera, container and particle slice) */
-	camera := rl.Camera3D{
-		Position:   rl.NewVector3(0, 0, 0),
-		Target:     rl.NewVector3(-4, -4, -4),
-		Up:         rl.NewVector3(0, 1, 0), // Asserts Y to be the vertical axis
-		Fovy:       120.0,
-		Projection: rl.CameraPerspective,
-	}
+	camera := rl.NewCamera3D(
+		rl.NewVector3(0, 0, 0),
+		rl.NewVector3(-4, -4, -4),
+		rl.NewVector3(0, 1, 0), // Asserts Y to be the vertical axis
+		120.0,
+		rl.CameraPerspective,
+	)
 
 	container := e.NewContainer(
 		rl.NewVector3(0, 0, 0),
@@ -102,7 +102,6 @@ func main() {
 	)
 
 	var particles []*e.Particle
-	// particles := []*src.Particle{}
 
 	/* Main loop */
 	for !rl.WindowShouldClose() {
@@ -141,7 +140,7 @@ func main() {
 
 					if rl.IsMouseButtonPressed(rl.MouseButtonRight) {
 						particle.Vel = m.V3Random(10 * e.ForceMult)
-					} else if rl.IsKeyReleased(rl.KeyP) {
+					} else if rl.IsKeyDown(rl.KeyP) {
 						particle.Vel = m.V3Add(
 							particle.Vel,
 							m.V3MultVal(
@@ -180,7 +179,7 @@ func main() {
 					fmt.Sprintf("%.2f g", e.Gravity*e.GravityMultiplier),
 					e.Gravity*e.GravityMultiplier,
 					0,
-					10,
+					3,
 				) / e.GravityMultiplier
 
 				e.TargetFPS = int32(rg.Slider(
@@ -206,7 +205,7 @@ func main() {
 					rl.NewRectangle(12+11*15, 60+24*5, 240, 20),
 					"Force Mult     ",
 					fmt.Sprintf("%.2f", e.ForceMult),
-					light.Intensity,
+					e.ForceMult,
 					0.0,
 					2.0,
 				)

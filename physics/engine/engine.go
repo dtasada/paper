@@ -3,6 +3,7 @@ package engine
 
 import (
 	"math"
+	"os"
 
 	m "github.com/dtasada/paper/engine/math"
 	"github.com/gen2brain/raylib-go/raylib"
@@ -15,7 +16,7 @@ type ( // so many dimensions is confusing so i made aliases
 )
 
 var (
-	GravityMultiplier float32 = 1e4
+	GravityMultiplier float32 = 10
 	Gravity           float32 = 1 / GravityMultiplier // gravity in m/s^2
 	Sensitivity       float32 = 0.0035
 	MovementSpeed     float32 = 1.0
@@ -69,11 +70,18 @@ func DrawText(text string, x, y float32, fontSize float32, tint rl.Color) {
 }
 
 /* Rounds value the nearest cell */
-func RoundToCellSize(val float32, cellSize float32) int {
+func RoundToCellSize[T float32 | int](val T, cellSize float32) int {
 	r := float32(math.Mod(float64(val), float64(cellSize)))
 	if r+r >= cellSize {
-		return m.FloorToZero(val + cellSize - r)
+		return m.FloorToZero(float32(val) + cellSize - r)
 	} else {
-		return m.FloorToZero(val - r)
+		return m.FloorToZero(float32(val) - r)
+	}
+}
+
+func Assert(condition bool, msg string) {
+	if !condition {
+		println(msg)
+		os.Exit(1)
 	}
 }

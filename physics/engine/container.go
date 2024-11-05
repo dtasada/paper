@@ -60,7 +60,7 @@ func NewContainer(pos, size m.V3, cellSize float32, shader rl.Shader) Container 
 		map[int]Plane{},
 	}
 
-	count := 0
+	count := 0.0
 	for z := -grid.Planes / 2; z <= grid.Planes/2; z++ {
 		zi := z * int(cellSize)
 		grid.Content[zi] = Plane{}
@@ -83,12 +83,12 @@ func NewContainer(pos, size m.V3, cellSize float32, shader rl.Shader) Container 
 		ZMin: pos.Z - length/2,
 		ZMax: pos.Z + length/2,
 
-		XMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(0.1, height, length)),
-		XMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(0.1, height, length)),
-		YMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, 0.1, length)),
-		YMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, 0.1, length)),
-		ZMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, height, 0.1)),
-		ZMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, height, 0.1)),
+		XMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(0.01, height, length)),
+		XMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(0.01, height, length)),
+		YMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, 0.01, length)),
+		YMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, 0.01, length)),
+		ZMinModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, height, 0.01)),
+		ZMaxModel: rl.LoadModelFromMesh(rl.GenMeshCube(width, height, 0.01)),
 	}
 
 	bounds.XMinModel.Materials.Shader = shader
@@ -146,26 +146,32 @@ func (self *Container) ForAdjacentParticles(pa *Particle, f func(*Particle, *Par
 }
 
 /* Helper function that calculates the lambda coefficient in SolveCollision */
-func calcLambda(pa, pb *Particle, normal m.V3) float32 {
-	var numerator, denominator float32
+func compLam(pa, pb *Particle, normal m.V3) float32 {
 	qa := m.MatrixMult(
 		m.MatrixInvInertia(pa.Inertia),
 		m.MatrixGlInverse(m.V3ToMatrix(pa.Pos)),
-		m.MatrixBitAnd(m.V3ToMatrix(pa.Lever), m.V3ToMatrix(normal)),
+		m.MatrixCross(m.V3ToMatrix(pa.Lever), m.V3ToMatrix(normal)),
 	)
 	qb := m.MatrixMult(
 		m.MatrixInvInertia(pb.Inertia),
 		m.MatrixGlInverse(m.V3ToMatrix(pb.Pos)),
-		m.MatrixBitAnd(m.V3ToMatrix(pb.Lever), m.V3ToMatrix(normal)),
+		m.MatrixCross(m.V3ToMatrix(pb.Lever), m.V3ToMatrix(normal)),
 	)
-	numerator -= m.MatrixBitOr(m.V3ToMatrix(pa.Vel), m.V3ToMatrix(normal))
-	numerator += m.MatrixBitOr(m.V3ToMatrix(pb.Vel), m.V3ToMatrix(normal))
-	numerator -= m.MatrixBitOr(m.MatrixMult(pa.Inertia, qa), m.V3ToMatrix(pa.AngVel))
-	numerator += m.MatrixBitOr(m.MatrixMult(pb.Inertia, qb), m.V3ToMatrix(pb.AngVel))
+
+	fmt.Println("qa:", qa)
+	fmt.Println("qb:", qb)
+
+	var numerator, denominator float32
+
+	numerator -= m.MatrixDot(m.V3ToMatrix(pa.Vel), m.V3ToMatrix(normal))
+	numerator += m.MatrixDot(m.V3ToMatrix(pb.Vel), m.V3ToMatrix(normal))
+	numerator -= m.MatrixDot(m.MatrixMult(pa.Inertia, qa), m.V3ToMatrix(pa.AngVel))
+	numerator += m.MatrixDot(m.MatrixMult(pb.Inertia, qb), m.V3ToMatrix(pb.AngVel))
+
 	denominator += 1 / pa.Mass
 	denominator += 1 / pb.Mass
-	denominator += m.MatrixBitOr(m.MatrixMult(pa.Inertia, qa), qa)
-	denominator += m.MatrixBitOr(m.MatrixMult(pb.Inertia, qb), qb)
+	denominator += m.MatrixDot(m.MatrixMult(pa.Inertia, qa), qa)
+	denominator += m.MatrixDot(m.MatrixMult(pb.Inertia, qb), qb)
 	return 2 * numerator / denominator
 }
 
@@ -178,28 +184,39 @@ func (self *Container) SolveCollision(pa, pb *Particle) {
 	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
 		normal := rl.Vector3Normalize(m.V3Sub(pa.Pos, pb.Pos))
 
-		λ := calcLambda(pa, pb, normal)
-		pa.Vel = m.V3Add(pa.Vel, m.V3MultVal(normal, (λ/pa.Mass)))
-		pb.Vel = m.V3Sub(pb.Vel, m.V3MultVal(normal, (λ/pb.Mass)))
+		// lam := compLam(pa, pb, normal)
+		lam := float32(0.01)
+		// if lam == 0 {
+		// 	pretty.Println("lam:", lam)
+		// }
+
+		pa.Vel = m.V3Add(pa.Vel, m.V3MultVal(normal, lam/pa.Mass))
+		pb.Vel = m.V3Sub(pb.Vel, m.V3MultVal(normal, lam/pb.Mass))
 		pa.AngVel = m.V3AddMatrix(
 			pa.AngVel,
 			m.MatrixMultVal(
-				m.MatrixMult(m.MatrixInvInertia(pa.Inertia), m.MatrixGlInverse(m.V3ToMatrix(pa.Pos))),
-				m.V3BitOr(pa.Lever, normal)*λ,
+				m.MatrixMult(
+					m.MatrixInvInertia(pa.Inertia),
+					m.MatrixGlInverse(m.V3ToMatrix(pa.Pos)),
+				),
+				rl.Vector3DotProduct(pa.Lever, normal)*lam,
 			),
 		)
 		pb.AngVel = m.V3SubMatrix(
 			pb.AngVel,
 			m.MatrixMultVal(
-				m.MatrixMult(m.MatrixInvInertia(pb.Inertia), m.MatrixGlInverse(m.V3ToMatrix(pb.Pos))),
-				m.V3BitOr(pb.Lever, normal)*λ,
+				m.MatrixMult(
+					m.MatrixInvInertia(pb.Inertia),
+					m.MatrixGlInverse(m.V3ToMatrix(pb.Pos)),
+				),
+				rl.Vector3DotProduct(pb.Lever, normal)*lam,
 			),
 		)
 	}
 
-	if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
+	/* if rl.CheckCollisionSpheres(pa.Pos, pa.Radius, pb.Pos, pb.Radius) {
 		fmt.Println(rl.GetTime(), "Collision not resolved")
-	}
+	} */
 }
 
 /* Deletes a given particle from its corresponding cell */
@@ -214,9 +231,9 @@ func (self *Container) DelParticleFromCell(particle *Particle, cell m.V3Int) {
 /* Returns a particle's corresponding cell */
 func (self *Container) GetParticleCell(particle *Particle) m.V3Int {
 	return m.V3Int{
-		RoundToCellSize(particle.Pos.X, self.CellSize),
-		RoundToCellSize(particle.Pos.Y, self.CellSize),
-		RoundToCellSize(particle.Pos.Z, self.CellSize),
+		X: RoundToCellSize(particle.Pos.X, self.CellSize),
+		Y: RoundToCellSize(particle.Pos.Y, self.CellSize),
+		Z: RoundToCellSize(particle.Pos.Z, self.CellSize),
 	}
 }
 
@@ -231,11 +248,11 @@ func (self *Container) DrawCell(cell m.V3Int, color rl.Color) {
 }
 
 func (self *Container) DrawBounds() {
-	// rl.DrawCubeWires(container.Pos, container.Width, container.Height, container.Length, rl.Red)
 	color := rl.Blue
 	if !ContainParticles {
 		color = rl.Red
 	}
+
 	if ShowContainerWalls {
 		rl.DrawModel(self.Bounds.XMinModel, rl.NewVector3(self.Bounds.XMin, 0, 0), 1, color)
 		rl.DrawModel(self.Bounds.XMaxModel, rl.NewVector3(self.Bounds.XMax, 0, 0), 1, color)
