@@ -2,36 +2,34 @@
 
 #include <raylib.h>
 
-#include <algorithm>
-
 #include "../include/Profiler.hpp"
 
 Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt) {
     this->container_size = container_size;
     this->fluid_size = fluid_size;
+    this->dt = dt;
     this->diff = diffusion;
     this->visc = viscosity;
-    this->dt = dt;
     int N = this->container_size;
-    this->s = (float *)calloc(N * N * N, sizeof(float));
-    this->density = (float *)calloc(N * N * N, sizeof(float));
-    this->Vx = (float *)calloc(N * N * N, sizeof(float));
-    this->Vy = (float *)calloc(N * N * N, sizeof(float));
-    this->Vz = (float *)calloc(N * N * N, sizeof(float));
-    this->Vx0 = (float *)calloc(N * N * N, sizeof(float));
-    this->Vy0 = (float *)calloc(N * N * N, sizeof(float));
-    this->Vz0 = (float *)calloc(N * N * N, sizeof(float));
+    this->s = new float[N * N * N]();
+    this->density = new float[N * N * N]();
+    this->Vx = new float[N * N * N]();
+    this->Vy = new float[N * N * N]();
+    this->Vz = new float[N * N * N]();
+    this->Vx0 = new float[N * N * N]();
+    this->Vy0 = new float[N * N * N]();
+    this->Vz0 = new float[N * N * N]();
 }
 
 Fluid::~Fluid() {
-    free(this->s);
-    free(this->density);
-    free(this->Vx);
-    free(this->Vy);
-    free(this->Vz);
-    free(this->Vx0);
-    free(this->Vy0);
-    free(this->Vz0);
+    delete[] this->s;
+    delete[] this->density;
+    delete[] this->Vx;
+    delete[] this->Vy;
+    delete[] this->Vz;
+    delete[] this->Vx0;
+    delete[] this->Vy0;
+    delete[] this->Vz0;
 }
 
 int Fluid::ContainerSize() { return container_size; }

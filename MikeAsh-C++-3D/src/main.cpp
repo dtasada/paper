@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include <raylib.h>
 #include <raymath.h>
+#include <rlgl.h>
 
 #include <cstdio>
 
@@ -70,6 +71,14 @@ int main(int argc, char* argv[]) {
             fluid.addVelocity({x, y, z}, amount);
         }
 
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+            amount.x = amount.y = amount.z = rand() % 11 - 5;
+
+            float x = 1, y = 1, z = 1;
+            fluid.addDensity({x, y, z}, 10000);
+            fluid.addVelocity({x, y, z}, amount);
+        }
+
         if (IsKeyPressed(KEY_ESCAPE)) {
             if (cursor) {
                 DisableCursor();
@@ -90,30 +99,28 @@ int main(int argc, char* argv[]) {
         fluid.step();
 
         BeginDrawing();
-        ClearBackground(BLACK);
+        ClearBackground(BLUE);
 
         BeginMode3D(camera);
         // light.update();
+
+        DrawCubeWiresV(containerCenter, containerSize, RED);
 
         for (float z = 0; z < fluid.ContainerSize(); z++) {
             for (float y = 0; y < fluid.ContainerSize(); y++) {
                 for (float x = 0; x < fluid.ContainerSize(); x++) {
                     float density = fluid.Density({x, y, z});
-                    if (density == 0) continue;
-                    printf("density: %f\n", density);
+                    if (density <= 10e-7) continue;
                     render_index = {x, y, z};
                     render_index = render_index * VECTOROF(fluid.FluidSize());
                     render_index = render_index + (fluid.FluidSize() / 2);
                     BeginBlendMode(BLEND_ALPHA);
                     DrawCubeV(render_index, VECTOROF(fluid.FluidSize()),
-                              {100, 255, 255, (uint8_t)density});
-                    // DrawModel(model, render_index, 1, {100, 255, 255, (uint8_t)density});
+                              {255, 70, 0, (uint8_t)density});
                     EndBlendMode();
                 }
             }
         }
-
-        DrawCubeWiresV(containerCenter, containerSize, RED);
 
         EndMode3D();
 
