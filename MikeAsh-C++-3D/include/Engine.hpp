@@ -1,3 +1,6 @@
+#ifndef ENGINE_HEADER
+#define ENGINE_HEADER
+
 #include <raymath.h>
 
 #include <string>
@@ -30,4 +33,7 @@ class v3 {
     const char* to_cstr();
 
     operator Vector3();
+    operator float*();
 };
+
+#endif

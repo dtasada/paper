@@ -1,11 +1,13 @@
 #include <math.h>
 #include <raylib.h>
 #include <stdlib.h>
+
+#define IX(x, y, z) \
+    (constrain(x, 0, N - 1) + (constrain(y, 0, N - 1) * N) + (constrain(z, 0, N - 1) * N * N))
+
 #define IXv(vec)                                                     \
     (constrain(vec.x, 0, N - 1) + (constrain(vec.y, 0, N - 1) * N) + \
      (constrain(vec.z, 0, N - 1) * N * N))
-#define IX(x, y, z) \
-    (constrain(x, 0, N - 1) + (constrain(y, 0, N - 1) * N) + (constrain(z, 0, N - 1) * N * N))
 
 #include "Engine.hpp"
 

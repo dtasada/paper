@@ -66,7 +66,7 @@ func NewLight(
 }
 
 func (self *Light) Update() {
-	// rl.DrawSphere(self.Position, 0.2, self.Color)
+	rl.DrawSphere(self.Position, 0.2, self.Color)
 
 	// Send to shader light enabled state and type
 	rl.SetShaderValue(self.Shader, self.EnabledLoc, unsafe.Slice((*float32)(unsafe.Pointer(&self.Enabled)), 4), rl.ShaderUniformInt)
