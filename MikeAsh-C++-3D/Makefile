@@ -1,5 +1,5 @@
 build:
-	g++ *.cpp -Wall -lraylib -o main
+	g++ -std=c++23 src/*.cpp -Wall -O3 -lraylib -o main
 
 run: build
 	./main

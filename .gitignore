@@ -1,4 +1,5 @@
 /target
+.DS_Store
 
 Article/*
 !Article/Article.tex
