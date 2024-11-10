@@ -1,11 +1,11 @@
-#include "../include/Light.hpp"
+#include "../../include/engine/Light.hpp"
 
 #include <raylib.h>
 
 #include <cstdio>
 #include <format>
 
-#include "../include/Engine.hpp"
+#include "../../include/engine/Engine.hpp"
 
 Light::Light(LightType light_type, v3 position, v3 target, Color color, float intensity,
              Shader shader)

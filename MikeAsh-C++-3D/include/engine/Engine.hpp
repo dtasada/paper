@@ -5,13 +5,12 @@
 
 #include <string>
 
-class v3 {
-   public:
+struct v3 {
     float x, y, z;
 
     v3(float x, float y, float z);
     v3(Vector3 v);
-    v3();
+    v3(void);
 
     v3 operator+(const v3& other);
     v3 operator-(const v3& other);

@@ -1,8 +1,8 @@
-#include "../include/Fluid.hpp"
+#include "../../include/engine/Fluid.hpp"
 
 #include <raylib.h>
 
-#include "../include/Profiler.hpp"
+#include "../../include/engine/Profiler.hpp"
 
 Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt) {
     this->container_size = container_size;

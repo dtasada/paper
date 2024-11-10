@@ -5,9 +5,9 @@
 
 #include <cstdio>
 
-#include "../include/Fluid.hpp"
-#include "../include/Light.hpp"
-#include "../include/Profiler.hpp"
+#include "../include/engine/Fluid.hpp"
+#include "../include/engine/Light.hpp"
+#include "../include/engine/Profiler.hpp"
 
 #define FPS 60.0f
 #define VECTOROF(x) \
@@ -27,6 +27,8 @@ int main(int argc, char* argv[]) {
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    rlDisableDepthTest();
+    rlDisableBackfaceCulling();
 
     float diffusion = 0;         // Diffusion constant
     float dt = 0.1;              // Timestep
