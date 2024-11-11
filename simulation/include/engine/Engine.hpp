@@ -41,4 +41,5 @@ struct Cell {
     float distanceSquared;  // Distance from the camera (squared)
 };
 
+int constrain(int val, int low, int high);
 #endif

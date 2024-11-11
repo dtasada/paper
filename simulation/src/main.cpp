@@ -8,7 +8,6 @@
 
 #include "../include/engine/Engine.hpp"
 #include "../include/engine/Fluid.hpp"
-#include "../include/engine/Profiler.hpp"
 
 #define FPS 60.0f
 #define VECTOROF(x) \
@@ -53,10 +52,10 @@ int main(int argc, char* argv[]) {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
             float x = 1, y = 1, z = 1;
             float amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 4 : 20;
-            fluid.addDensity({x, y, z}, 100);
+            fluid.add_density({x, y, z}, 100);
 
             v3 vel(4, -9.81, 4);
-            fluid.addVelocity({x, y, z}, VECTOROF(amount));
+            fluid.add_velocity({x, y, z}, VECTOROF(amount));
         }
 
         if (IsKeyPressed(KEY_ESCAPE)) {
@@ -99,7 +98,7 @@ int main(int argc, char* argv[]) {
         }
         std::ranges::sort(cells, std::greater{}, &Cell::distanceSquared);
 
-        // Begin Drawing
+        /* Begin Drawing */
         BeginDrawing();
         ClearBackground(BLACK);
 
@@ -109,9 +108,9 @@ int main(int argc, char* argv[]) {
 
         // Render cubes
         for (const Cell& cell : cells) {
+            // get color of cube
             float norm = std::min(cell.density / 100.0f, 1.0f);
             float hue = (1.0f - norm) * 0.66f * 360.0f;
-
             Color c = ColorFromHSV(hue, 1.0f, 1.0f);
             Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
 
@@ -130,6 +129,5 @@ int main(int argc, char* argv[]) {
     }
 
     CloseWindow();
-    Profiler::printResults();
     return 0;
 }

@@ -31,3 +31,5 @@ v3::operator float*() const { return new float[3]{x, y, z}; }
 
 std::string v3::to_string() { return std::format("v3({:.1f}, {:.1f}, {:.1f})", x, y, z); }
 const char* v3::to_cstr() { return to_string().c_str(); }
+
+int constrain(int val, int low, int high) { return std::min(std::max(val, low), high); }

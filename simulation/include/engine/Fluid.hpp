@@ -4,15 +4,18 @@
 
 #include "Engine.hpp"
 
-#define IX(x, y, z) \
-    (constrain(x, 0, N - 1) + (constrain(y, 0, N - 1) * N) + (constrain(z, 0, N - 1) * N * N))
+#define IX(x, y, z)                                                 \
+    int(constrain((x), 0, N - 1) + (constrain((y), 0, N - 1) * N) + \
+        (constrain((z), 0, N - 1) * N * N))
 
-#define IXv(vec)                                                     \
-    (constrain(vec.x, 0, N - 1) + (constrain(vec.y, 0, N - 1) * N) + \
-     (constrain(vec.z, 0, N - 1) * N * N))
+#define IXv(vec)                                                            \
+    int(constrain((vec).x, 0, N - 1) + (constrain((vec).y, 0, N - 1) * N) + \
+        (constrain((vec).z, 0, N - 1) * N * N))
 
 class Fluid {
    private:
+    static const int iter = 4;
+
     float container_size;
     float fluid_size;
     float dt;
@@ -36,16 +39,14 @@ class Fluid {
     float Density(v3 position);
     float FluidSize();
     int ContainerSize();
-    void addDensity(v3 position, float amount);
-    void addVelocity(v3 position, v3 amount);
+    void add_density(v3 position, float amount);
+    void add_velocity(v3 position, v3 amount);
     void renderGrid();
     void step();
-};
 
-void set_bnd(int bound, float *x, int N);
-void lin_solve(int b, float *x, float *x0, float a, float c, int iter, int N);
-void diffuse(int b, float *x, float *x0, float diff, float dt, int iter, int N);
-void project(float *velocX, float *velocY, float *velocZ, float *p, float *div, int iter, int N);
-void advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ, float dt,
-            int N);
-int constrain(int val, int low, int high);
+    void diffuse(int b, float *x, float *x0, float diff);
+    void project(float *velocX, float *velocY, float *velocZ, float *p, float *div);
+    void advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ);
+    void set_bnd(int bound, float *x);
+    void lin_solve(int b, float *x, float *x0, float a, float c);
+};
