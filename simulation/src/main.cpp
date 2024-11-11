@@ -54,6 +54,8 @@ int main(int argc, char* argv[]) {
             float x = 1, y = 1, z = 1;
             float amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 4 : 20;
             fluid.addDensity({x, y, z}, 100);
+
+            v3 vel(4, -9.81, 4);
             fluid.addVelocity({x, y, z}, VECTOROF(amount));
         }
 
