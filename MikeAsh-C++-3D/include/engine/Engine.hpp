@@ -31,8 +31,14 @@ struct v3 {
     std::string to_string();
     const char* to_cstr();
 
-    operator Vector3();
-    operator float*();
+    operator Vector3() const;
+    operator float*() const;
+};
+
+struct Cell {
+    v3 position;
+    float density;
+    float distanceSquared;  // Distance from the camera (squared)
 };
 
 #endif
