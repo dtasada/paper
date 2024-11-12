@@ -4,13 +4,15 @@
 
 #include "Engine.hpp"
 
-#define IX(x, y, z)                                                 \
-    int(constrain((x), 0, N - 1) + (constrain((y), 0, N - 1) * N) + \
-        (constrain((z), 0, N - 1) * N * N))
+#define IX(x, y, z)                                                \
+    int(constrain((x), 0, container_size - 1) +                    \
+        (constrain((y), 0, container_size - 1) * container_size) + \
+        (constrain((z), 0, container_size - 1) * container_size * container_size))
 
-#define IXv(vec)                                                            \
-    int(constrain((vec).x, 0, N - 1) + (constrain((vec).y, 0, N - 1) * N) + \
-        (constrain((vec).z, 0, N - 1) * N * N))
+#define IXv(vec)                                                       \
+    int(constrain((vec).x, 0, container_size - 1) +                    \
+        (constrain((vec).y, 0, container_size - 1) * container_size) + \
+        (constrain((vec).z, 0, container_size - 1) * container_size * container_size))
 
 class Fluid {
    private:
@@ -34,7 +36,7 @@ class Fluid {
     float *Vz0;
 
    public:
-    Fluid(int container_size, float scale, float diffusion, float viscosity, float dt);
+    Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
     ~Fluid();
     float Density(v3 position);
     float FluidSize();
@@ -44,6 +46,7 @@ class Fluid {
     void renderGrid();
     void step();
 
+    void add_gravity();
     void diffuse(int b, float *x, float *x0, float diff);
     void project(float *velocX, float *velocY, float *velocZ, float *p, float *div);
     void advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ);

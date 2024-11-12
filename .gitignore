@@ -1,4 +1,6 @@
-/target
+# /target
+# /out
+/paper
 .DS_Store
 
 Article/*

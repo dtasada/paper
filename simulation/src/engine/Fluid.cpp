@@ -4,7 +4,7 @@
 
 Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt) {
     this->container_size = container_size;
-    this->fluid_size = fluid_size;
+    this->fluid_size = fluid_size;  // raylib coordinate size of a single cell
     this->dt = dt;
     this->diff = diffusion;
     this->visc = viscosity;
@@ -34,49 +34,55 @@ Fluid::~Fluid() {
 int Fluid::ContainerSize() { return container_size; }
 float Fluid::FluidSize() { return fluid_size; }
 
-void Fluid::add_density(v3 position, float amount) {
-    int N = this->container_size;
-    this->density[IXv(position)] += amount;
-}
+void Fluid::add_density(v3 position, float amount) { this->density[IXv(position)] += amount; }
 
 void Fluid::add_velocity(v3 position, v3 amount) {
-    int N = this->container_size;
     int index = IXv(position);
-    this->Vx[index] += amount.x;
-    this->Vy[index] += amount.y;
-    this->Vz[index] += amount.z;
+    Vx[index] += amount.x;
+    Vy[index] += amount.y;
+    Vz[index] += amount.z;
+}
+
+void Fluid::add_gravity() {
+    int N = container_size;
+    float gravity = -2.0f;
+
+    for (int z = 1; z < N - 1; z++) {
+        for (int y = 1; y < N - 1; y++) {
+            for (int x = 1; x < N - 1; x++) {
+                Vy[IX(x, y, z)] += -2.0f;
+            }
+        }
+    }
 }
 
 void Fluid::step() {
-    diffuse(1, this->Vx0, this->Vx, this->visc);
-    diffuse(2, this->Vy0, this->Vy, this->visc);
-    diffuse(3, this->Vz0, this->Vz, this->visc);
+    // add_gravity();
+    diffuse(1, Vx0, Vx, visc);
+    diffuse(2, Vy0, Vy, visc);
+    diffuse(3, Vz0, Vz, visc);
 
-    project(this->Vx0, this->Vy0, this->Vz0, this->Vx, this->Vy);
+    project(Vx0, Vy0, Vz0, Vx, Vy);
 
-    advect(1, this->Vx, this->Vx0, this->Vx0, this->Vy0, this->Vz0);
-    advect(2, this->Vy, this->Vy0, this->Vx0, this->Vy0, this->Vz0);
-    advect(3, this->Vz, this->Vz0, this->Vx0, this->Vy0, this->Vz0);
+    advect(1, Vx, Vx0, Vx0, Vy0, Vz0);
+    advect(2, Vy, Vy0, Vx0, Vy0, Vz0);
+    advect(3, Vz, Vz0, Vx0, Vy0, Vz0);
 
-    project(this->Vx, this->Vy, this->Vz, this->Vx0, this->Vy0);
+    project(Vx, Vy, Vz, Vx0, Vy0);
 
-    diffuse(0, this->s, this->density, this->diff);
-    advect(0, this->density, this->s, this->Vx, this->Vy, this->Vz);
+    diffuse(0, s, density, diff);
+    advect(0, density, s, Vx, Vy, Vz);
 }
 
-float Fluid::Density(v3 position) {
-    int N = this->container_size;
-    return this->density[IXv(position)];
-}
+float Fluid::Density(v3 position) { return density[IXv(position)]; }
 
 void Fluid::diffuse(int b, float *x, float *x0, float diff) {
-    int N = this->container_size;
-    float a = dt * diff * (N - 2) * (N - 2);
+    float a = dt * diff * pow(container_size - 2, 3);
     lin_solve(b, x, x0, a, 1 + 6 * a);
 }
 
 void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float *div) {
-    int N = this->container_size;
+    int N = container_size;
 
     for (int k = 1; k < N - 1; k++) {
         for (int j = 1; j < N - 1; j++) {
@@ -104,6 +110,7 @@ void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float
             }
         }
     }
+
     set_bnd(1, velocX);
     set_bnd(2, velocY);
     set_bnd(3, velocZ);
@@ -111,7 +118,7 @@ void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float
 
 void Fluid::advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ) {
     float dt = this->dt;
-    float N = this->container_size;
+    float N = container_size;
 
     float i0, i1, j0, j1, k0, k1;
 
@@ -175,7 +182,7 @@ void Fluid::advect(int b, float *d, float *d0, float *velocX, float *velocY, flo
 }
 
 void Fluid::set_bnd(int b, float *x) {
-    int N = this->container_size;
+    int N = container_size;
 
     for (int j = 1; j < N - 1; j++) {
         for (int i = 1; i < N - 1; i++) {
@@ -214,7 +221,8 @@ void Fluid::set_bnd(int b, float *x) {
 
 void Fluid::lin_solve(int b, float *x, float *x0, float a, float c) {
     float cRecip = 1.0 / c;
-    int N = this->container_size;
+    int N = container_size;
+
     for (int k = 0; k < iter; k++) {
         for (int m = 1; m < N - 1; m++) {
             for (int j = 1; j < N - 1; j++) {

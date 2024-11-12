@@ -10,8 +10,6 @@
 #include "../include/engine/Fluid.hpp"
 
 #define FPS 60.0f
-#define VECTOROF(x) \
-    v3 { (float)x, (float)x, (float)x }
 
 int main(int argc, char* argv[]) {
     srand(time(nullptr));
@@ -26,26 +24,24 @@ int main(int argc, char* argv[]) {
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    rlDisableDepthTest();
-    rlDisableBackfaceCulling();
-
-    bool cursor = false;
-    Camera3D camera = {
-        .position = v3(10, 10, 10),
-        .target = v3(-100, -100, -100),
-        .up = {0.0, 1.0, 0.0},
-        .fovy = 90.0f,
-        .projection = CAMERA_PERSPECTIVE,
-    };
 
     /* Fluid sim setup */
     float diffusion = 0;         // Diffusion constant
-    float dt = 1.0;              // Timestep
+    float dt = 1.0f;             // Timestep
     float viscosity = 0.000001;  // Viscosity constant
 
-    Fluid fluid(64, 0.5f, diffusion, viscosity, dt);
-    v3 containerSize = VECTOROF(fluid.ContainerSize() * fluid.FluidSize());
+    Fluid fluid(24, 1.0f, diffusion, viscosity, dt);
+    v3 containerSize(fluid.ContainerSize() * fluid.FluidSize());
     v3 containerCenter = containerSize * 0.5f;
+
+    bool cursor = false;
+    Camera3D camera = {
+        .position = v3(fluid.ContainerSize() * fluid.FluidSize()),
+        .target = containerCenter,
+        .up = {0.0, 1.0, 0.0},
+        .fovy = 45.0f,
+        .projection = CAMERA_ORTHOGRAPHIC,
+    };
 
     while (!WindowShouldClose()) {
         /* Handle input */
@@ -55,7 +51,7 @@ int main(int argc, char* argv[]) {
             fluid.add_density({x, y, z}, 100);
 
             v3 vel(4, -9.81, 4);
-            fluid.add_velocity({x, y, z}, VECTOROF(amount));
+            fluid.add_velocity({x, y, z}, v3(amount));
         }
 
         if (IsKeyPressed(KEY_ESCAPE)) {
@@ -68,7 +64,7 @@ int main(int argc, char* argv[]) {
 
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
 
-        if (!cursor) UpdateCamera(&camera, CAMERA_FREE);
+        if (!cursor) UpdateCamera(&camera, CAMERA_THIRD_PERSON);
 
         /* Update sim */
         fluid.step();
@@ -81,7 +77,7 @@ int main(int argc, char* argv[]) {
                     float density = fluid.Density({x, y, z});
                     if (density > 0.01f) {  // Skip cubes with very low density
                         v3 cubePosition = {x, y, z};
-                        cubePosition = cubePosition * VECTOROF(fluid.FluidSize());
+                        cubePosition = cubePosition * v3(fluid.FluidSize());
                         cubePosition = cubePosition + (fluid.FluidSize() / 2);
 
                         // Calculate the squared distance to the camera
@@ -115,7 +111,7 @@ int main(int argc, char* argv[]) {
             Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
 
             BeginBlendMode(BLEND_ALPHA);
-            DrawCubeV(cell.position, VECTOROF(fluid.FluidSize()), color);
+            DrawCubeV(cell.position, v3(fluid.FluidSize()), color);
             EndBlendMode();
         }
 
