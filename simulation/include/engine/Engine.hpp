@@ -1,5 +1,6 @@
-#ifndef ENGINE_HEADER
-#define ENGINE_HEADER
+#pragma once
+#ifndef Engine_hpp
+#define Engine_hpp
 
 #include <raymath.h>
 
@@ -38,6 +39,7 @@ struct v3 {
 struct Cell {
     v3 position;
     float density;
+    bool is_solid;
     float distanceSquared;  // Distance from the camera (squared)
 };
 

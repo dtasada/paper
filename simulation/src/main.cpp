@@ -32,7 +32,9 @@ int main(int argc, char* argv[]) {
 
     Fluid fluid(24, 1.0f, diffusion, viscosity, dt);
     v3 containerSize(fluid.ContainerSize() * fluid.FluidSize());
-    v3 containerCenter = containerSize * 0.5f;
+    v3 containerCenter(containerSize * 0.5f);
+
+    fluid.add_cube(v3(10), 10);
 
     bool cursor = false;
     Camera3D camera = {
@@ -54,6 +56,8 @@ int main(int argc, char* argv[]) {
             fluid.add_velocity({x, y, z}, v3(amount));
         }
 
+        if (IsKeyPressed(KEY_F)) ToggleFullscreen();
+        if (IsKeyPressed(KEY_R)) fluid.reset();
         if (IsKeyPressed(KEY_ESCAPE)) {
             if (cursor)
                 DisableCursor();
@@ -61,8 +65,6 @@ int main(int argc, char* argv[]) {
                 EnableCursor();
             cursor = !cursor;
         }
-
-        if (IsKeyPressed(KEY_F)) ToggleFullscreen();
 
         if (!cursor) UpdateCamera(&camera, CAMERA_THIRD_PERSON);
 
@@ -75,19 +77,20 @@ int main(int argc, char* argv[]) {
             for (float y = 0; y < fluid.ContainerSize(); y++) {
                 for (float x = 0; x < fluid.ContainerSize(); x++) {
                     float density = fluid.Density({x, y, z});
-                    if (density > 0.01f) {  // Skip cubes with very low density
-                        v3 cubePosition = {x, y, z};
-                        cubePosition = cubePosition * v3(fluid.FluidSize());
-                        cubePosition = cubePosition + (fluid.FluidSize() / 2);
+                    bool is_solid = fluid.Solid({x, y, z});
+                    if (density > 0.01f || is_solid) {  // Skip cubes with very low density
+                        v3 cube_position = {x, y, z};
+                        cube_position = cube_position * v3(fluid.FluidSize());
+                        cube_position = cube_position + (fluid.FluidSize() / 2);
 
                         // Calculate the squared distance to the camera
-                        float dx = cubePosition.x - camera.position.x;
-                        float dy = cubePosition.y - camera.position.y;
-                        float dz = cubePosition.z - camera.position.z;
+                        float dx = cube_position.x - camera.position.x;
+                        float dy = cube_position.y - camera.position.y;
+                        float dz = cube_position.z - camera.position.z;
                         float distanceSquared = dx * dx + dy * dy + dz * dz;
 
                         // Store cube data
-                        cells.push_back({cubePosition, density, distanceSquared});
+                        cells.push_back({cube_position, density, is_solid, distanceSquared});
                     }
                 }
             }
@@ -104,15 +107,19 @@ int main(int argc, char* argv[]) {
 
         // Render cubes
         for (const Cell& cell : cells) {
-            // get color of cube
-            float norm = std::min(cell.density / 100.0f, 1.0f);
-            float hue = (1.0f - norm) * 0.66f * 360.0f;
-            Color c = ColorFromHSV(hue, 1.0f, 1.0f);
-            Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
+            if (!cell.is_solid) {
+                // get color of cube
+                float norm = std::min(cell.density / 100.0f, 1.0f);
+                float hue = (1.0f - norm) * 0.66f * 360.0f;
+                Color c = ColorFromHSV(hue, 1.0f, 1.0f);
+                Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
 
-            BeginBlendMode(BLEND_ALPHA);
-            DrawCubeV(cell.position, v3(fluid.FluidSize()), color);
-            EndBlendMode();
+                BeginBlendMode(BLEND_ALPHA);
+                DrawCubeV(cell.position, v3(fluid.FluidSize()), color);
+                EndBlendMode();
+            } else {
+                DrawCubeV(cell.position, v3(fluid.FluidSize()), BROWN);
+            }
         }
 
         EndMode3D();
