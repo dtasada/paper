@@ -16,42 +16,44 @@
 
 class Fluid {
    private:
-    float container_size;
-    float fluid_size;
     float dt;
-    float diff;
     float visc;
 
     bool *solid;
     float *s;
     float *density;
 
-    float *Vx;
-    float *Vy;
-    float *Vz;
+    float *vx;
+    float *vy;
+    float *vz;
 
-    float *Vx0;
-    float *Vy0;
-    float *Vz0;
+    float *vx0;
+    float *vy0;
+    float *vz0;
 
    public:
+    int container_size;
+    float fluid_size;
+    float diffusion;
+
     Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
     ~Fluid();
     float Density(v3 position);
     bool Solid(v3 position);
-    float FluidSize();
-    int ContainerSize();
     void reset();
+    v3 get_position(int i);
 
     void add_gravity();
     void add_density(v3 position, float amount);
     void add_velocity(v3 position, v3 amount);
 
     void advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ);
+    void advect(float *d, float *d0, float *velocX, float *velocY, float *velocZ);
     void diffuse(int b, float *x, float *x0, float diff);
     void lin_solve(int b, float *x, float *x0, float a, float c);
     void project(float *velocX, float *velocY, float *velocZ, float *p, float *div);
-    void set_bnd(int bound, float *x);
+    void set_boundaries(int bound, float *x);
+    void set_boundaries(float *x);
     void step();
 
     // geometry

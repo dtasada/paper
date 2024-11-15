@@ -3,7 +3,6 @@
 #include <raylib.h>
 
 #include <cstring>
-#include <iostream>
 
 #define PRINT_ARRAY(arr, size)                             \
     printf("{ ");                                          \
@@ -14,70 +13,70 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     this->container_size = container_size;
     this->fluid_size = fluid_size;  // raylib coordinate size of a single cell
     this->dt = dt;
-    this->diff = diffusion;
+    this->diffusion = diffusion;
     this->visc = viscosity;
 
     int array_size = pow(container_size, 3);
     this->s = new float[array_size]();
     this->solid = new bool[array_size]();
     this->density = new float[array_size]();
-    this->Vx = new float[array_size]();
-    this->Vy = new float[array_size]();
-    this->Vz = new float[array_size]();
-    this->Vx0 = new float[array_size]();
-    this->Vy0 = new float[array_size]();
-    this->Vz0 = new float[array_size]();
+    this->vx = new float[array_size]();
+    this->vy = new float[array_size]();
+    this->vz = new float[array_size]();
+    this->vx0 = new float[array_size]();
+    this->vy0 = new float[array_size]();
+    this->vz0 = new float[array_size]();
 }
 
 Fluid::~Fluid() {
     delete[] this->s;
     delete[] this->solid;
     delete[] this->density;
-    delete[] this->Vx;
-    delete[] this->Vy;
-    delete[] this->Vz;
-    delete[] this->Vx0;
-    delete[] this->Vy0;
-    delete[] this->Vz0;
+    delete[] this->vx;
+    delete[] this->vy;
+    delete[] this->vz;
+    delete[] this->vx0;
+    delete[] this->vy0;
+    delete[] this->vz0;
 }
 
 float Fluid::Density(v3 position) { return density[IXv(position)]; }
 bool Fluid::Solid(v3 position) { return solid[IXv(position)]; }
-float Fluid::FluidSize() { return fluid_size; }
-int Fluid::ContainerSize() { return container_size; }
 
 void Fluid::reset() {
     int array_size = pow(container_size, 3);
     std::fill(s, s + array_size, 0.0f);
     std::fill(density, density + array_size, 0.0f);
-    std::fill(Vx, Vx + array_size, 0.0f);
-    std::fill(Vy, Vy + array_size, 0.0f);
-    std::fill(Vz, Vz + array_size, 0.0f);
-    std::fill(Vx0, Vx0 + array_size, 0.0f);
-    std::fill(Vy0, Vy0 + array_size, 0.0f);
-    std::fill(Vz0, Vz0 + array_size, 0.0f);
+    std::fill(vx, vx + array_size, 0.0f);
+    std::fill(vy, vy + array_size, 0.0f);
+    std::fill(vz, vz + array_size, 0.0f);
+    std::fill(vx0, vx0 + array_size, 0.0f);
+    std::fill(vy0, vy0 + array_size, 0.0f);
+    std::fill(vz0, vz0 + array_size, 0.0f);
 }
 
 void Fluid::add_gravity() {
     int N = container_size;
-    float gravity = -2.0f;
+    float gravity = -9.8f;
 
     for (int z = 1; z < N - 1; z++) {
         for (int y = 1; y < N - 1; y++) {
             for (int x = 1; x < N - 1; x++) {
-                Vy[IX(x, y, z)] += -2.0f;
+                vy[IX(x, y, z)] += gravity;
             }
         }
     }
+
+    set_boundaries(2, vy);
 }
 
 void Fluid::add_density(v3 position, float amount) { this->density[IXv(position)] += amount; }
 
 void Fluid::add_velocity(v3 position, v3 amount) {
     int index = IXv(position);
-    Vx[index] += amount.x;
-    Vy[index] += amount.y;
-    Vz[index] += amount.z;
+    vx[index] += amount.x;
+    vy[index] += amount.y;
+    vz[index] += amount.z;
 }
 
 void Fluid::advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ) {
@@ -149,7 +148,7 @@ void Fluid::advect(int b, float *d, float *d0, float *velocX, float *velocY, flo
             }
         }
     }
-    set_bnd(b, d);
+    set_boundaries(b, d);
 }
 
 void Fluid::diffuse(int b, float *x, float *x0, float diff) {
@@ -173,13 +172,14 @@ void Fluid::lin_solve(int b, float *x, float *x0, float a, float c) {
                 }
             }
         }
-        set_bnd(b, x);
+        set_boundaries(b, x);
     }
 }
 
 void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float *div) {
     int N = container_size;
 
+    // Calculate divergence
     for (int k = 1; k < N - 1; k++) {
         for (int j = 1; j < N - 1; j++) {
             for (int i = 1; i < N - 1; i++) {
@@ -193,10 +193,11 @@ void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float
         }
     }
 
-    set_bnd(0, div);
-    set_bnd(0, p);
+    set_boundaries(0, div);
+    set_boundaries(0, p);
     lin_solve(0, p, div, 1, 6);
 
+    // Adjust velocity based on pressure
     for (int k = 1; k < N - 1; k++) {
         for (int j = 1; j < N - 1; j++) {
             for (int i = 1; i < N - 1; i++) {
@@ -207,12 +208,12 @@ void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float
         }
     }
 
-    set_bnd(1, velocX);
-    set_bnd(2, velocY);
-    set_bnd(3, velocZ);
+    set_boundaries(1, velocX);
+    set_boundaries(2, velocY);
+    set_boundaries(3, velocZ);
 }
 
-void Fluid::set_bnd(int b, float *x) {
+void Fluid::set_boundaries(int b, float *x) {
     int N = container_size;
 
     // Handle solid boundaries first
@@ -299,20 +300,20 @@ void Fluid::set_bnd(int b, float *x) {
 
 void Fluid::step() {
     // add_gravity();
-    diffuse(1, Vx0, Vx, visc);
-    diffuse(2, Vy0, Vy, visc);
-    diffuse(3, Vz0, Vz, visc);
+    diffuse(1, vx0, vx, visc);
+    diffuse(2, vy0, vy, visc);
+    diffuse(3, vz0, vz, visc);
 
-    project(Vx0, Vy0, Vz0, Vx, Vy);
+    project(vx0, vy0, vz0, vx, vy);
 
-    advect(1, Vx, Vx0, Vx0, Vy0, Vz0);
-    advect(2, Vy, Vy0, Vx0, Vy0, Vz0);
-    advect(3, Vz, Vz0, Vx0, Vy0, Vz0);
+    advect(1, vx, vx0, vx0, vy0, vz0);
+    advect(2, vy, vy0, vx0, vy0, vz0);
+    advect(3, vz, vz0, vx0, vy0, vz0);
 
-    project(Vx, Vy, Vz, Vx0, Vy0);
+    project(vx, vy, vz, vx0, vy0);
 
-    diffuse(0, s, density, diff);
-    advect(0, density, s, Vx, Vy, Vz);
+    diffuse(0, s, density, diffusion);
+    advect(0, density, s, vx, vy, vz);
 }
 
 void Fluid::add_cube(v3 pos, float size) {
