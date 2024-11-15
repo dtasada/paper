@@ -1,5 +1,5 @@
 src =  simulation/src/*.cpp
-incl = simulation/src/engine/*.cpp 
+incl = simulation/src/engine/*.cpp
 lib = simulation/lib/rlImGui/*.cpp
 in = $(src) $(incl) $(lib) 
 

@@ -1,13 +1,11 @@
 #include "../../include/engine/Fluid.hpp"
 
 #include <raylib.h>
+#include <raymath.h>
 
 #include <cstring>
 
-#define PRINT_ARRAY(arr, size)                             \
-    printf("{ ");                                          \
-    for (int i = 0; i < size; i++) printf("%f, ", arr[i]); \
-    printf("}\n");
+#include "../../include/engine/Engine.hpp"
 
 Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt) {
     this->container_size = container_size;
@@ -26,6 +24,9 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     this->vx0 = new float[array_size]();
     this->vy0 = new float[array_size]();
     this->vz0 = new float[array_size]();
+
+    this->meshes = std::vector<Mesh>();
+    this->meshPositions = std::vector<v3>();
 }
 
 Fluid::~Fluid() {
@@ -42,6 +43,7 @@ Fluid::~Fluid() {
 
 float Fluid::Density(v3 position) { return density[IXv(position)]; }
 bool Fluid::Solid(v3 position) { return solid[IXv(position)]; }
+void Fluid::set_solid(v3 position, bool set) { solid[IXv(position)] = set; }
 
 void Fluid::reset() {
     int array_size = pow(container_size, 3);
@@ -213,50 +215,50 @@ void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float
     set_boundaries(3, velocZ);
 }
 
-void Fluid::set_boundaries(int b, float *x) {
+void Fluid::set_boundaries(int b, float *f) {
     int N = container_size;
 
     // Handle solid boundaries first
-    for (int k = 1; k < N - 1; k++) {
-        for (int j = 1; j < N - 1; j++) {
-            for (int i = 1; i < N - 1; i++) {
-                if (solid[IX(i, j, k)]) {
+    for (int z = 1; z < N - 1; z++) {
+        for (int y = 1; y < N - 1; y++) {
+            for (int x = 1; x < N - 1; x++) {
+                if (solid[IX(x, y, z)]) {
                     // For velocity components, enforce no-slip condition
-                    if (b == 1) x[IX(i, j, k)] = 0;  // x velocity
-                    if (b == 2) x[IX(i, j, k)] = 0;  // y velocity
-                    if (b == 3) x[IX(i, j, k)] = 0;  // z velocity
+                    if (b == 1) f[IX(x, y, z)] = 0;  // x velocity
+                    if (b == 2) f[IX(x, y, z)] = 0;  // y velocity
+                    if (b == 3) f[IX(x, y, z)] = 0;  // z velocity
 
                     // For density and pressure, use average of neighboring non-solid cells
                     if (b == 0) {
                         float sum = 0;
                         int count = 0;
 
-                        if (!solid[IX(i - 1, j, k)]) {
-                            sum += x[IX(i - 1, j, k)];
+                        if (!solid[IX(x - 1, y, z)]) {
+                            sum += f[IX(x - 1, y, z)];
                             count++;
                         }
-                        if (!solid[IX(i + 1, j, k)]) {
-                            sum += x[IX(i + 1, j, k)];
+                        if (!solid[IX(x + 1, y, z)]) {
+                            sum += f[IX(x + 1, y, z)];
                             count++;
                         }
-                        if (!solid[IX(i, j - 1, k)]) {
-                            sum += x[IX(i, j - 1, k)];
+                        if (!solid[IX(x, y - 1, z)]) {
+                            sum += f[IX(x, y - 1, z)];
                             count++;
                         }
-                        if (!solid[IX(i, j + 1, k)]) {
-                            sum += x[IX(i, j + 1, k)];
+                        if (!solid[IX(x, y + 1, z)]) {
+                            sum += f[IX(x, y + 1, z)];
                             count++;
                         }
-                        if (!solid[IX(i, j, k - 1)]) {
-                            sum += x[IX(i, j, k - 1)];
+                        if (!solid[IX(x, y, z - 1)]) {
+                            sum += f[IX(x, y, z - 1)];
                             count++;
                         }
-                        if (!solid[IX(i, j, k + 1)]) {
-                            sum += x[IX(i, j, k + 1)];
+                        if (!solid[IX(x, y, z + 1)]) {
+                            sum += f[IX(x, y, z + 1)];
                             count++;
                         }
 
-                        x[IX(i, j, k)] = count > 0 ? sum / count : x[IX(i, j, k)];
+                        f[IX(x, y, z)] = count > 0 ? sum / count : f[IX(x, y, z)];
                     }
                 }
             }
@@ -265,37 +267,37 @@ void Fluid::set_boundaries(int b, float *x) {
 
     for (int j = 1; j < N - 1; j++) {
         for (int i = 1; i < N - 1; i++) {
-            x[IX(i, j, 0)] = b == 3 ? -x[IX(i, j, 1)] : x[IX(i, j, 1)];
-            x[IX(i, j, N - 1)] = b == 3 ? -x[IX(i, j, N - 2)] : x[IX(i, j, N - 2)];
+            f[IX(i, j, 0)] = b == 3 ? -f[IX(i, j, 1)] : f[IX(i, j, 1)];
+            f[IX(i, j, N - 1)] = b == 3 ? -f[IX(i, j, N - 2)] : f[IX(i, j, N - 2)];
         }
     }
 
     for (int k = 1; k < N - 1; k++) {
         for (int i = 1; i < N - 1; i++) {
-            x[IX(i, 0, k)] = b == 2 ? -x[IX(i, 1, k)] : x[IX(i, 1, k)];
-            x[IX(i, N - 1, k)] = b == 2 ? -x[IX(i, N - 2, k)] : x[IX(i, N - 2, k)];
+            f[IX(i, 0, k)] = b == 2 ? -f[IX(i, 1, k)] : f[IX(i, 1, k)];
+            f[IX(i, N - 1, k)] = b == 2 ? -f[IX(i, N - 2, k)] : f[IX(i, N - 2, k)];
         }
     }
 
     for (int k = 1; k < N - 1; k++) {
         for (int j = 1; j < N - 1; j++) {
-            x[IX(0, j, k)] = b == 1 ? -x[IX(1, j, k)] : x[IX(1, j, k)];
-            x[IX(N - 1, j, k)] = b == 1 ? -x[IX(N - 2, j, k)] : x[IX(N - 2, j, k)];
+            f[IX(0, j, k)] = b == 1 ? -f[IX(1, j, k)] : f[IX(1, j, k)];
+            f[IX(N - 1, j, k)] = b == 1 ? -f[IX(N - 2, j, k)] : f[IX(N - 2, j, k)];
         }
     }
 
-    x[IX(0, 0, 0)] = 0.33f * (x[IX(1, 0, 0)] + x[IX(0, 1, 0)] + x[IX(0, 0, 1)]);
-    x[IX(0, N - 1, 0)] = 0.33f * (x[IX(1, N - 1, 0)] + x[IX(0, N - 2, 0)] + x[IX(0, N - 1, 1)]);
-    x[IX(0, 0, N - 1)] = 0.33f * (x[IX(1, 0, N - 1)] + x[IX(0, 1, N - 1)] + x[IX(0, 0, N)]);
-    x[IX(0, N - 1, N - 1)] =
-        0.33f * (x[IX(1, N - 1, N - 1)] + x[IX(0, N - 2, N - 1)] + x[IX(0, N - 1, N - 2)]);
-    x[IX(N - 1, 0, 0)] = 0.33f * (x[IX(N - 2, 0, 0)] + x[IX(N - 1, 1, 0)] + x[IX(N - 1, 0, 1)]);
-    x[IX(N - 1, N - 1, 0)] =
-        0.33f * (x[IX(N - 2, N - 1, 0)] + x[IX(N - 1, N - 2, 0)] + x[IX(N - 1, N - 1, 1)]);
-    x[IX(N - 1, 0, N - 1)] =
-        0.33f * (x[IX(N - 2, 0, N - 1)] + x[IX(N - 1, 1, N - 1)] + x[IX(N - 1, 0, N - 2)]);
-    x[IX(N - 1, N - 1, N - 1)] = 0.33f * (x[IX(N - 2, N - 1, N - 1)] + x[IX(N - 1, N - 2, N - 1)] +
-                                          x[IX(N - 1, N - 1, N - 2)]);
+    f[IX(0, 0, 0)] = 0.33f * (f[IX(1, 0, 0)] + f[IX(0, 1, 0)] + f[IX(0, 0, 1)]);
+    f[IX(0, N - 1, 0)] = 0.33f * (f[IX(1, N - 1, 0)] + f[IX(0, N - 2, 0)] + f[IX(0, N - 1, 1)]);
+    f[IX(0, 0, N - 1)] = 0.33f * (f[IX(1, 0, N - 1)] + f[IX(0, 1, N - 1)] + f[IX(0, 0, N)]);
+    f[IX(0, N - 1, N - 1)] =
+        0.33f * (f[IX(1, N - 1, N - 1)] + f[IX(0, N - 2, N - 1)] + f[IX(0, N - 1, N - 2)]);
+    f[IX(N - 1, 0, 0)] = 0.33f * (f[IX(N - 2, 0, 0)] + f[IX(N - 1, 1, 0)] + f[IX(N - 1, 0, 1)]);
+    f[IX(N - 1, N - 1, 0)] =
+        0.33f * (f[IX(N - 2, N - 1, 0)] + f[IX(N - 1, N - 2, 0)] + f[IX(N - 1, N - 1, 1)]);
+    f[IX(N - 1, 0, N - 1)] =
+        0.33f * (f[IX(N - 2, 0, N - 1)] + f[IX(N - 1, 1, N - 1)] + f[IX(N - 1, 0, N - 2)]);
+    f[IX(N - 1, N - 1, N - 1)] = 0.33f * (f[IX(N - 2, N - 1, N - 1)] + f[IX(N - 1, N - 2, N - 1)] +
+                                          f[IX(N - 1, N - 1, N - 2)]);
 }
 
 void Fluid::step() {
@@ -324,4 +326,9 @@ void Fluid::add_cube(v3 pos, float size) {
             }
         }
     }
+}
+
+void Fluid::add_mesh(Mesh mesh, v3 position) {
+    meshes.push_back(mesh);
+    meshPositions.push_back(position);
 }

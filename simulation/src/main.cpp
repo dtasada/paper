@@ -4,7 +4,6 @@
 #include <rlgl.h>
 
 #include <algorithm>
-#include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -13,8 +12,6 @@
 
 #include "../include/engine/Engine.hpp"
 #include "../include/engine/Fluid.hpp"
-// #include "../include/raygui.h"
-
 #include "../lib/rlImGui/rlImGui.h"
 
 #define FPS 60.0f
@@ -44,7 +41,9 @@ int main(int argc, char* argv[]) {
     v3 containerSize(fluid.container_size * fluid.fluid_size);
     v3 containerCenter(containerSize * 0.5f);
 
-    fluid.add_cube(v3(10), 10);
+    // fluid.add_cube(v3(4), 10);
+
+    fluid.add_mesh(GenMeshCube(10, 10, 10), v3(4));
 
     bool cursor = false;
     Camera3D camera = {
@@ -99,10 +98,12 @@ int main(int argc, char* argv[]) {
         for (float z = 0; z < fluid.container_size; z++) {
             for (float y = 0; y < fluid.container_size; y++) {
                 for (float x = 0; x < fluid.container_size; x++) {
-                    float density = fluid.Density({x, y, z});
-                    bool is_solid = fluid.Solid({x, y, z});
+                    v3 position(x, y, z);
+
+                    float density = fluid.Density(position);
+                    bool is_solid = fluid.Solid(position);
                     if (density > 0.01f || is_solid) {  // Skip cubes with very low density
-                        v3 cube_position = {x, y, z};
+                        v3 cube_position = position;
                         cube_position = cube_position * v3(fluid.fluid_size);
                         cube_position = cube_position + (fluid.fluid_size / 2);
 
@@ -114,6 +115,13 @@ int main(int argc, char* argv[]) {
 
                         // Store cube data
                         cells.push_back({cube_position, density, is_solid, distanceSquared});
+                    }
+
+                    for (Mesh& mesh : fluid.meshes) {
+                        if (check_collision_mesh(mesh, position)) {
+                            fluid.set_solid(position, true);
+                            break;
+                        }
                     }
                 }
             }
@@ -129,6 +137,7 @@ int main(int argc, char* argv[]) {
         DrawCubeWiresV(containerCenter, containerSize, RED);
 
         // Render cubes
+        BeginBlendMode(BLEND_ALPHA);
         for (const Cell& cell : cells) {
             if (!cell.is_solid) {
                 // get color of cube
@@ -137,13 +146,15 @@ int main(int argc, char* argv[]) {
                 Color c = ColorFromHSV(hue, 1.0f, 1.0f);
                 Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
 
-                BeginBlendMode(BLEND_ALPHA);
                 DrawCubeV(cell.position, v3(fluid.fluid_size), color);
-                EndBlendMode();
             } else {
                 if (ui_settings.show_cube) DrawCubeV(cell.position, v3(fluid.fluid_size), BROWN);
             }
         }
+        for (size_t i = 0; i < fluid.meshes.size(); i++) {
+            DrawModel(LoadModelFromMesh(fluid.meshes[i]), fluid.meshPositions[i], 1.0f, WHITE);
+        }
+        EndBlendMode();
 
         EndMode3D();
 
