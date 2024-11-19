@@ -42,8 +42,6 @@ class Fluid {
     int container_size;
     float fluid_size;
     float diffusion;
-    std::vector<Mesh> meshes;
-    std::vector<v3> meshPositions;
 
     Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
     ~Fluid();
@@ -67,6 +65,4 @@ class Fluid {
     // geometry
     void add_cube(v3 position, float size);
     void handle_solid_boundaries(float *x, int b);
-
-    void add_mesh(Mesh mesh, v3 position);
 };

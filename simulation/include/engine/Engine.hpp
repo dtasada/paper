@@ -42,6 +42,3 @@ struct Cell {
 };
 
 int constrain(int val, int low, int high);
-
-bool check_collision_mesh(Mesh mesh, v3 point);
-bool check_collision_bounding_box(BoundingBox box, v3 point);

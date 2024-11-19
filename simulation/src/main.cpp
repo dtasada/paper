@@ -41,9 +41,7 @@ int main(int argc, char* argv[]) {
     v3 containerSize(fluid.container_size * fluid.fluid_size);
     v3 containerCenter(containerSize * 0.5f);
 
-    // fluid.add_cube(v3(4), 10);
-
-    fluid.add_mesh(GenMeshCube(10, 10, 10), v3(4));
+    fluid.add_cube(v3(4), 10);
 
     bool cursor = false;
     Camera3D camera = {
@@ -116,13 +114,6 @@ int main(int argc, char* argv[]) {
                         // Store cube data
                         cells.push_back({cube_position, density, is_solid, distanceSquared});
                     }
-
-                    for (Mesh& mesh : fluid.meshes) {
-                        if (check_collision_mesh(mesh, position)) {
-                            fluid.set_solid(position, true);
-                            break;
-                        }
-                    }
                 }
             }
         }
@@ -150,9 +141,6 @@ int main(int argc, char* argv[]) {
             } else {
                 if (ui_settings.show_cube) DrawCubeV(cell.position, v3(fluid.fluid_size), BROWN);
             }
-        }
-        for (size_t i = 0; i < fluid.meshes.size(); i++) {
-            DrawModel(LoadModelFromMesh(fluid.meshes[i]), fluid.meshPositions[i], 1.0f, WHITE);
         }
         EndBlendMode();
 

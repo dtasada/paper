@@ -24,9 +24,6 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     this->vx0 = new float[array_size]();
     this->vy0 = new float[array_size]();
     this->vz0 = new float[array_size]();
-
-    this->meshes = std::vector<Mesh>();
-    this->meshPositions = std::vector<v3>();
 }
 
 Fluid::~Fluid() {
@@ -326,9 +323,4 @@ void Fluid::add_cube(v3 pos, float size) {
             }
         }
     }
-}
-
-void Fluid::add_mesh(Mesh mesh, v3 position) {
-    meshes.push_back(mesh);
-    meshPositions.push_back(position);
 }
