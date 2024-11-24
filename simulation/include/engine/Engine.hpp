@@ -28,7 +28,7 @@ struct v3 {
     v3 operator*=(const float& other);
     v3 operator/=(const float& other);
 
-    std::string to_string() const;
+    std::string to_string(void) const;
 
     operator Vector3() const;
     operator float*() const;
@@ -42,3 +42,6 @@ struct Cell {
 };
 
 int constrain(int val, int low, int high);
+
+void draw_text_codepoint_3d(int codepoint, Vector3 position, float font_size, Color color);
+void draw_text_3d(std::string text, v3 position, float size, Color color);
