@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt]{report}
+\documentclass[a4paper,12pt]{article}
 
 % Packages
 \usepackage{amsmath}
@@ -45,6 +45,7 @@ citecolor=blue,
 \titleformat{\chapter}[display]
 {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
 \titlespacing{\chapter}{0pt}{0pt}{0pt}
+\newcommand{\sectionbreak}{\clearpage}
 
 % Title and Author
 \title{Computational Fluid Dynamics With a Paper Airplane}
@@ -68,7 +69,7 @@ citecolor=blue,
 \tableofcontents
 
 % Introduction
-\chapter{Introduction}
+\section{Introduction}
 This thesis covers the simulation of the aerodynamics of an airplane, using
 our own Computation Fluid Dynamics (or CFD) model.
 
@@ -84,15 +85,11 @@ The thesis questions are the following:
 \end{itemize}
 
 % Methodology
-\chapter{Execution}
-\section{Methodology}
-To achieve our goal, we've had first had to learn about particle dynamics.
-It took a while to get an understanding, but here's what we found:
-
-\subsection{The Math}
-\subsubsection{Particle collision}
-Part one of the fluid dynamics simulation is particle collision.
-Fluid dynamics, in essence is particle physics, where every air molecule is a "particle".
+\section{Execution}
+\subsection{Preliminary: Lagrangian Fluid Simulation}
+Our first attempt at a fluid simulator was using a technique called Lagrangian fluid simulation.
+This involves simulating the fluid as a particle collision simulation.
+It regards fluid dynamics, as particle physics, where every air molecule is a "particle".
 We start with a container, and a bunch of air molecules, all of which interact with
 each other to create a fluid. This interaction is effectively the collisions between particles.
 It turns out that simulating  particle dynamics in two dimensions is pretty straightforward.
@@ -140,25 +137,45 @@ The following formulas represent the relation between particles:
 \end{array}
 \]
 
-\subsection{The Code}
-\subsubsection{The Structure}
-We decided to write the simulator in Go, for its simplicity and development ergonomics.
-We used \href{www.github.com/gen2brain/raylib-go/}{raylib} for the 3D rendering, as it's a simple and easy-to-use library.
-The \verb|github.com/dtasada/paper| package contains the main entry point of the program, which then
-uses the \verb|github.com/dtasada/paper/engine| package to perform the interactions between particles.
+After lots of trial and error, we were able to successfully implement the math.
+We did this using Go and raylib, and the code is available at \verb|github.com/dtasada/paper| at the \verb|lagrangian-go| branch.
+But we encountered a simple issue where the particles would phase into each other,
+rendering the particle simulation worthless.
+This could be because of a too small time step, or a logic error in the collision detection.
+This should be fixable by adding more simulation steps, which means that each particles solves its collisions more than once per collision, but we weren't able to successfully implement this.
+In the end, we ended up scrapping the Lagrangian simulation model.
 
-8 arrays of N*N*N * sizeof(float) bytes each
-$8 * 24^3 * 4 = 442 KB$
-$8 * 1024^3 * 4 = 32 GB$
+\subsection{Eulerian Fluid Simulation}
+Next we tried a method that we'd had our eyes on for a while. This was had
+originally been our first choice, but we switched to Lagrangian due to problems I'll explain shortly.
+It's called Eulerian fluid simulation, and the way this model works is that it
+sees fluid as a grid of cells that react to each other.
+Eulerian fluid simulation is an application of cellular automata,
+which is a computation model used in physics, biology, and many other applications.
 
-TODO: Explain container system, maybe show code samples
+Our fluid simulation involves a two or three-dimensional grid of cells,
+each of which have velocity and density fields.
+Each frame, the cells interact with each other according to the
+\hyperlink{https://en.wikipedia.org/wiki/Navier\%E2\%80\%93Stokes_equations}{Navier-Stokes equations}.
+
+We're not pretending to understand the math involved in the Navier-Stokes equations,
+which are difficult to understand without a good background in physics and differential equations.
+We have humbly borrowed most of the math from Mike Ash's
+\hyperlink{https://mikeash.com/pyblog/fluid-simulation-for-dummies.html}{Fluid Simulation for Dummies}
+(\cite{mikeash}), which is in turn based on Jos Stam's brilliant work on
+\hyperlink{http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf}{Real-Time Fluid Dynamics for Games} (\cite{josstam}).
+
+\subsubsection{The Code}
+\paragraph{The Structure}
+\subsubsection{Methodology}
+\subsubsection{The Math}
 
 % Results
-\chapter{Results}
+\section{Results}
 Present your experimental or theoretical results in this section. Use tables and figures to illustrate important points.
 
 % Conclusion
-\section{Conclusion}
+\subsection{Conclusion}
 Summarize the main findings of the paper. Mention potential future work or research directions.
 
 % References
