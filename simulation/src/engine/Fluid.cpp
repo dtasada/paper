@@ -44,19 +44,20 @@ void Fluid::set_solid(v3 position, bool set) { solid[IXv(position)] = set; }
 
 void Fluid::reset() {
     int array_size = pow(container_size, 3);
-    std::fill(s, s + array_size, 0.0f);
-    std::fill(density, density + array_size, 0.0f);
-    std::fill(vx, vx + array_size, 0.0f);
-    std::fill(vy, vy + array_size, 0.0f);
-    std::fill(vz, vz + array_size, 0.0f);
-    std::fill(vx0, vx0 + array_size, 0.0f);
-    std::fill(vy0, vy0 + array_size, 0.0f);
-    std::fill(vz0, vz0 + array_size, 0.0f);
+    float base = 0.0f;
+    std::fill(s, s + array_size, base);
+    std::fill(density, density + array_size, base);
+    std::fill(vx, vx + array_size, base);
+    std::fill(vy, vy + array_size, base);
+    std::fill(vz, vz + array_size, base);
+    std::fill(vx0, vx0 + array_size, base);
+    std::fill(vy0, vy0 + array_size, base);
+    std::fill(vz0, vz0 + array_size, base);
 }
 
 void Fluid::add_gravity() {
     int N = container_size;
-    float gravity = -9.8f;
+    float gravity = -9.81f;
 
     for (int z = 1; z < N - 1; z++) {
         for (int y = 1; y < N - 1; y++) {
@@ -79,7 +80,6 @@ void Fluid::add_velocity(v3 position, v3 amount) {
 }
 
 void Fluid::advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ) {
-    float dt = this->dt;
     float N = container_size;
 
     float i0, i1, j0, j1, k0, k1;

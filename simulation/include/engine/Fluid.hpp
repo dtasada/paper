@@ -2,8 +2,6 @@
 #include <raylib.h>
 #include <stdlib.h>
 
-#include <vector>
-
 #include "Engine.hpp"
 
 #define IX(x, y, z)                                                \
@@ -65,4 +63,6 @@ class Fluid {
     // geometry
     void add_cube(v3 position, float size);
     void handle_solid_boundaries(float *x, int b);
+
+    void print_density(void);
 };

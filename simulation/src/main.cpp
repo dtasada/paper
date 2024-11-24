@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <rlgl.h>
+#include <sys/cdefs.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]) {
     float dt = 1.0f;             // Timestep
     float viscosity = 0.000001;  // Viscosity constant
 
-    Fluid fluid(24, 1.0f, diffusion, viscosity, dt);
+    Fluid fluid(32, 1.0f, diffusion, viscosity, dt);
     v3 containerSize(fluid.container_size * fluid.fluid_size);
     v3 containerCenter(containerSize * 0.5f);
 
@@ -55,6 +56,7 @@ int main(int argc, char* argv[]) {
     struct {
         bool show_cube = true;
         bool should_orthographic = true;
+        bool show_density_float = false;
     } ui_settings;
 
     /* Main loop */
@@ -137,9 +139,14 @@ int main(int argc, char* argv[]) {
                 Color c = ColorFromHSV(hue, 1.0f, 1.0f);
                 Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
 
-                DrawCubeV(cell.position, v3(fluid.fluid_size), color);
-            } else {
-                if (ui_settings.show_cube) DrawCubeV(cell.position, v3(fluid.fluid_size), BROWN);
+                if (!ui_settings.show_density_float) {
+                    DrawCubeV(cell.position, v3(fluid.fluid_size), color);
+                } else {
+                    draw_text_3d(TextFormat("%.1f", cell.density), cell.position,
+                                 fluid.fluid_size * 10, WHITE);
+                }
+            } else if (ui_settings.show_cube) {
+                DrawCubeV(cell.position, v3(fluid.fluid_size), BROWN);
             }
         }
         EndBlendMode();
@@ -156,6 +163,7 @@ int main(int argc, char* argv[]) {
             ImGui::Begin("Fluid Simulation");
 
             ImGui::Checkbox("Show cube", &ui_settings.show_cube);
+            ImGui::Checkbox("Show density with numbers", &ui_settings.show_density_float);
 
             ImGui::Checkbox("Camera Orthograhic", &ui_settings.should_orthographic);
             camera.projection =
