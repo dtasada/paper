@@ -57,7 +57,9 @@ int main(int argc, char* argv[]) {
         bool show_cube = true;
         bool should_orthographic = true;
         bool show_density_float = false;
-    } ui_settings;
+        bool show_vel_arrows = false;
+        bool gravity = false;
+    } settings;
 
     /* Main loop */
     while (!WindowShouldClose()) {
@@ -65,12 +67,12 @@ int main(int argc, char* argv[]) {
         if (!cursor) {
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 DisableCursor();
-                float x = 1, y = 1, z = 1;
-                float amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 4 : 20;
-                fluid.add_density({x, y, z}, 100);
+                v3 position(1, 1, 1);
+                float density_amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 100 : 200;
+                fluid.add_density(position, density_amount);
 
-                v3 vel(4, -9.81, 4);
-                fluid.add_velocity({x, y, z}, v3(amount));
+                v3 velocity_amount(4, 4, 4);
+                fluid.add_velocity(position, velocity_amount);
             }
 
             UpdateCamera(&camera, CAMERA_THIRD_PERSON);
@@ -89,19 +91,27 @@ int main(int argc, char* argv[]) {
 
             cursor = !cursor;
         }
+        if (IsKeyDown(KEY_G)) {
+            fluid.add_velocity(v3(12.0f, 12.0f, 12.0f), v3(0.0f, -9.81f, 0.0f));
+        }
 
         /* Update sim */
         fluid.step();
 
-        // Calculate distance to camera for each cube. This is important for rendering purposes
+        // Sort cubes by distance to camera. This is important for backface rendering
         std::vector<Cell> cells;
-        for (float z = 0; z < fluid.container_size; z++) {
-            for (float y = 0; y < fluid.container_size; y++) {
-                for (float x = 0; x < fluid.container_size; x++) {
+        for (float z = 0.0f; z < fluid.container_size; z++) {
+            for (float y = 0.0f; y < fluid.container_size; y++) {
+                for (float x = 0.0f; x < fluid.container_size; x++) {
                     v3 position(x, y, z);
 
-                    float density = fluid.Density(position);
-                    bool is_solid = fluid.Solid(position);
+                    if (settings.gravity) {
+                        fluid.add_velocity(position, v3(0.0f, -9.81f, 0.0f));
+                    }
+
+                    float density = fluid.get_density(position);
+                    bool is_solid = fluid.is_solid(position);
+
                     if (density > 0.01f || is_solid) {  // Skip cubes with very low density
                         v3 cube_position = position;
                         cube_position = cube_position * v3(fluid.fluid_size);
@@ -114,7 +124,7 @@ int main(int argc, char* argv[]) {
                         float distanceSquared = dx * dx + dy * dy + dz * dz;
 
                         // Store cube data
-                        cells.push_back({cube_position, density, is_solid, distanceSquared});
+                        cells.push_back({cube_position, distanceSquared});
                     }
                 }
             }
@@ -132,21 +142,33 @@ int main(int argc, char* argv[]) {
         // Render cubes
         BeginBlendMode(BLEND_ALPHA);
         for (const Cell& cell : cells) {
-            if (!cell.is_solid) {
-                // get color of cube
-                float norm = std::min(cell.density / 100.0f, 1.0f);
-                float hue = (1.0f - norm) * 0.66f * 360.0f;
-                Color c = ColorFromHSV(hue, 1.0f, 1.0f);
-                Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
+            v3 position = cell.position;
 
-                if (!ui_settings.show_density_float) {
-                    DrawCubeV(cell.position, v3(fluid.fluid_size), color);
-                } else {
-                    draw_text_3d(TextFormat("%.1f", cell.density), cell.position,
-                                 fluid.fluid_size * 10, WHITE);
+            float density = fluid.get_density(cell.position);
+            bool is_solid = fluid.is_solid(position);
+            if (density > 0.01f || is_solid) {
+                if (settings.show_vel_arrows) {
+                    BeginBlendMode(BLEND_SUBTRACT_COLORS);
+                    // DrawLine3D(position, position + (fluid.get_velocity(position) * 1000), RED);
+                    DrawCylinderEx(position, position + (fluid.get_velocity(position) * 100),
+                                   density / 100.f, density / 100.f, 10, RED);
+                    BeginBlendMode(BLEND_ALPHA);
+                } else if (!is_solid) {
+                    // get color of cube
+                    float norm = std::min(density / 100.0f, 1.0f);
+                    float hue = (1.0f - norm) * 0.66f * 360.0f;
+                    Color c = ColorFromHSV(hue, 1.0f, 1.0f);
+                    Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
+
+                    if (!settings.show_density_float) {
+                        DrawCubeV(position, v3(fluid.fluid_size), color);
+                    } else {
+                        draw_text_3d(TextFormat("%.1f", density), position, fluid.fluid_size * 10,
+                                     WHITE);
+                    }
+                } else if (settings.show_cube) {
+                    DrawCubeV(position, v3(fluid.fluid_size), BROWN);
                 }
-            } else if (ui_settings.show_cube) {
-                DrawCubeV(cell.position, v3(fluid.fluid_size), BROWN);
             }
         }
         EndBlendMode();
@@ -154,22 +176,22 @@ int main(int argc, char* argv[]) {
         EndMode3D();
 
         DrawFPS(10, 10);
-        DrawText(std::string("Position: ").append(v3(camera.position).to_string()).c_str(), 10, 30,
-                 20, RAYWHITE);
 
         if (cursor) {
             /* Render UI */
             rlImGuiBegin();
             ImGui::Begin("Fluid Simulation");
 
-            ImGui::Checkbox("Show cube", &ui_settings.show_cube);
-            ImGui::Checkbox("Show density with numbers", &ui_settings.show_density_float);
+            ImGui::Checkbox("Gravity", &settings.gravity);
+            ImGui::Checkbox("Show cube", &settings.show_cube);
+            ImGui::Checkbox("Show density with numbers", &settings.show_density_float);
+            ImGui::Checkbox("Show velocity with arrows", &settings.show_vel_arrows);
 
-            ImGui::Checkbox("Camera Orthograhic", &ui_settings.should_orthographic);
+            ImGui::Checkbox("Camera Orthograhic", &settings.should_orthographic);
             camera.projection =
-                ui_settings.should_orthographic ? CAMERA_ORTHOGRAPHIC : CAMERA_PERSPECTIVE;
+                settings.should_orthographic ? CAMERA_ORTHOGRAPHIC : CAMERA_PERSPECTIVE;
 
-            ImGui::SliderFloat("Diffusion", &fluid.diffusion, 0.0f, 1.0f);
+            ImGui::SliderFloat("Diffusion", &fluid.diffusion, 0.0f, 0.0001f);
 
             ImGui::End();
             ImGui::Render();

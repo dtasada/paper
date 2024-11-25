@@ -38,8 +38,15 @@ Fluid::~Fluid() {
     delete[] this->vz0;
 }
 
-float Fluid::Density(v3 position) { return density[IXv(position)]; }
-bool Fluid::Solid(v3 position) { return solid[IXv(position)]; }
+float Fluid::get_density(v3 position) { return density[IXv(position)]; }
+v3 Fluid::get_velocity(v3 position) {
+    return {
+        vx[IXv(position)],
+        vy[IXv(position)],
+        vz[IXv(position)],
+    };
+}
+bool Fluid::is_solid(v3 position) { return solid[IXv(position)]; }
 void Fluid::set_solid(v3 position, bool set) { solid[IXv(position)] = set; }
 
 void Fluid::reset() {
@@ -62,7 +69,7 @@ void Fluid::add_gravity() {
     for (int z = 1; z < N - 1; z++) {
         for (int y = 1; y < N - 1; y++) {
             for (int x = 1; x < N - 1; x++) {
-                vy[IX(x, y, z)] += gravity;
+                add_velocity(v3(x, y, z), v3(0.0f, gravity, 0.0f));
             }
         }
     }

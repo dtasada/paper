@@ -123,7 +123,6 @@ void draw_text_3d(std::string text, v3 position, float font_size, Color color) {
     float scale = font_size / (float)font.baseSize;
 
     float line_spacing = 0.1f;
-    bool backface = true;
 
     for (size_t i = 0; i < text.length(); i++) {
         // Get next codepoint from byte string and glyph index in font

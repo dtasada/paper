@@ -261,11 +261,13 @@
       \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
-      \field{labeldatesource}{nodate}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Navier-Stokes equations}
+      \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
       \verb https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
@@ -552,11 +554,13 @@
       \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
-      \field{labeldatesource}{nodate}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Navier-Stokes equations}
+      \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
       \verb https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations

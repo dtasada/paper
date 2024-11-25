@@ -43,11 +43,12 @@ class Fluid {
 
     Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
     ~Fluid();
-    float Density(v3 position);
-    bool Solid(v3 position);
+    float get_density(v3 position);
+    v3 get_velocity(v3 position);
+    v3 get_position(int i);
+    bool is_solid(v3 position);
     void set_solid(v3 position, bool set);
     void reset();
-    v3 get_position(int i);
 
     void add_gravity();
     void add_density(v3 position, float amount);

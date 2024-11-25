@@ -37,6 +37,11 @@ INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphic
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/mathcolor.ltx
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/mathcolor.ltx
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/mathcolor.ltx
+INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/dirtree/dirtree.sty
+INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/dirtree/dirtree.sty
+INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/dirtree/dirtree.tex
+INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/dirtree/dirtree.tex
+INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/dirtree/dirtree.tex
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/geometry/geometry.sty
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/geometry/geometry.sty
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/keyval.sty

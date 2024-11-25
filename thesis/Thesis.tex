@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{bibentry}
 \usepackage{color}
+\usepackage{dirtree}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{hyphenat}
@@ -167,6 +168,20 @@ We have humbly borrowed most of the math from Mike Ash's
 \hyperlink{http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf}{Real-Time Fluid Dynamics for Games} (\cite{josstam}).
 
 \subsubsection{The Code}
+Our code is structured as follows:
+\dirtree{%
+	.1 paper.
+	.2 simulation\DTcomment{Contains the physics simulation code}. 
+	.3 include\DTcomment{Our own engine headers}.
+	.3 lib\DTcomment{External libraries}.
+	.3 resources\DTcomment{Resources like images, fonts, shaders}.
+	.3 src\DTcomment{Actual engine source}.
+	.2 neural\DTcomment{Contains ML engine}.
+	.2 Makefile.
+}
+
+The code is written in C++, and uses \hyperlink{https://www.raylib.com/}{raylib} library for rendering.
+
 \paragraph{The Structure}
 \subsubsection{Methodology}
 
