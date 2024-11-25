@@ -160,9 +160,9 @@ each of which have velocity and density fields.
 Each frame, the cells interact with each other according to the
 \hyperlink{https://en.wikipedia.org/wiki/Navier\%E2\%80\%93Stokes_equations}{Navier-Stokes equations}.
 
-We're not pretending to understand the math involved in the Navier-Stokes equations,
-which are difficult to understand without a good background in physics and differential equations.
-We have humbly borrowed most of the math from Mike Ash's
+The math involved in the Navier-Stokes equations is very complex and
+difficult to understand without a good background in physics and differential equations.
+That is why we have humbly borrowed most of the math from Mike Ash's
 \hyperlink{https://mikeash.com/pyblog/fluid-simulation-for-dummies.html}{Fluid Simulation for Dummies}
 (\cite{mikeash}), which is in turn based on Jos Stam's brilliant work on
 \hyperlink{http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf}{Real-Time Fluid Dynamics for Games} (\cite{josstam}).
@@ -197,9 +197,12 @@ The Navier-Stokes equations show us how these velocity vectors evolve over time 
 \end{array}
 \]
 The first equation shows the change in velocity in a compact vector notation. 
-Unlike the Lagrangian fluid simulation, in Eularian fluid simulation the fluid is not represented by individual particles. 
+Unlike in Lagrangian fluid simulation, in Eularian fluid simulation the fluid is not represented by individual particles. 
 Thats why, instead, fluid density is used, which tells us the amount of particles present in a point in space. 
-The second equation represents the change of this density.
+The second equation represents the change of this density. 
+The reader is not expected to fully understand these equations because they are, as mentioned earlier,
+very difficult to understand. But it should be noted that the two equations above look a lot like eachother,
+as this was helpful in developing the simulation. (\cite{josstam})
 
 % Results
 \section{Results}
