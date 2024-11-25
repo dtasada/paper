@@ -12,6 +12,7 @@
 \usepackage{listings}
 \usepackage{titlesec}
 \usepackage{url}
+\usepackage{physics}
 \usepackage[normalem]{ulem}
 \usepackage[backend=biber, style=apa]{biblatex}
 \usepackage[
@@ -94,7 +95,7 @@ We start with a container, and a bunch of air molecules, all of which interact w
 each other to create a fluid. This interaction is effectively the collisions between particles.
 It turns out that simulating  particle dynamics in two dimensions is pretty straightforward.
 But when you throw in that Z-axis, it gets a lot harder.
-The main article I used for this is \hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution} (\cite{hakenberg}).
+The main article we used for this is \hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution} (\cite{hakenberg}).
 
 Here is a set of formulas necessary to perform the calculations that describe
 the behavior of a pair particle before and after their collision:
@@ -168,7 +169,22 @@ We have humbly borrowed most of the math from Mike Ash's
 \subsubsection{The Code}
 \paragraph{The Structure}
 \subsubsection{Methodology}
+
+% Math
 \subsubsection{The Math}
+In Eularian fluid dynamics we represent fluids with a velocity vector field. This means we assign a velocity vector to every point in space.
+The Navier-Stokes equations show us how these velocity vectors evolve over time with an infinitely small timestep.
+\[
+\begin{array}{ll}
+	\pdv{u}{t} = -(u \cdot \nabla)u + v\nabla^2 + f \\
+  \\
+  \pdv{\rho}{t} = -(u \cdot \nabla)\rho + k\nabla^2\rho + S
+\end{array}
+\]
+The first equation shows the change in velocity in a compact vector notation. 
+Unlike the Lagrangian fluid simulation, in Eularian fluid simulation the fluid is not represented by individual particles. 
+Thats why, instead, fluid density is used, which tells us the amount of particles present in a point in space. 
+The second equation represents the change of this density.
 
 % Results
 \section{Results}
