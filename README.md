@@ -1,4 +1,4 @@
-# paper
+# paper (Paper Airplane Physics Engine Research)
 
 ## Deadlines
     - December 2: Hand in concept
