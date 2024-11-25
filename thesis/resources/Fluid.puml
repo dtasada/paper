@@ -1,0 +1,64 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class Fluid {
+	+Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt)
+	+~Fluid()
+	+Solid(v3 position) : bool
+	-solid : bool*
+	+Density(v3 position) : float
+	+diffusion : float
+	-dt : float
+	+fluid_size : float
+	-visc : float
+	-density : float*
+	-s : float*
+	-vx : float*
+	-vx0 : float*
+	-vy : float*
+	-vy0 : float*
+	-vz : float*
+	-vz0 : float*
+	+container_size : int
+	+get_position(int i) : v3
+	+add_cube(v3 position, float size) : void
+	+add_density(v3 position, float amount) : void
+	+add_gravity() : void
+	+add_velocity(v3 position, v3 amount) : void
+	+advect(int b, float* d, float* d0, float* velocX, float* velocY, float* velocZ) : void
+	+diffuse(int b, float* x, float* x0, float diff) : void
+	+handle_solid_boundaries(float* x, int b) : void
+	+lin_solve(int b, float* x, float* x0, float a, float c) : void
+	+print_density() : void
+	+project(float* velocX, float* velocY, float* velocZ, float* p, float* div) : void
+	+reset() : void
+	+set_boundaries(int b, float* x) : void
+	+set_solid(v3 position, bool set) : void
+	+step() : void
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+
+
+
+/' Aggregation relationships '/
+
+
+
+
+
+/' Nested objects '/
+
+
+
+@enduml
