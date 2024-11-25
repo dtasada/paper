@@ -1,0 +1,66 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class Cell {
+	+is_solid : bool
+	+density : float
+	+distanceSquared : float
+	+position : v3
+}
+
+
+class v3 {
+	+operatorVector3() {query}
+	+operatorfloat*() {query}
+	+v3(float x, float y, float z)
+	+v3(Vector3 v)
+	+v3()
+	+v3(float v)
+	+x : float
+	+y : float
+	+z : float
+	+to_string() : std::string {query}
+	+operator*(const v3& other) : v3
+	+operator*(const float& other) : v3
+	+operator*=(const v3& other) : v3
+	+operator*=(const float& other) : v3
+	+operator+(const v3& other) : v3
+	+operator+(const float& other) : v3
+	+operator+=(const v3& other) : v3
+	+operator-(const v3& other) : v3
+	+operator-(const float& other) : v3
+	+operator-=(const v3& other) : v3
+	+operator/(const v3& other) : v3
+	+operator/(const float& other) : v3
+	+operator/=(const v3& other) : v3
+	+operator/=(const float& other) : v3
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+
+
+
+/' Aggregation relationships '/
+
+Cell *-- v3
+
+
+
+
+
+
+/' Nested objects '/
+
+
+
+@enduml
