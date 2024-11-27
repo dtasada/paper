@@ -1,10 +1,11 @@
+#include <imgui.h>
 #include <raylib.h>
 #include <raymath.h>
 #include <rlgl.h>
 #include <sys/cdefs.h>
 
 #include <algorithm>
-#include <cstdint>
+#include <cinttypes>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -13,7 +14,6 @@
 #include "../include/engine/Engine.hpp"
 #include "../include/engine/Fluid.hpp"
 #include "../lib/rlImGui/rlImGui.h"
-#include "../lib/imgui/imgui.h"
 
 #define FPS 60.0f
 
