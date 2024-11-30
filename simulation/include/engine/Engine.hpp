@@ -39,6 +39,11 @@ struct Cell {
     float distanceSquared;  // Distance from the camera (squared)
 };
 
+struct Obstacle {
+    v3 position;
+    Model model;
+};
+
 int constrain(int val, int low, int high);
 
 void draw_text_codepoint_3d(int codepoint, Vector3 position, float font_size, Color color);
