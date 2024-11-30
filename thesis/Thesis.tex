@@ -1,6 +1,7 @@
 \documentclass[a4paper,12pt]{article}
 
 % Packages
+\usepackage{animate}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{bibentry}
@@ -11,9 +12,11 @@
 \usepackage{hyphenat}
 \usepackage{indentfirst}
 \usepackage{listings}
+\usepackage{ipsum}
 \usepackage{titlesec}
 \usepackage{url}
 \usepackage{physics}
+\usepackage{fontspec}
 \usepackage[normalem]{ulem}
 \usepackage[backend=biber, style=apa]{biblatex}
 \usepackage[
@@ -26,21 +29,23 @@ citecolor=blue,
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
-\lstset{frame=tb,
-  language=Go,
-  aboveskip=3mm,
-  belowskip=3mm,
-  showstringspaces=false,
-  columns=flexible,
-  basicstyle={\small\ttfamily},
-  numbers=none,
-  numberstyle=\tiny\color{gray},
-  keywordstyle=\color{blue},
-  commentstyle=\color{dkgreen},
-  stringstyle=\color{mauve},
-  breaklines=true,
-  breakatwhitespace=true,
-  tabsize=4
+\setmonofont{CaskaydiaCove Nerd Font}
+\lstset{
+	aboveskip=3mm,
+	basicstyle={\small\ttfamily},
+	belowskip=3mm,
+	breakatwhitespace=true,
+	breaklines=true,
+	columns=flexible,
+	commentstyle=\color{dkgreen},
+	frame=none,
+	keywordstyle=\color{blue},
+	language=C++,
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	showstringspaces=false,
+	stringstyle=\color{mauve},
+	tabsize=4
 }
 \addbibresource{references.bib}
 \geometry{margin=1in}
@@ -63,8 +68,8 @@ citecolor=blue,
 % Title and abstract
 \maketitle
 \begin{abstract}
-	In this paper, we investigate the relationship between an airplane's shape and its performance.
-	Our results show that \dots
+	In this paper, we investigate the relationship between an airplane's shape
+	and its performance. Our results show that \dots
 \end{abstract}
 
 % Table of Contents
@@ -75,28 +80,30 @@ citecolor=blue,
 This thesis covers the simulation of the aerodynamics of an airplane, using
 our own Computation Fluid Dynamics (or CFD) model.
 
-The goal is to calculate the ideal shape of an airplane for its aerodynamic performance.
-We aim to do this by creating a Machine Learning model, and feed it the results of the CFD,
-which should result in our final model.
+The goal is to calculate the ideal shape of an airplane for its aerodynamic
+performance. We aim to do this by creating a Machine Learning model, and feed
+it the results of the CFD, which should result in our final model.
 
 The thesis questions are the following:
 \begin{itemize}
-	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
+	\item{How do the different aspects of fluid dynamics work and how do we
+		implement it in a computer program?}
 	\item{How do we dynamically generate 3D models?}
 	\item{How does an airplane's wing shape influence its performance?}
 \end{itemize}
 
-% Methodology
+% Execution
 \section{Execution}
 \subsection{Preliminary: Lagrangian Fluid Simulation}
-Our first attempt at a fluid simulator was using a technique called Lagrangian fluid simulation.
-This involves simulating the fluid as a particle collision simulation.
-It regards fluid dynamics, as particle physics, where every air molecule is a "particle".
-We start with a container, and a bunch of air molecules, all of which interact with
-each other to create a fluid. This interaction is effectively the collisions between particles.
-It turns out that simulating  particle dynamics in two dimensions is pretty straightforward.
-But when you throw in that Z-axis, it gets a lot harder.
-The main article we used for this is \hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution} (\cite{hakenberg}).
+Our first attempt at a fluid simulator was using a technique called Lagrangian
+fluid simulation. This involves simulating the fluid as a particle collision
+simulation. It regards fluid dynamics, as particle physics, where every air
+molecule is a "particle". We start with a container, and a bunch of air molecules,
+all of which interact with each other to create a fluid. This interaction is
+effectively the collisions between particles. It turns out that simulating
+particle dynamics in two dimensions is pretty straightforward. But when you
+throw in that Z-axis, it gets a lot harder. The main article we used for this is
+\hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution} (\cite{hakenberg}).
 
 Here is a set of formulas necessary to perform the calculations that describe
 the behavior of a pair particle before and after their collision:
@@ -140,20 +147,23 @@ The following formulas represent the relation between particles:
 \]
 
 After lots of trial and error, we were able to successfully implement the math.
-We did this using Go and raylib, and the code is available at \verb|github.com/dtasada/paper| at the \verb|lagrangian-go| branch.
+We did this using Go and raylib, and the code is available at
+\verb|github.com/dtasada/paper| at the \verb|lagrangian-go| branch.
 But we encountered a simple issue where the particles would phase into each other,
 rendering the particle simulation worthless.
-This could be because of a too small time step, or a logic error in the collision detection.
-This should be fixable by adding more simulation steps, which means that each particles solves its collisions more than once per collision, but we weren't able to successfully implement this.
-In the end, we ended up scrapping the Lagrangian simulation model.
+This could be because of a too small time step, or a logic error in the collision
+detection. This should be fixable by adding more simulation steps, which means
+that each particles solves its collisions more than once per collision, but we
+weren't able to successfully implement this. In the end, we ended up scrapping
+the Lagrangian simulation model.
 
 \subsection{Eulerian Fluid Simulation}
 Next we tried a method that we'd had our eyes on for a while. This was had
-originally been our first choice, but we switched to Lagrangian due to problems I'll explain shortly.
-It's called Eulerian fluid simulation, and the way this model works is that it
-sees fluid as a grid of cells that react to each other.
-Eulerian fluid simulation is an application of cellular automata,
-which is a computation model used in physics, biology, and many other applications.
+originally been our first choice, but we switched to Lagrangian due to problems
+I'll explain shortly. It's called Eulerian fluid simulation, and the way this
+model works is that it sees fluid as a grid of cells that react to each other.
+Eulerian fluid simulation is an application of cellular automata, which is a
+computation model used in physics, biology, and many other applications.
 
 Our fluid simulation involves a two or three-dimensional grid of cells,
 each of which have velocity and density fields.
@@ -161,29 +171,11 @@ Each frame, the cells interact with each other according to the
 \hyperlink{https://en.wikipedia.org/wiki/Navier\%E2\%80\%93Stokes_equations}{Navier-Stokes equations}.
 
 The math involved in the Navier-Stokes equations is very complex and
-difficult to understand without a good background in physics and differential equations.
-That is why we have humbly borrowed most of the math from Mike Ash's
+difficult to understand without a good background in physics and differential
+equations. That is why we have humbly borrowed most of the math from Mike Ash's
 \hyperlink{https://mikeash.com/pyblog/fluid-simulation-for-dummies.html}{Fluid Simulation for Dummies}
 (\cite{mikeash}), which is in turn based on Jos Stam's brilliant work on
 \hyperlink{http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf}{Real-Time Fluid Dynamics for Games} (\cite{josstam}).
-
-\subsubsection{The Code}
-Our code is structured as follows:
-\dirtree{%
-	.1 paper.
-	.2 simulation\DTcomment{Contains the physics simulation code}. 
-	.3 include\DTcomment{Our own engine headers}.
-	.3 lib\DTcomment{External libraries}.
-	.3 resources\DTcomment{Resources like images, fonts, shaders}.
-	.3 src\DTcomment{Actual engine source}.
-	.2 neural\DTcomment{Contains ML engine}.
-	.2 Makefile.
-}
-
-The code is written in C++, and uses \hyperlink{https://www.raylib.com/}{raylib} library for rendering.
-
-\paragraph{The Structure}
-\subsubsection{Methodology}
 
 % Math
 \subsubsection{The Math}
@@ -204,13 +196,138 @@ The reader is not expected to fully understand these equations because they are,
 very difficult to understand. But it should be noted that the two equations above look a lot like eachother,
 as this was helpful in developing the simulation. (\cite{josstam})
 
+\subsubsection{The Implementation}
+Our code is structured as follows:
+\dirtree{%
+	.1 paper.
+	.2 simulation\DTcomment{Contains the physics simulation code}. 
+	.3 include\DTcomment{Our own engine headers}.
+	.3 lib\DTcomment{External libraries}.
+	.3 resources\DTcomment{Resources like images, fonts, shaders}.
+	.3 src\DTcomment{Actual engine source}.
+	.2 neural\DTcomment{Contains ML engine}.
+	.2 Makefile.
+}
+
+The code is written in C++, and uses the \hyperlink{https://www.raylib.com/}{raylib}
+library for easy 3D rendering.
+We originally wanted to use Go because of preference and developer ergonomics,
+which is what we did with the first Lagrangian model, but we ended up writing
+the physics simulation in C++ because of the way that Jos Stam's implementation
+utilizes 3D arrays, which we found not to be viable in Go, which is why we
+switched to the Lagrangian model in the first place.
+
+The main class we use for the simulation is the \verb|Fluid| class. The implementation
+is available at \verb|/simulation/src/Fluid.cpp|. The interface is as follows:
+\begin{lstlisting}
+class Fluid {
+   private:
+	float dt;    // simulation timestep
+	float visc;  // viscosity constant
+
+	// 3D cell property fields
+	float *s, *density;      // density fields
+	float *vx, *vy, *vz;     // velocity fields
+	float *vx0, *vy0, *vz0;  // backup velocity fields
+
+   public:
+	int container_size;
+	float fluid_size;
+	float diffusion;
+
+	Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
+	~Fluid();
+	float get_density(v3 position);
+	v3 get_velocity(v3 position);
+	v3 get_position(int i);
+	void reset();
+
+	void add_gravity();
+	void add_density(v3 position, float amount);
+	void add_velocity(v3 position, v3 amount);
+
+	void advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ);
+	void diffuse(int b, float *x, float *x0, float diff);
+	void lin_solve(int b, float *x, float *x0, float a, float c);
+	void project(float *velocX, float *velocY, float *velocZ, float *p, float *div);
+	void set_boundaries(int b, float *x);
+	void step();
+
+	// geometry
+	void add_cube(v3 position, float size);
+	void handle_solid_boundaries(float *x, int b);
+
+	void print_density(void);
+};
+\end{lstlisting}
+
+The class contains the cell property fields as well as all the functions related
+to the physics simulation, including the advection, diffusion and projection procedures.
+With this we have a basic working fluid simulator.
+
+The next step is to add geometry. We did this by adding a boolean field to the
+Fluid properties and some getters and setters.
+\begin{lstlisting}
+class Fluid {
+   private:
+	// rest of private members
+	bool *solid;
+
+   public:
+	// rest of public members
+	bool is_solid(v3 position);
+	void set_solid(v3 position, bool set);
+}
+\end{lstlisting}
+Then we change the advection and boundary handling functions to account for
+solid boundaries. This is done by checking whether each cell is solid, and if
+so, the cell properties aren't advected.
+
+\begin{lstlisting}
+// in advection function, for each cell:
+if (solid[IX(i, j, k)]) {
+	if (b >= 1 && b <= 3) {  // For velocity components
+		d[IX(i, j, k)] = 0;
+	}
+	continue;
+}
+
+// in boundary function, for each cell:
+if (solid[IX(x, y, z)]) {
+	// For velocity components, enforce no-slip condition
+	if (b == 1) f[IX(x, y, z)] = 0;  // x velocity
+	if (b == 2) f[IX(x, y, z)] = 0;  // y velocity
+	if (b == 3) f[IX(x, y, z)] = 0;  // z velocity
+
+	// For density and pressure, use average of neighboring
+	// non-solid cells
+	if (b == 0) {
+		float sum = 0;
+		int count = 0;
+
+		if (!solid[IX(x-1, y, z)]) { sum += f[IX(x-1, y, z)]; count++; }
+		if (!solid[IX(x+1, y, z)]) { sum += f[IX(x+1, y, z)]; count++; }
+		if (!solid[IX(x, y-1, z)]) { sum += f[IX(x, y-1, z)]; count++; }
+		if (!solid[IX(x, y+1, z)]) { sum += f[IX(x, y+1, z)]; count++; }
+		if (!solid[IX(x, y, z-1)]) { sum += f[IX(x, y, z-1)]; count++; }
+		if (!solid[IX(x, y, z+1)]) { sum += f[IX(x, y, z+1)]; count++; }
+
+		f[IX(x, y, z)] = count > 0 ? sum / count : f[IX(x, y, z)];
+	}
+}
+\end{lstlisting}
+
+This allows us to add a cube of a given size at a given position, which the
+fluid will treat as a solid object. Unfortunately, a plane is more complex than
+a cube. There are a few ways to handle this.
+
 % Results
 \section{Results}
-Present your experimental or theoretical results in this section. Use tables and figures to illustrate important points.
+\ipsum[1]
 
 % Conclusion
 \subsection{Conclusion}
-Summarize the main findings of the paper. Mention potential future work or research directions.
+\ipsum[1]
 
 % References
 \nocite{*}

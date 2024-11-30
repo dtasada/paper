@@ -3,7 +3,8 @@
 /paper
 .DS_Store
 
-Article/*
-!Article/Article.tex
-!Article/references.bib
-!Article/Article.pdf
+thesis/*
+!thesis/Thesis.tex
+!thesis/resources
+!thesis/references.bib
+!thesis/Thesis.pdf

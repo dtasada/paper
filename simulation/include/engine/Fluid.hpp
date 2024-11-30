@@ -14,27 +14,16 @@
         (constrain((vec).y, 0, container_size - 1) * container_size) + \
         (constrain((vec).z, 0, container_size - 1) * container_size * container_size))
 
-#define PRINT_ARRAY(arr, size)                             \
-    printf("{ ");                                          \
-    for (int i = 0; i < size; i++) printf("%f, ", arr[i]); \
-    printf("}\n");
-
 class Fluid {
    private:
-    float dt;
-    float visc;
+    float dt;    // simulation timestep
+    float visc;  // viscosity constant
 
-    bool *solid;
-    float *s;
-    float *density;
-
-    float *vx;
-    float *vy;
-    float *vz;
-
-    float *vx0;
-    float *vy0;
-    float *vz0;
+    // 3D cell property fields
+    bool *solid;             // binary solid geometry
+    float *s, *density;      // density fields
+    float *vx, *vy, *vz;     // velocity fields
+    float *vx0, *vy0, *vz0;  // backup velocity fields
 
    public:
     int container_size;

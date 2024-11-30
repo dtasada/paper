@@ -5,7 +5,7 @@
 #include <sys/cdefs.h>
 
 #include <algorithm>
-#include <cinttypes>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     SetTargetFPS(FPS);
     SetExitKey(0);
     DisableCursor();
-    // HideCursor();
+    HideCursor();
 
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     v3 containerSize(fluid.container_size * fluid.fluid_size);
     v3 containerCenter(containerSize * 0.5f);
 
-    fluid.add_cube(v3(4), 10);
+    fluid.add_cube(v3(4), 16);
 
     bool cursor = false;
     Camera3D camera = {
@@ -66,7 +66,6 @@ int main(int argc, char* argv[]) {
         /* Handle input */
         if (!cursor) {
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-                DisableCursor();
                 v3 position(1, 1, 1);
                 float density_amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 100 : 200;
                 fluid.add_density(position, density_amount);
@@ -83,14 +82,15 @@ int main(int argc, char* argv[]) {
         if (IsKeyPressed(KEY_ESCAPE)) {
             if (cursor) {
                 DisableCursor();
-                // HideCursor();
+                HideCursor();
             } else {
                 EnableCursor();
-                // ShowCursor();
+                ShowCursor();
             }
 
             cursor = !cursor;
         }
+
         if (IsKeyDown(KEY_G)) {
             fluid.add_velocity(v3(12.0f, 12.0f, 12.0f), v3(0.0f, -9.81f, 0.0f));
         }
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
         /* Update sim */
         fluid.step();
 
-        // Sort cubes by distance to camera. This is important for backface rendering
+        // Sort cell by distance to camera. This is important for backface rendering
         std::vector<Cell> cells;
         for (float z = 0.0f; z < fluid.container_size; z++) {
             for (float y = 0.0f; y < fluid.container_size; y++) {
@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) {
                     float norm = std::min(density / 100.0f, 1.0f);
                     float hue = (1.0f - norm) * 0.66f * 360.0f;
                     Color c = ColorFromHSV(hue, 1.0f, 1.0f);
-                    Color color = {c.r, c.g, c.b, (uint8_t)(norm * 255)};
+                    Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
 
                     if (!settings.show_density_float) {
                         DrawCubeV(position, v3(fluid.fluid_size), color);

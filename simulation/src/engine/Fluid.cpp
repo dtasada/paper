@@ -232,35 +232,19 @@ void Fluid::set_boundaries(int b, float *f) {
                     if (b == 2) f[IX(x, y, z)] = 0;  // y velocity
                     if (b == 3) f[IX(x, y, z)] = 0;  // z velocity
 
-                    // For density and pressure, use average of neighboring non-solid cells
+                    // For density and pressure, use average of neighboring
+                    // non-solid cells
                     if (b == 0) {
                         float sum = 0;
                         int count = 0;
 
-                        if (!solid[IX(x - 1, y, z)]) {
-                            sum += f[IX(x - 1, y, z)];
-                            count++;
-                        }
-                        if (!solid[IX(x + 1, y, z)]) {
-                            sum += f[IX(x + 1, y, z)];
-                            count++;
-                        }
-                        if (!solid[IX(x, y - 1, z)]) {
-                            sum += f[IX(x, y - 1, z)];
-                            count++;
-                        }
-                        if (!solid[IX(x, y + 1, z)]) {
-                            sum += f[IX(x, y + 1, z)];
-                            count++;
-                        }
-                        if (!solid[IX(x, y, z - 1)]) {
-                            sum += f[IX(x, y, z - 1)];
-                            count++;
-                        }
-                        if (!solid[IX(x, y, z + 1)]) {
-                            sum += f[IX(x, y, z + 1)];
-                            count++;
-                        }
+                        // clang-format off
+                        if (!solid[IX(x - 1, y, z)]) { sum += f[IX(x - 1, y, z)]; count++; }
+                        if (!solid[IX(x + 1, y, z)]) { sum += f[IX(x + 1, y, z)]; count++; }
+                        if (!solid[IX(x, y - 1, z)]) { sum += f[IX(x, y - 1, z)]; count++; }
+                        if (!solid[IX(x, y + 1, z)]) { sum += f[IX(x, y + 1, z)]; count++; }
+                        if (!solid[IX(x, y, z - 1)]) { sum += f[IX(x, y, z - 1)]; count++; }
+                        if (!solid[IX(x, y, z + 1)]) { sum += f[IX(x, y, z + 1)]; count++; }
 
                         f[IX(x, y, z)] = count > 0 ? sum / count : f[IX(x, y, z)];
                     }
@@ -305,7 +289,6 @@ void Fluid::set_boundaries(int b, float *f) {
 }
 
 void Fluid::step() {
-    // add_gravity();
     diffuse(1, vx0, vx, visc);
     diffuse(2, vy0, vy, visc);
     diffuse(3, vz0, vz, visc);

@@ -2,9 +2,7 @@
 \contentsline {section}{\numberline {2}Execution}{4}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Preliminary: Lagrangian Fluid Simulation}{4}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Eulerian Fluid Simulation}{5}{subsection.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.1}The Code}{5}{subsubsection.2.2.1}%
-\contentsline {paragraph}{The Structure}{5}{paragraph*.1}%
-\contentsline {subsubsection}{\numberline {2.2.2}Methodology}{5}{subsubsection.2.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.3}The Math}{5}{subsubsection.2.2.3}%
-\contentsline {section}{\numberline {3}Results}{7}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Conclusion}{7}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {2.2.1}The Math}{5}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}The Code}{5}{subsubsection.2.2.2}%
+\contentsline {section}{\numberline {3}Results}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Conclusion}{8}{subsection.3.1}%
