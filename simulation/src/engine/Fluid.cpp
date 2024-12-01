@@ -16,7 +16,6 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     this->visc = viscosity;
 
     s = Field<float>();
-    solid = Field<bool>();
     density = Field<float>();
     vx = Field<float>();
     vy = Field<float>();
@@ -24,6 +23,7 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     vx0 = Field<float>();
     vy0 = Field<float>();
     vz0 = Field<float>();
+    state = Field<CellType>();
 
     // not implemented
     // this->obstacles = std::vector<Obstacle>();
@@ -31,8 +31,7 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
 }
 
 Fluid::~Fluid(void) {
-    // delete solid_frac;
-    // for (const Obstacle &obstacle : obstacles) UnloadModel(obstacle.model);
+    for (const Obstacle& obstacle : obstacles) UnloadModel(obstacle.model);
 }
 
 float Fluid::get_density(v3 position) { return density[IXv(position)]; }
@@ -43,8 +42,6 @@ v3 Fluid::get_velocity(v3 position) {
         vz[IXv(position)],
     };
 }
-bool Fluid::is_solid(v3 position) { return solid[IXv(position)]; }
-void Fluid::set_solid(v3 position, bool set) { solid[IXv(position)] = set; }
 
 void Fluid::reset(void) {
     float base = 0.0f;
@@ -70,8 +67,6 @@ void Fluid::add_velocity(v3 position, v3 amount) {
 
 void Fluid::advect(FieldType b, Field<float>& d, Field<float>& d0, Field<float>& velocX,
                    Field<float>& velocY, Field<float>& velocZ) {
-    float N = container_size;
-
     float i0, i1, j0, j1, k0, k1;
 
     float dtx = dt * (N - 2);
@@ -88,13 +83,6 @@ void Fluid::advect(FieldType b, Field<float>& d, Field<float>& d0, Field<float>&
     for (k = 1, kfloat = 1; k < N - 1; k++, kfloat++) {
         for (j = 1, jfloat = 1; j < N - 1; j++, jfloat++) {
             for (i = 1, ifloat = 1; i < N - 1; i++, ifloat++) {
-                if (solid[IX(i, j, k)]) {
-                    if (b != FieldType::DENSITY) {  // For velocity components
-                        d[IX(i, j, k)] = 0;
-                    }
-                    continue;
-                }
-
                 tmp1 = dtx * velocX[IX(i, j, k)];
                 tmp2 = dty * velocY[IX(i, j, k)];
                 tmp3 = dtz * velocZ[IX(i, j, k)];
@@ -147,7 +135,6 @@ void Fluid::diffuse(FieldType b, Field<float>& x, Field<float>& x0, float diff) 
 
 void Fluid::lin_solve(FieldType b, Field<float>& x, Field<float>& x0, float a, float c) {
     float cRecip = 1.0 / c;
-    int N = container_size;
 
     for (int k = 0; k < 4; k++) {
         for (int m = 1; m < N - 1; m++) {
@@ -167,8 +154,6 @@ void Fluid::lin_solve(FieldType b, Field<float>& x, Field<float>& x0, float a, f
 
 void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ,
                     Field<float>& p, Field<float>& div) {
-    int N = container_size;
-
     // Calculate divergence
     for (int k = 1; k < N - 1; k++) {
         for (int j = 1; j < N - 1; j++) {
@@ -204,39 +189,6 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
 }
 
 void Fluid::set_boundaries(FieldType b, Field<float>& f) {
-    int N = container_size;
-
-    // Handle solid boundaries first
-    for (int z = 1; z < N - 1; z++) {
-        for (int y = 1; y < N - 1; y++) {
-            for (int x = 1; x < N - 1; x++) {
-                if (solid[IX(x, y, z)]) {
-                    // For velocity components, enforce no-slip condition
-                    if (b == FieldType::VX) f[IX(x, y, z)] = 0;  // x velocity
-                    if (b == FieldType::VY) f[IX(x, y, z)] = 0;  // y velocity
-                    if (b == FieldType::VZ) f[IX(x, y, z)] = 0;  // z velocity
-
-                    // For density and pressure, use average of neighboring
-                    // non-solid cells
-                    if (b == FieldType::DENSITY) {
-                        float sum = 0;
-                        int count = 0;
-
-                        // clang-format off
-                        if (!solid[IX(x - 1, y, z)]) { sum += f[IX(x - 1, y, z)]; count++; }
-                        if (!solid[IX(x + 1, y, z)]) { sum += f[IX(x + 1, y, z)]; count++; }
-                        if (!solid[IX(x, y - 1, z)]) { sum += f[IX(x, y - 1, z)]; count++; }
-                        if (!solid[IX(x, y + 1, z)]) { sum += f[IX(x, y + 1, z)]; count++; }
-                        if (!solid[IX(x, y, z - 1)]) { sum += f[IX(x, y, z - 1)]; count++; }
-                        if (!solid[IX(x, y, z + 1)]) { sum += f[IX(x, y, z + 1)]; count++; }
-
-                        f[IX(x, y, z)] = count > 0 ? sum / count : f[IX(x, y, z)];
-                    }
-                }
-            }
-        }
-    }
-
     for (int j = 1; j < N - 1; j++) {
         for (int i = 1; i < N - 1; i++) {
             f[IX(i, j, 0)] = b == FieldType::VZ ? -f[IX(i, j, 1)] : f[IX(i, j, 1)];
@@ -289,17 +241,42 @@ void Fluid::step() {
     advect(FieldType::DENSITY, density, s, vx, vy, vz);
 }
 
-void Fluid::add_cube(v3 pos, float size) {
-    for (int z = pos.z; z < pos.z + size && z < container_size; z++) {
-        for (int y = pos.y; y < pos.y + size && y < container_size; y++) {
-            for (int x = pos.x; x < pos.y + size && x < container_size; x++) {
-                solid[IX(x, y, z)] = true;
+void Fluid::add_obstacle(v3 position, v3 size, Model model) {
+    Obstacle obstacle = {position, size, model};
+    obstacles.push_back(obstacle);
+    voxelize(obstacle);
+}
+
+void Fluid::voxelize(Obstacle obstacle) {
+    for (int z = 0; z < N; z++) {
+        for (int y = 0; y < N; y++) {
+            for (int x = 0; x < N; x++) {
+                // ClassifyCell({x, y, z}, {1, 1, 1}, obstacle.position, obstacle.size);
+
+                v3 min_cell = v3(x, y, z);
+                v3 max_cell = v3(x + 1, y + 1, z + 1);
+
+                v3 min_model = obstacle.position - obstacle.size / 2;
+                v3 max_model = obstacle.position + obstacle.size / 2;
+
+                if (!((min_cell.x <= max_model.x && max_cell.x >= min_model.x) &&
+                      (min_cell.y <= max_model.y && max_cell.y >= min_model.y) &&
+                      (min_cell.z <= max_model.z && max_cell.z >= min_model.z))) {
+                    state[IXv(min_cell)] = CellType::FLUID;
+                    continue;
+                }
+
+                if (min_cell.x >= min_model.x && max_cell.x <= max_model.x &&
+                    min_cell.y >= min_model.y && max_cell.y <= max_model.y &&
+                    min_cell.z >= min_model.z && max_cell.z <= max_model.z) {
+                    state[IXv(min_cell)] = CellType::SOLID;
+                    continue;
+                }
+
+                state[IXv(min_cell)] = CellType::CUT_CELL;
             }
         }
     }
 }
 
-// not implemented
-// void Fluid::add_obstacle(v3 position, Model model) {
-// 	obstacles.push_back({position, model});
-// }
+CellType Fluid::get_state(v3 position) { return state[IXv(position)]; }

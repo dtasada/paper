@@ -40,7 +40,7 @@ struct Cell {
 };
 
 struct Obstacle {
-    v3 position;
+    v3 position, size;
     Model model;
 };
 

@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     v3 containerSize(fluid.container_size * fluid.fluid_size);
     v3 containerCenter(containerSize * 0.5f);
 
-    fluid.add_cube(v3(4), 16);
+    fluid.add_obstacle(v3(10.0f), v3(5.0f), LoadModel("simulation/resources/models/cube.obj"));
 
     bool cursor = false;
     Camera3D camera = {
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
     };
 
     struct {
-        bool show_cube = true;
+        bool show_models = true;
         bool should_orthographic = true;
         bool show_density_float = false;
         bool show_vel_arrows = false;
@@ -110,9 +110,10 @@ int main(int argc, char* argv[]) {
                     }
 
                     float density = fluid.get_density(position);
-                    bool is_solid = fluid.is_solid(position);
 
-                    if (density > 0.01f || is_solid) {  // Skip cubes with very low density
+                    if (density > 0.01f ||
+                        fluid.get_state(position) !=
+                            CellType::FLUID) {  // Skip cubes with very low density
                         v3 cube_position = position;
                         cube_position = cube_position * v3(fluid.fluid_size);
                         cube_position = cube_position + (fluid.fluid_size / 2);
@@ -141,18 +142,24 @@ int main(int argc, char* argv[]) {
 
         // Render cubes
         BeginBlendMode(BLEND_ALPHA);
+        if (settings.show_models) {
+            for (Obstacle& obstacle : fluid.obstacles) {
+                DrawModel(obstacle.model, obstacle.position, obstacle.size.x, RED);
+            }
+        }
+
         for (const Cell& cell : cells) {
             v3 position = cell.position;
 
             float density = fluid.get_density(cell.position);
-            bool is_solid = fluid.is_solid(position);
-            if (density > 0.01f || is_solid) {
+            CellType state = fluid.get_state(cell.position);
+            if (density > 0.01f) {
                 if (settings.show_vel_arrows) {
                     BeginBlendMode(BLEND_SUBTRACT_COLORS);
                     DrawCylinderEx(position, position + (fluid.get_velocity(position) * 100),
                                    density / 100.f, density / 100.f, 10, RED);
                     BeginBlendMode(BLEND_ALPHA);
-                } else if (!is_solid) {
+                } else {
                     // get color of cube
                     float norm = std::min(density / 100.0f, 1.0f);
                     float hue = (1.0f - norm) * 0.66f * 360.0f;
@@ -165,9 +172,14 @@ int main(int argc, char* argv[]) {
                         draw_text_3d(TextFormat("%.1f", density), position, fluid.fluid_size * 10,
                                      WHITE);
                     }
-                } else if (settings.show_cube) {
-                    DrawCubeV(position, v3(fluid.fluid_size), BROWN);
                 }
+            }
+
+            if (state == CellType::SOLID) {
+                DrawCubeV(position, v3(fluid.fluid_size), WHITE);
+            }
+            if (state == CellType::CUT_CELL) {
+                DrawCubeV(position, v3(fluid.fluid_size), GREEN);
             }
         }
         EndBlendMode();
@@ -182,7 +194,7 @@ int main(int argc, char* argv[]) {
             ImGui::Begin("Fluid Simulation");
 
             ImGui::Checkbox("Gravity", &settings.gravity);
-            ImGui::Checkbox("Show cube", &settings.show_cube);
+            ImGui::Checkbox("Show models", &settings.show_models);
             ImGui::Checkbox("Show density with numbers", &settings.show_density_float);
             ImGui::Checkbox("Show velocity with arrows", &settings.show_vel_arrows);
 

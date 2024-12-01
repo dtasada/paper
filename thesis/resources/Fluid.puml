@@ -34,7 +34,6 @@ class Fluid {
 	+diffuse(int b, float* x, float* x0, float diff) : void
 	+handle_solid_boundaries(float* x, int b) : void
 	+lin_solve(int b, float* x, float* x0, float a, float c) : void
-	+print_density() : void
 	+project(float* velocX, float* velocY, float* velocZ, float* p, float* div) : void
 	+reset() : void
 	+set_boundaries(int b, float* x) : void
