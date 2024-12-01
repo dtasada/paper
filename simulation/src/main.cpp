@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     float dt = 1.0f;             // Timestep
     float viscosity = 0.000001;  // Viscosity constant
 
-    Fluid fluid(32, 1.0f, diffusion, viscosity, dt);
+    Fluid fluid(SIM_RES, 1.0f, diffusion, viscosity, dt);
     v3 containerSize(fluid.container_size * fluid.fluid_size);
     v3 containerCenter(containerSize * 0.5f);
 
@@ -149,7 +149,6 @@ int main(int argc, char* argv[]) {
             if (density > 0.01f || is_solid) {
                 if (settings.show_vel_arrows) {
                     BeginBlendMode(BLEND_SUBTRACT_COLORS);
-                    // DrawLine3D(position, position + (fluid.get_velocity(position) * 1000), RED);
                     DrawCylinderEx(position, position + (fluid.get_velocity(position) * 100),
                                    density / 100.f, density / 100.f, 10, RED);
                     BeginBlendMode(BLEND_ALPHA);

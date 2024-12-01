@@ -3,6 +3,7 @@
 #include <raymath.h>
 #include <stdlib.h>
 
+#include <array>
 #include <vector>
 
 #include "Engine.hpp"
@@ -17,6 +18,12 @@
         (constrain((vec).y, 0, container_size - 1) * container_size) + \
         (constrain((vec).z, 0, container_size - 1) * container_size * container_size))
 
+#define SIM_RES 24
+#define FIELD_SIZE (SIM_RES * SIM_RES * SIM_RES)
+
+template <typename T>
+using Field = std::array<T, FIELD_SIZE>;  // contains an array of size N*N*N
+
 enum class FieldType { VX, VY, VZ, DENSITY };
 enum class CellType { SOLID, FLUID, CUT_CELL };
 
@@ -26,11 +33,11 @@ class Fluid {
     float visc;  // viscosity constant
 
     // 3D cell property fields
-    bool *solid;             // binary solid geometry
-    float *s, *density;      // density fields
-    float *vx, *vy, *vz;     // velocity fields
-    float *vx0, *vy0, *vz0;  // backup velocity fields
-                             /// float *solid_frac; // not implemented
+    Field<bool> solid;           // binary solid geometry
+    Field<float> s, density;     // density fields
+    Field<float> vx, vy, vz;     // velocity fields
+    Field<float> vx0, vy0, vz0;  // backup velocity fields
+                                 /// std::array<float> solid_frac; // not implemented
 
     // std::vector<Obstacle> obstacles; // not implemented
 
@@ -51,16 +58,18 @@ class Fluid {
     void add_density(v3 position, float amount);
     void add_velocity(v3 position, v3 amount);
 
-    void advect(FieldType b, float *d, float *d0, float *velocX, float *velocY, float *velocZ);
-    void diffuse(FieldType b, float *x, float *x0, float diff);
-    void lin_solve(FieldType b, float *x, float *x0, float a, float c);
-    void project(float *velocX, float *velocY, float *velocZ, float *p, float *div);
-    void set_boundaries(FieldType b, float *x);
+    void advect(FieldType b, Field<float>& d, Field<float>& d0, Field<float>& velocX,
+                Field<float>& velocY, Field<float>& velocZ);
+    void diffuse(FieldType b, Field<float>& x, Field<float>& x0, float diff);
+    void lin_solve(FieldType b, Field<float>& x, Field<float>& x0, float a, float c);
+    void project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ, Field<float>& p,
+                 Field<float>& div);
+    void set_boundaries(FieldType b, Field<float>& x);
     void step(void);
 
     // geometry
     void add_cube(v3 position, float size);
-    void handle_solid_boundaries(float *x, int b);
+    void handle_solid_boundaries(Field<float>& x, int b);
     /* not implemented
 void add_obstacle(v3 position, Model model);
 void voxelize_obstacles(void);

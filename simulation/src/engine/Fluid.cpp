@@ -15,16 +15,15 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     this->diffusion = diffusion;
     this->visc = viscosity;
 
-    int array_size = pow(container_size, 3);
-    this->s = new float[array_size]();
-    this->solid = new bool[array_size]();
-    this->density = new float[array_size]();
-    this->vx = new float[array_size]();
-    this->vy = new float[array_size]();
-    this->vz = new float[array_size]();
-    this->vx0 = new float[array_size]();
-    this->vy0 = new float[array_size]();
-    this->vz0 = new float[array_size]();
+    s = Field<float>();
+    solid = Field<bool>();
+    density = Field<float>();
+    vx = Field<float>();
+    vy = Field<float>();
+    vz = Field<float>();
+    vx0 = Field<float>();
+    vy0 = Field<float>();
+    vz0 = Field<float>();
 
     // not implemented
     // this->obstacles = std::vector<Obstacle>();
@@ -32,19 +31,8 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
 }
 
 Fluid::~Fluid(void) {
-    delete[] s;
-    delete[] solid;
-    delete[] density;
-    delete[] vx;
-    delete[] vy;
-    delete[] vz;
-    delete[] vx0;
-    delete[] vy0;
-    delete[] vz0;
-
-    delete[] solid_frac;
-
-    for (const Obstacle &obstacle : obstacles) UnloadModel(obstacle.model);
+    // delete solid_frac;
+    // for (const Obstacle &obstacle : obstacles) UnloadModel(obstacle.model);
 }
 
 float Fluid::get_density(v3 position) { return density[IXv(position)]; }
@@ -59,16 +47,16 @@ bool Fluid::is_solid(v3 position) { return solid[IXv(position)]; }
 void Fluid::set_solid(v3 position, bool set) { solid[IXv(position)] = set; }
 
 void Fluid::reset(void) {
-    int array_size = pow(container_size, 3);
     float base = 0.0f;
-    std::fill(s, s + array_size, base);
-    std::fill(density, density + array_size, base);
-    std::fill(vx, vx + array_size, base);
-    std::fill(vy, vy + array_size, base);
-    std::fill(vz, vz + array_size, base);
-    std::fill(vx0, vx0 + array_size, base);
-    std::fill(vy0, vy0 + array_size, base);
-    std::fill(vz0, vz0 + array_size, base);
+
+    s.fill(base);
+    density.fill(base);
+    vx.fill(base);
+    vy.fill(base);
+    vz.fill(base);
+    vx0.fill(base);
+    vy0.fill(base);
+    vz0.fill(base);
 }
 
 void Fluid::add_density(v3 position, float amount) { this->density[IXv(position)] += amount; }
@@ -80,7 +68,8 @@ void Fluid::add_velocity(v3 position, v3 amount) {
     vz[index] += amount.z;
 }
 
-void Fluid::advect(FieldType b, float *d, float *d0, float *velocX, float *velocY, float *velocZ) {
+void Fluid::advect(FieldType b, Field<float>& d, Field<float>& d0, Field<float>& velocX,
+                   Field<float>& velocY, Field<float>& velocZ) {
     float N = container_size;
 
     float i0, i1, j0, j1, k0, k1;
@@ -151,12 +140,12 @@ void Fluid::advect(FieldType b, float *d, float *d0, float *velocX, float *veloc
     set_boundaries(b, d);
 }
 
-void Fluid::diffuse(FieldType b, float *x, float *x0, float diff) {
+void Fluid::diffuse(FieldType b, Field<float>& x, Field<float>& x0, float diff) {
     float a = dt * diff * pow(container_size - 2, 3);
     lin_solve(b, x, x0, a, 1 + 6 * a);
 }
 
-void Fluid::lin_solve(FieldType b, float *x, float *x0, float a, float c) {
+void Fluid::lin_solve(FieldType b, Field<float>& x, Field<float>& x0, float a, float c) {
     float cRecip = 1.0 / c;
     int N = container_size;
 
@@ -176,7 +165,8 @@ void Fluid::lin_solve(FieldType b, float *x, float *x0, float a, float c) {
     }
 }
 
-void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float *div) {
+void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ,
+                    Field<float>& p, Field<float>& div) {
     int N = container_size;
 
     // Calculate divergence
@@ -213,7 +203,7 @@ void Fluid::project(float *velocX, float *velocY, float *velocZ, float *p, float
     set_boundaries(FieldType::VZ, velocZ);
 }
 
-void Fluid::set_boundaries(FieldType b, float *f) {
+void Fluid::set_boundaries(FieldType b, Field<float>& f) {
     int N = container_size;
 
     // Handle solid boundaries first
@@ -283,8 +273,6 @@ void Fluid::set_boundaries(FieldType b, float *f) {
 }
 
 void Fluid::step() {
-	voxelize_obstacles();
-
     diffuse(FieldType::VX, vx0, vx, visc);
     diffuse(FieldType::VY, vy0, vy, visc);
     diffuse(FieldType::VZ, vz0, vz, visc);
