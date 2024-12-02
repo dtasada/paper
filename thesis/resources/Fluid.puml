@@ -9,36 +9,41 @@
 class Fluid {
 	+Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt)
 	+~Fluid()
-	+Solid(v3 position) : bool
-	-solid : bool*
-	+Density(v3 position) : float
+	-density : Field<float>
+	-s : Field<float>
+	-solid_frac : Field<float>
+	-vx : Field<float>
+	-vx0 : Field<float>
+	-vy : Field<float>
+	-vy0 : Field<float>
+	-vz : Field<float>
+	-vz0 : Field<float>
 	+diffusion : float
 	-dt : float
 	+fluid_size : float
+	+get_density(v3 position) : float
 	-visc : float
-	-density : float*
-	-s : float*
-	-vx : float*
-	-vx0 : float*
-	-vy : float*
-	-vy0 : float*
-	-vz : float*
-	-vz0 : float*
 	+container_size : int
+	+obstacles : std::vector<Obstacle>
 	+get_position(int i) : v3
-	+add_cube(v3 position, float size) : void
+	+get_velocity(v3 position) : v3
 	+add_density(v3 position, float amount) : void
-	+add_gravity() : void
 	+add_velocity(v3 position, v3 amount) : void
-	+advect(int b, float* d, float* d0, float* velocX, float* velocY, float* velocZ) : void
-	+diffuse(int b, float* x, float* x0, float diff) : void
-	+handle_solid_boundaries(float* x, int b) : void
-	+lin_solve(int b, float* x, float* x0, float a, float c) : void
-	+project(float* velocX, float* velocY, float* velocZ, float* p, float* div) : void
+	+advect(FieldType b, Field<float>& d, Field<float>& d0, Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ) : void
+	+diffuse(FieldType b, Field<float>& x, Field<float>& x0, float diff) : void
+	+lin_solve(FieldType b, Field<float>& x, Field<float>& x0, float a, float c) : void
+	+project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ, Field<float>& p, Field<float>& div) : void
 	+reset() : void
-	+set_boundaries(int b, float* x) : void
-	+set_solid(v3 position, bool set) : void
+	+set_boundaries(FieldType b, Field<float>& x) : void
 	+step() : void
+}
+
+
+enum FieldType {
+	DENSITY
+	VX
+	VY
+	VZ
 }
 
 

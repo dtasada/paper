@@ -24,7 +24,7 @@
 #define N container_size
 
 template <typename T>
-using Field = std::array<T, FIELD_SIZE>;  // contains an array of size N*N*N
+using Field = std::array<T, FIELD_SIZE>;  // contains an array of size N^3
 
 enum class FieldType { VX, VY, VZ, DENSITY };
 enum class CellType { SOLID, FLUID, CUT_CELL };

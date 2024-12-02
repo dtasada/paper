@@ -218,46 +218,10 @@ utilizes 3D arrays, which we found not to be viable in Go, which is why we
 switched to the Lagrangian model in the first place.
 
 The main class we use for the simulation is the \verb|Fluid| class. The implementation
-is available at \verb|/simulation/src/Fluid.cpp|. The interface is as follows:
-\begin{lstlisting}
-class Fluid {
-   private:
-	float dt;    // simulation timestep
-	float visc;  // viscosity constant
-
-	// 3D cell property fields
-	float *s, *density;      // density fields
-	float *vx, *vy, *vz;     // velocity fields
-	float *vx0, *vy0, *vz0;  // backup velocity fields
-
-   public:
-	int container_size;
-	float fluid_size;
-	float diffusion;
-
-	Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
-	~Fluid();
-	float get_density(v3 position);
-	v3 get_velocity(v3 position);
-	v3 get_position(int i);
-	void reset();
-
-	void add_gravity();
-	void add_density(v3 position, float amount);
-	void add_velocity(v3 position, v3 amount);
-
-	void advect(int b, float *d, float *d0, float *velocX, float *velocY, float *velocZ);
-	void diffuse(int b, float *x, float *x0, float diff);
-	void lin_solve(int b, float *x, float *x0, float a, float c);
-	void project(float *velocX, float *velocY, float *velocZ, float *p, float *div);
-	void set_boundaries(int b, float *x);
-	void step();
-
-	// geometry
-	void add_cube(v3 position, float size);
-	void handle_solid_boundaries(float *x, int b);
-};
-\end{lstlisting}
+is available at \verb|/simulation/src/Fluid.cpp|. The interface is as follows: \\
+\begin{center}
+	\includegraphics[width=\textwidth]{resources/Fluid.png}
+\end{center}
 
 The class contains the cell property fields as well as all the functions related
 to the physics simulation, including the advection, diffusion and projection procedures.
@@ -284,7 +248,7 @@ so, the cell properties aren't advected.
 \begin{lstlisting}
 // in advection function, for each cell:
 if (solid[IX(i, j, k)]) {
-	if (b >= 1 && b <= 3) {  // For velocity components
+	if (b != FieldType::DENSITY) {  // For velocity components
 		d[IX(i, j, k)] = 0;
 	}
 	continue;
@@ -293,9 +257,9 @@ if (solid[IX(i, j, k)]) {
 // in boundary function, for each cell:
 if (solid[IX(x, y, z)]) {
 	// For velocity components, enforce no-slip condition
-	if (b == 1) f[IX(x, y, z)] = 0;  // x velocity
-	if (b == 2) f[IX(x, y, z)] = 0;  // y velocity
-	if (b == 3) f[IX(x, y, z)] = 0;  // z velocity
+	if (b == FieldType::VX) f[IX(x, y, z)] = 0;  // x velocity
+	if (b == FieldType::VY) f[IX(x, y, z)] = 0;  // y velocity
+	if (b == FieldType::VZ) f[IX(x, y, z)] = 0;  // z velocity
 
 	// For density and pressure, use average of neighboring
 	// non-solid cells
@@ -317,7 +281,19 @@ if (solid[IX(x, y, z)]) {
 
 This allows us to add a cube of a given size at a given position, which the
 fluid will treat as a solid object. Unfortunately, a plane is more complex than
-a cube. There are a few ways to handle this.
+a cube. There are a few ways to handle this. The most obvious and least efficient
+is to raise the resolution of the grid. Currently we've been experimenting with a
+24x24x24 or a 32x32x32 grid, and that's already not as performant as we'd like.
+A 24x24x24 grid has to iterate $24^3 = 13824$ times per frame. And to simulate
+complex shapes, the higher resolution the better. But simply increasing the
+resolution to something like 128x128x128 or higher just isn't viable.
+
+We're still implementing this at the time of writing the concept, but the goal
+is to use the method explained above in combination with the Cut-Cell method,
+which will dynamically create more of these cells along the borders of the model,
+in this case a plane. This would create a high-resolution grid near the important
+and complex areas of the simulation, while preserving resources by keeping the
+unimportant areas (like large patches of just air) from being computed.
 
 % Results
 \section{Results}
