@@ -263,7 +263,7 @@ if (solid[IX(x, y, z)]) {
 
 	// For density and pressure, use average of neighboring
 	// non-solid cells
-	if (b == 0) {
+	if (b == FieldType::DENSITY) {
 		float sum = 0;
 		int count = 0;
 

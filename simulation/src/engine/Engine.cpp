@@ -4,6 +4,7 @@
 #include <raymath.h>
 #include <rlgl.h>
 
+#include <algorithm>
 #include <format>
 #include <string>
 

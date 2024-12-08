@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
     /* Raylib setup */
     InitWindow(1280, 720, "Fluid Grid");
     SetTargetFPS(FPS);
-    SetExitKey(0);
+    SetExitKey(KEY_Q);
     DisableCursor();
     HideCursor();
 
@@ -109,11 +109,9 @@ int main(int argc, char* argv[]) {
                         fluid.add_velocity(position, v3(0.0f, -9.81f, 0.0f));
                     }
 
-                    float density = fluid.get_density(position);
-
-                    if (density > 0.01f ||
-                        fluid.get_state(position) !=
-                            CellType::FLUID) {  // Skip cubes with very low density
+                    if (fluid.get_density(position) > 0.01f ||
+                        fluid.get_state(position) != CellType::FLUID) {
+                        // Skip cubes with very low density
                         v3 cube_position = position;
                         cube_position = cube_position * v3(fluid.fluid_size);
                         cube_position = cube_position + (fluid.fluid_size / 2);
@@ -175,11 +173,15 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            if (state == CellType::SOLID) {
-                DrawCubeV(position, v3(fluid.fluid_size), WHITE);
-            }
-            if (state == CellType::CUT_CELL) {
-                DrawCubeV(position, v3(fluid.fluid_size), GREEN);
+            switch (state) {
+                case CellType::SOLID:
+                    DrawCubeV(position, v3(fluid.fluid_size), WHITE);
+                    break;
+                case CellType::CUT_CELL:
+                    DrawCubeV(position, v3(fluid.fluid_size), GREEN);
+                    break;
+                default:
+                    break;
             }
         }
         EndBlendMode();

@@ -25,9 +25,9 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     vz0 = Field<float>();
     state = Field<CellType>();
 
-    // not implemented
-    // this->obstacles = std::vector<Obstacle>();
-    // this->solid_frac = new float[array_size]();
+    boundary_cache = std::vector<float>();
+    boundary_cells = std::vector<v3>();
+    is_boundary_dirty = true;
 }
 
 Fluid::~Fluid(void) {
@@ -133,37 +133,44 @@ void Fluid::diffuse(FieldType b, Field<float>& x, Field<float>& x0, float diff) 
     lin_solve(b, x, x0, a, 1 + 6 * a);
 }
 
-void Fluid::lin_solve(FieldType b, Field<float>& x, Field<float>& x0, float a, float c) {
-    float cRecip = 1.0 / c;
+void Fluid::lin_solve(FieldType b, Field<float>& f, Field<float>& f0, float a, float c) {
+    float cRecip = 1.0f / c;
 
-    for (int k = 0; k < 4; k++) {
-        for (int m = 1; m < N - 1; m++) {
-            for (int j = 1; j < N - 1; j++) {
-                for (int i = 1; i < N - 1; i++) {
-                    x[IX(i, j, m)] =
-                        (x0[IX(i, j, m)] +
-                         a * (x[IX(i + 1, j, m)] + x[IX(i - 1, j, m)] + x[IX(i, j + 1, m)] +
-                              x[IX(i, j - 1, m)] + x[IX(i, j, m + 1)] + x[IX(i, j, m - 1)])) *
+    for (int i = 0; i < 4; i++) {
+        for (int z = 1; z < N - 1; z++) {
+            for (int y = 1; y < N - 1; y++) {
+                for (int x = 1; x < N - 1; x++) {
+                    f[IX(x, y, z)] =
+                        (f0[IX(x, y, z)] +
+                         a * (f[IX(x + 1, y, z)] + f[IX(x - 1, y, z)] + f[IX(x, y + 1, z)] +
+                              f[IX(x, y - 1, z)] + f[IX(x, y, z + 1)] + f[IX(x, y, z - 1)])) *
                         cRecip;
                 }
             }
         }
-        set_boundaries(b, x);
+        set_boundaries(b, f);
     }
 }
 
 void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ,
                     Field<float>& p, Field<float>& div) {
-    // Calculate divergence
-    for (int k = 1; k < N - 1; k++) {
-        for (int j = 1; j < N - 1; j++) {
-            for (int i = 1; i < N - 1; i++) {
-                div[IX(i, j, k)] =
-                    -0.5f *
-                    (velocX[IX(i + 1, j, k)] - velocX[IX(i - 1, j, k)] + velocY[IX(i, j + 1, k)] -
-                     velocY[IX(i, j - 1, k)] + velocZ[IX(i, j, k + 1)] - velocZ[IX(i, j, k - 1)]) /
-                    N;
-                p[IX(i, j, k)] = 0;
+    for (int z = 1; z < N - 1; z++) {
+        for (int y = 1; y < N - 1; y++) {
+            for (int x = 1; x < N - 1; x++) {
+                int position = IX(x, y, z);
+                if (state[position] == CellType::FLUID) {
+                    div[position] = -0.5f *
+                                    (velocX[IX(x + 1, y, z)] - velocX[IX(x - 1, y, z)] +
+                                     velocY[IX(x, y + 1, z)] - velocY[IX(x, y - 1, z)] +
+                                     velocZ[IX(x, y, z + 1)] - velocZ[IX(x, y, z - 1)]) /
+                                    N;
+                    p[position] = 0;
+                } else if (state[position] == CellType::CUT_CELL) {
+                    // Scale divergence and pressure by fractional volume
+                    float fraction = get_fractional_volume(v3(x, y, z));  // Implement this
+                    div[position] *= fraction;
+                    p[position] *= fraction;
+                }
             }
         }
     }
@@ -172,13 +179,16 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
     set_boundaries(FieldType::DENSITY, p);
     lin_solve(FieldType::DENSITY, p, div, 1, 6);
 
-    // Adjust velocity based on pressure
-    for (int k = 1; k < N - 1; k++) {
-        for (int j = 1; j < N - 1; j++) {
-            for (int i = 1; i < N - 1; i++) {
-                velocX[IX(i, j, k)] -= 0.5f * (p[IX(i + 1, j, k)] - p[IX(i - 1, j, k)]) * N;
-                velocY[IX(i, j, k)] -= 0.5f * (p[IX(i, j + 1, k)] - p[IX(i, j - 1, k)]) * N;
-                velocZ[IX(i, j, k)] -= 0.5f * (p[IX(i, j, k + 1)] - p[IX(i, j, k - 1)]) * N;
+    // Adjust velocity based on corrected pressure
+    for (int z = 1; z < N - 1; z++) {
+        for (int y = 1; y < N - 1; y++) {
+            for (int x = 1; x < N - 1; x++) {
+                int index = IX(x, y, z);
+                if (state[index] == CellType::FLUID || state[index] == CellType::CUT_CELL) {
+                    velocX[index] -= 0.5f * (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
+                    velocY[index] -= 0.5f * (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
+                    velocZ[index] -= 0.5f * (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
+                }
             }
         }
     }
@@ -188,31 +198,122 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
     set_boundaries(FieldType::VZ, velocZ);
 }
 
-void Fluid::set_boundaries(FieldType b, Field<float>& f) {
-    for (int j = 1; j < N - 1; j++) {
-        for (int i = 1; i < N - 1; i++) {
-            f[IX(i, j, 0)] = b == FieldType::VZ ? -f[IX(i, j, 1)] : f[IX(i, j, 1)];
-            f[IX(i, j, N - 1)] = b == FieldType::VZ ? -f[IX(i, j, N - 2)] : f[IX(i, j, N - 2)];
+/* void Fluid::set_boundaries(FieldType b, Field<float>& f) {
+    for (int y = 1; y < N - 1; y++) {
+        for (int x = 1; x < N - 1; x++) {
+            f[IX(x, y, 0)] = b == FieldType::VZ ? -f[IX(x, y, 1)] : f[IX(x, y, 1)];
+            f[IX(x, y, N - 1)] = b == FieldType::VZ ? -f[IX(x, y, N - 2)] : f[IX(x, y, N - 2)];
         }
     }
 
-    for (int k = 1; k < N - 1; k++) {
-        for (int i = 1; i < N - 1; i++) {
-            f[IX(i, 0, k)] = b == FieldType::VY ? -f[IX(i, 1, k)] : f[IX(i, 1, k)];
-            f[IX(i, N - 1, k)] = b == FieldType::VY ? -f[IX(i, N - 2, k)] : f[IX(i, N - 2, k)];
+    for (int z = 1; z < N - 1; z++) {
+        for (int x = 1; x < N - 1; x++) {
+            f[IX(x, 0, z)] = b == FieldType::VY ? -f[IX(x, 1, z)] : f[IX(x, 1, z)];
+            f[IX(x, N - 1, z)] = b == FieldType::VY ? -f[IX(x, N - 2, z)] : f[IX(x, N - 2, z)];
         }
     }
 
-    for (int k = 1; k < N - 1; k++) {
-        for (int j = 1; j < N - 1; j++) {
-            f[IX(0, j, k)] = b == FieldType::VX ? -f[IX(1, j, k)] : f[IX(1, j, k)];
-            f[IX(N - 1, j, k)] = b == FieldType::VX ? -f[IX(N - 2, j, k)] : f[IX(N - 2, j, k)];
+    for (int z = 1; z < N - 1; z++) {
+        for (int y = 1; y < N - 1; y++) {
+            f[IX(0, y, z)] = b == FieldType::VX ? -f[IX(1, y, z)] : f[IX(1, y, z)];
+            f[IX(N - 1, y, z)] = b == FieldType::VX ? -f[IX(N - 2, y, z)] : f[IX(N - 2, y, z)];
         }
     }
 
     f[IX(0, 0, 0)] = 0.33f * (f[IX(1, 0, 0)] + f[IX(0, 1, 0)] + f[IX(0, 0, 1)]);
     f[IX(0, N - 1, 0)] = 0.33f * (f[IX(1, N - 1, 0)] + f[IX(0, N - 2, 0)] + f[IX(0, N - 1, 1)]);
     f[IX(0, 0, N - 1)] = 0.33f * (f[IX(1, 0, N - 1)] + f[IX(0, 1, N - 1)] + f[IX(0, 0, N)]);
+    f[IX(0, N - 1, N - 1)] =
+        0.33f * (f[IX(1, N - 1, N - 1)] + f[IX(0, N - 2, N - 1)] + f[IX(0, N - 1, N - 2)]);
+    f[IX(N - 1, 0, 0)] = 0.33f * (f[IX(N - 2, 0, 0)] + f[IX(N - 1, 1, 0)] + f[IX(N - 1, 0, 1)]);
+    f[IX(N - 1, N - 1, 0)] =
+        0.33f * (f[IX(N - 2, N - 1, 0)] + f[IX(N - 1, N - 2, 0)] + f[IX(N - 1, N - 1, 1)]);
+    f[IX(N - 1, 0, N - 1)] =
+        0.33f * (f[IX(N - 2, 0, N - 1)] + f[IX(N - 1, 1, N - 1)] + f[IX(N - 1, 0, N - 2)]);
+    f[IX(N - 1, N - 1, N - 1)] = 0.33f * (f[IX(N - 2, N - 1, N - 1)] + f[IX(N - 1, N - 2, N - 1)] +
+                                          f[IX(N - 1, N - 1, N - 2)]);
+} */
+
+void Fluid::set_boundaries(FieldType b, Field<float>& f) {
+    // If boundary cache is dirty, update the cache
+    if (is_boundary_dirty) {
+        // Iterate over all boundary cells to update the cache
+        for (v3 position : boundary_cells) {
+            int index = IXv(position);
+            CellType cellType = state[index];
+
+            if (cellType == CellType::SOLID) {
+                boundary_cache[index] = 0.0f;  // For solid cells, set value to 0 (no velocity)
+            } else if (cellType == CellType::CUT_CELL) {
+                // For cut cells, handle them based on fluid behavior, not just negating
+                int x = position.x;
+                int y = position.y;
+                int z = position.z;
+
+                if (b == FieldType::VX) {
+                    // Do not reflect in CUT_CELL cells, just pass-through behavior (depending on
+                    // the simulation)
+                    boundary_cache[index] = f[IX(x + 1, y, z)];  // Use adjacent fluid velocity
+                } else if (b == FieldType::VY) {
+                    boundary_cache[index] = f[IX(x, y + 1, z)];  // Use adjacent fluid velocity
+                } else if (b == FieldType::VZ) {
+                    boundary_cache[index] = f[IX(x, y, z + 1)];  // Use adjacent fluid velocity
+                }
+            }
+        }
+        // After updating, set the dirty flag to false
+        is_boundary_dirty = false;
+    }
+
+    // Apply the cached values to the actual field
+    for (v3 position : boundary_cells) {
+        f[IXv(position)] = boundary_cache[IXv(position)];
+    }
+
+    // Additional handling for boundary cells outside the cache (e.g., corners)
+    for (int z = 1; z < N - 1; z++) {
+        for (int y = 1; y < N - 1; y++) {
+            for (int x = 1; x < N - 1; x++) {
+                int index = IX(z, y, x);
+
+                // Handling boundaries for velocity fields (VX, VY, VZ)
+                if (b == FieldType::VX) {
+                    if (z == 0) {
+                        // Reflect velocity at left boundary
+                        f[IX(0, y, x)] = f[IX(1, y, x)];
+                    } else if (z == N - 1) {
+                        // Reflect velocity at right boundary
+                        f[IX(N - 1, y, x)] = f[IX(N - 2, y, x)];
+                    }
+                }
+
+                if (b == FieldType::VY) {
+                    if (y == 0) {
+                        // Reflect velocity at bottom boundary
+                        f[IX(z, 0, x)] = f[IX(z, 1, x)];
+                    } else if (y == N - 1) {
+                        // Reflect velocity at top boundary
+                        f[IX(z, N - 1, x)] = f[IX(z, N - 2, x)];
+                    }
+                }
+
+                if (b == FieldType::VZ) {
+                    if (x == 0) {
+                        // Reflect velocity at front boundary
+                        f[IX(z, y, 0)] = f[IX(z, y, 1)];
+                    } else if (x == N - 1) {
+                        // Reflect velocity at back boundary
+                        f[IX(z, y, N - 1)] = f[IX(z, y, N - 2)];
+                    }
+                }
+            }
+        }
+    }
+
+    // Corner Handling: Average values at the corners (adjusted to avoid instability)
+    f[IX(0, 0, 0)] = 0.33f * (f[IX(1, 0, 0)] + f[IX(0, 1, 0)] + f[IX(0, 0, 1)]);
+    f[IX(0, N - 1, 0)] = 0.33f * (f[IX(1, N - 1, 0)] + f[IX(0, N - 2, 0)] + f[IX(0, N - 1, 1)]);
+    f[IX(0, 0, N - 1)] = 0.33f * (f[IX(1, 0, N - 1)] + f[IX(0, 1, N - 1)] + f[IX(0, 0, N - 2)]);
     f[IX(0, N - 1, N - 1)] =
         0.33f * (f[IX(1, N - 1, N - 1)] + f[IX(0, N - 2, N - 1)] + f[IX(0, N - 1, N - 2)]);
     f[IX(N - 1, 0, 0)] = 0.33f * (f[IX(N - 2, 0, 0)] + f[IX(N - 1, 1, 0)] + f[IX(N - 1, 0, 1)]);
@@ -242,41 +343,44 @@ void Fluid::step() {
 }
 
 void Fluid::add_obstacle(v3 position, v3 size, Model model) {
-    Obstacle obstacle = {position, size, model};
+    Obstacle obstacle(position, size, model);
     obstacles.push_back(obstacle);
     voxelize(obstacle);
+    is_boundary_dirty = true;
 }
 
 void Fluid::voxelize(Obstacle obstacle) {
     for (int z = 0; z < N; z++) {
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
-                // ClassifyCell({x, y, z}, {1, 1, 1}, obstacle.position, obstacle.size);
+                BoundingBox cell = {v3(x, y, z), v3(x, y, z) + v3(1)};
+                BoundingBox model = {obstacle.position - obstacle.size / 2,
+                                     obstacle.position + obstacle.size / 2};
 
-                v3 min_cell = v3(x, y, z);
-                v3 max_cell = v3(x + 1, y + 1, z + 1);
-
-                v3 min_model = obstacle.position - obstacle.size / 2;
-                v3 max_model = obstacle.position + obstacle.size / 2;
-
-                if (!((min_cell.x <= max_model.x && max_cell.x >= min_model.x) &&
-                      (min_cell.y <= max_model.y && max_cell.y >= min_model.y) &&
-                      (min_cell.z <= max_model.z && max_cell.z >= min_model.z))) {
-                    state[IXv(min_cell)] = CellType::FLUID;
+                if (!((cell.min.x <= model.max.x && cell.max.x >= model.min.x) &&
+                      (cell.min.y <= model.max.y && cell.max.y >= model.min.y) &&
+                      (cell.min.z <= model.max.z && cell.max.z >= model.min.z))) {
+                    state[IXv(cell.min)] = CellType::FLUID;
                     continue;
                 }
 
-                if (min_cell.x >= min_model.x && max_cell.x <= max_model.x &&
-                    min_cell.y >= min_model.y && max_cell.y <= max_model.y &&
-                    min_cell.z >= min_model.z && max_cell.z <= max_model.z) {
-                    state[IXv(min_cell)] = CellType::SOLID;
+                if (cell.min.x >= model.min.x && cell.max.x <= model.max.x &&
+                    cell.min.y >= model.min.y && cell.max.y <= model.max.y &&
+                    cell.min.z >= model.min.z && cell.max.z <= model.max.z) {
+                    state[IXv(cell.min)] = CellType::SOLID;
                     continue;
                 }
 
-                state[IXv(min_cell)] = CellType::CUT_CELL;
+                state[IXv(cell.min)] = CellType::CUT_CELL;
             }
         }
     }
 }
 
 CellType Fluid::get_state(v3 position) { return state[IXv(position)]; }
+
+float Fluid::get_fractional_volume(v3 position) {
+    // Compute the fractional volume of a CUT_CELL
+    // Based on voxelized geometry or external input
+    return 0.5f;  // Placeholder
+}

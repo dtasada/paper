@@ -2,6 +2,7 @@
 # /out
 /paper
 .DS_Store
+perf.data
 
 thesis/*
 !thesis/Thesis.tex

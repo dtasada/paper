@@ -23,8 +23,9 @@
 
 #define N container_size
 
+/** contains an array of size N^3 */
 template <typename T>
-using Field = std::array<T, FIELD_SIZE>;  // contains an array of size N^3
+using Field = std::array<T, FIELD_SIZE>;
 
 enum class FieldType { VX, VY, VZ, DENSITY };
 enum class CellType { SOLID, FLUID, CUT_CELL };
@@ -39,8 +40,11 @@ class Fluid {
     Field<float> vx, vy, vz;     // velocity fields
     Field<float> vx0, vy0, vz0;  // backup velocity fields
 
-    Field<CellType> state;    // cell state field
-    Field<float> solid_frac;  // solid fraction field
+    Field<CellType> state;  // cell state field
+    std::vector<v3> boundary_cells;
+    std::vector<float> boundary_cache;
+
+    bool is_boundary_dirty = true;
 
    public:
     int container_size;
@@ -71,5 +75,6 @@ class Fluid {
     // geometry
     void add_obstacle(v3 position, v3 size, Model model);
     void voxelize(Obstacle obstacle);
+    float get_fractional_volume(v3 position);
     CellType get_state(v3 position);
 };
