@@ -342,8 +342,8 @@ void Fluid::step() {
     advect(FieldType::DENSITY, density, s, vx, vy, vz);
 }
 
-void Fluid::add_obstacle(v3 position, v3 size, Model model) {
-    Obstacle obstacle(position, size, model);
+void Fluid::add_obstacle(v3 position, float size, Model model) {
+    Obstacle obstacle = {position, size, model};
     obstacles.push_back(obstacle);
     voxelize(obstacle);
     is_boundary_dirty = true;

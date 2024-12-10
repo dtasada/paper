@@ -1,3 +1,7 @@
 [submodule "rlImGui"]
 	path = simulation/include/rlImGui
 	url = https://github.com/raylib-extras/rlImGui
+
+[submodule "simulation/lib/tomlplusplus"]
+	path = simulation/lib/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus

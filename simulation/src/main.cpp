@@ -14,6 +14,7 @@
 #include "../include/engine/Engine.hpp"
 #include "../include/engine/Fluid.hpp"
 #include "../lib/rlImGui/rlImGui.h"
+#include "../lib/tomlplusplus/toml.hpp"
 
 #define FPS 60.0f
 
@@ -42,7 +43,19 @@ int main(int argc, char* argv[]) {
     v3 containerSize(fluid.container_size * fluid.fluid_size);
     v3 containerCenter(containerSize * 0.5f);
 
-    fluid.add_obstacle(v3(10.0f), v3(5.0f), LoadModel("simulation/resources/models/cube.obj"));
+    /* Parse config file */
+    for (const auto& node : *toml::parse_file("config.toml")["obstacle"].as_array()) {
+        const auto& obstacle = *node.as_table();
+
+        const auto& size = obstacle["size"].value_or(1.0f);
+        const auto& position_array = *obstacle["position"].as_array();
+        v3 position(position_array[0].value_or(0.0), position_array[1].value_or(0.0),
+                    position_array[2].value_or(0.0));
+
+        Model model = LoadModel(obstacle["model"].value_or(""));
+
+        fluid.add_obstacle(position, size, model);
+    }
 
     bool cursor = false;
     Camera3D camera = {
@@ -58,6 +71,7 @@ int main(int argc, char* argv[]) {
         bool should_orthographic = true;
         bool show_density_float = false;
         bool show_vel_arrows = false;
+        bool show_bounds = false;
         bool gravity = false;
     } settings;
 
@@ -116,13 +130,11 @@ int main(int argc, char* argv[]) {
                         cube_position = cube_position * v3(fluid.fluid_size);
                         cube_position = cube_position + (fluid.fluid_size / 2);
 
-                        // Calculate the squared distance to the camera
                         float dx = cube_position.x - camera.position.x;
                         float dy = cube_position.y - camera.position.y;
                         float dz = cube_position.z - camera.position.z;
                         float distanceSquared = dx * dx + dy * dy + dz * dz;
 
-                        // Store cube data
                         cells.push_back({cube_position, distanceSquared});
                     }
                 }
@@ -142,15 +154,15 @@ int main(int argc, char* argv[]) {
         BeginBlendMode(BLEND_ALPHA);
         if (settings.show_models) {
             for (Obstacle& obstacle : fluid.obstacles) {
-                DrawModel(obstacle.model, obstacle.position, obstacle.size.x, RED);
+                DrawModel(obstacle.model, obstacle.position, obstacle.size, RED);
             }
         }
 
         for (const Cell& cell : cells) {
             v3 position = cell.position;
 
-            float density = fluid.get_density(cell.position);
-            CellType state = fluid.get_state(cell.position);
+            float density = fluid.get_density(position);
+            CellType state = fluid.get_state(position);
             if (density > 0.01f) {
                 if (settings.show_vel_arrows) {
                     BeginBlendMode(BLEND_SUBTRACT_COLORS);
@@ -173,15 +185,17 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            switch (state) {
-                case CellType::SOLID:
-                    DrawCubeV(position, v3(fluid.fluid_size), WHITE);
-                    break;
-                case CellType::CUT_CELL:
-                    DrawCubeV(position, v3(fluid.fluid_size), GREEN);
-                    break;
-                default:
-                    break;
+            if (settings.show_bounds) {
+                switch (state) {
+                    case CellType::SOLID:
+                        DrawCubeV(position, v3(fluid.fluid_size), WHITE);
+                        break;
+                    case CellType::CUT_CELL:
+                        DrawCubeV(position, v3(fluid.fluid_size), GREEN);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         EndBlendMode();
@@ -199,6 +213,7 @@ int main(int argc, char* argv[]) {
             ImGui::Checkbox("Show models", &settings.show_models);
             ImGui::Checkbox("Show density with numbers", &settings.show_density_float);
             ImGui::Checkbox("Show velocity with arrows", &settings.show_vel_arrows);
+            ImGui::Checkbox("Show bounds", &settings.show_bounds);
 
             ImGui::Checkbox("Camera Orthograhic", &settings.should_orthographic);
             camera.projection =
