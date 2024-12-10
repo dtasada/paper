@@ -198,7 +198,7 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
     set_boundaries(FieldType::VZ, velocZ);
 }
 
-/* void Fluid::set_boundaries(FieldType b, Field<float>& f) {
+void Fluid::set_boundaries(FieldType b, Field<float>& f) {
     for (int y = 1; y < N - 1; y++) {
         for (int x = 1; x < N - 1; x++) {
             f[IX(x, y, 0)] = b == FieldType::VZ ? -f[IX(x, y, 1)] : f[IX(x, y, 1)];
@@ -232,9 +232,9 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
         0.33f * (f[IX(N - 2, 0, N - 1)] + f[IX(N - 1, 1, N - 1)] + f[IX(N - 1, 0, N - 2)]);
     f[IX(N - 1, N - 1, N - 1)] = 0.33f * (f[IX(N - 2, N - 1, N - 1)] + f[IX(N - 1, N - 2, N - 1)] +
                                           f[IX(N - 1, N - 1, N - 2)]);
-} */
+}
 
-void Fluid::set_boundaries(FieldType b, Field<float>& f) {
+/* void Fluid::set_boundaries(FieldType b, Field<float>& f) {
     // If boundary cache is dirty, update the cache
     if (is_boundary_dirty) {
         // Iterate over all boundary cells to update the cache
@@ -323,7 +323,7 @@ void Fluid::set_boundaries(FieldType b, Field<float>& f) {
         0.33f * (f[IX(N - 2, 0, N - 1)] + f[IX(N - 1, 1, N - 1)] + f[IX(N - 1, 0, N - 2)]);
     f[IX(N - 1, N - 1, N - 1)] = 0.33f * (f[IX(N - 2, N - 1, N - 1)] + f[IX(N - 1, N - 2, N - 1)] +
                                           f[IX(N - 1, N - 1, N - 2)]);
-}
+} */
 
 void Fluid::step() {
     diffuse(FieldType::VX, vx0, vx, visc);

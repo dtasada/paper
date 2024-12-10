@@ -44,14 +44,16 @@ int main(int argc, char* argv[]) {
     v3 containerCenter(containerSize * 0.5f);
 
     /* Parse config file */
-    for (const auto& node : *toml::parse_file("config.toml")["obstacle"].as_array()) {
+    auto config = toml::parse_file("config.toml");
+    for (const auto& node : *config["obstacle"].as_array()) {
         const auto& obstacle = *node.as_table();
-
         const auto& size = obstacle["size"].value_or(1.0f);
+
         const auto& position_array = *obstacle["position"].as_array();
         v3 position(position_array[0].value_or(0.0), position_array[1].value_or(0.0),
                     position_array[2].value_or(0.0));
 
+        // Parse model
         Model model = LoadModel(obstacle["model"].value_or(""));
 
         fluid.add_obstacle(position, size, model);
