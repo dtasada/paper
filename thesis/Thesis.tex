@@ -200,13 +200,14 @@ as this was helpful in developing the simulation. (\cite{josstam})
 Our code is structured as follows:
 \dirtree{%
 	.1 paper.
-	.2 simulation\DTcomment{Contains the physics simulation code}. 
-	.3 include\DTcomment{Our own engine headers}.
-	.3 lib\DTcomment{External libraries}.
-	.3 resources\DTcomment{Resources like images, fonts, shaders}.
-	.3 src\DTcomment{Actual engine source}.
+	.2 simulation/\DTcomment{Contains the physics simulation code}. 
+	.3 include/\DTcomment{Our own engine headers}.
+	.3 lib/\DTcomment{External libraries}.
+	.3 resources/\DTcomment{Resources like images, fonts, shaders}.
+	.3 src/\DTcomment{Actual engine source}.
+	.3 config.toml\DTcomment{Configuration file}.
+	.3 Makefile.
 	.2 neural\DTcomment{Contains ML engine}.
-	.2 Makefile.
 }
 
 The code is written in C++, and uses the \hyperlink{https://www.raylib.com/}{raylib}

@@ -8,15 +8,15 @@
 
 #include "Engine.hpp"
 
-#define IX(x, y, z)                                                \
-    int(constrain((x), 0, container_size - 1) +                    \
-        (constrain((y), 0, container_size - 1) * container_size) + \
-        (constrain((z), 0, container_size - 1) * container_size * container_size))
+#define IX(x, y, z)                                                    \
+    std::clamp(int(x), 0, container_size - 1) +                        \
+        (std::clamp(int(y), 0, container_size - 1) * container_size) + \
+        (std::clamp(int(z), 0, container_size - 1) * container_size * container_size)
 
-#define IXv(vec)                                                       \
-    int(constrain((vec).x, 0, container_size - 1) +                    \
-        (constrain((vec).y, 0, container_size - 1) * container_size) + \
-        (constrain((vec).z, 0, container_size - 1) * container_size * container_size))
+#define IXv(vec)                                                             \
+    std::clamp(int((vec).x), 0, container_size - 1) +                        \
+        (std::clamp(int((vec).y), 0, container_size - 1) * container_size) + \
+        (std::clamp(int((vec).z), 0, container_size - 1) * container_size * container_size)
 
 #define SIM_RES 24
 #define FIELD_SIZE (SIM_RES * SIM_RES * SIM_RES)
@@ -32,13 +32,13 @@ enum class CellType { SOLID, FLUID, CUT_CELL };
 
 class Fluid {
    private:
-    float dt;    // simulation timestep
-    float visc;  // viscosity constant
+    float dt;   /** simulation timestep */
+    float visc; /** viscosity constant */
 
-    // 3D cell property fields
-    Field<float> s, density;     // density fields
-    Field<float> vx, vy, vz;     // velocity fields
-    Field<float> vx0, vy0, vz0;  // backup velocity fields
+    /** 3D cell property fields */
+    Field<float> s, density;    /** density fields */
+    Field<float> vx, vy, vz;    /** velocity fields */
+    Field<float> vx0, vy0, vz0; /** backup velocity fields */
 
     Field<CellType> state;  // cell state field
     std::vector<v3> boundary_cells;

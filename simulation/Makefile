@@ -5,7 +5,7 @@ in = $(src) $(src_engine) $(lib)
 
 out = ./paper
 
-flags = -std=c++23 -Wall -O3 -g
+flags = -std=c++23 -Wall -O3 -g -fopenmp
 linker = -lraylib -limgui
 
 # cc = g++

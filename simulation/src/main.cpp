@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
 #include <vector>
 
 #include "../include/engine/Engine.hpp"
@@ -26,7 +27,6 @@ int main(int argc, char* argv[]) {
     SetTargetFPS(FPS);
     SetExitKey(KEY_Q);
     DisableCursor();
-    HideCursor();
 
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);
@@ -44,19 +44,24 @@ int main(int argc, char* argv[]) {
     v3 containerCenter(containerSize * 0.5f);
 
     /* Parse config file */
-    auto config = toml::parse_file("config.toml");
-    for (const auto& node : *config["obstacle"].as_array()) {
-        const auto& obstacle = *node.as_table();
-        const auto& size = obstacle["size"].value_or(1.0f);
+    try {
+        auto config = toml::parse_file("config.toml");
+        if (!config.empty())
+            for (const auto& node : *config["obstacle"].as_array()) {
+                const auto& obstacle = *node.as_table();
+                const auto& size = obstacle["size"].value_or(1.0f);
 
-        const auto& position_array = *obstacle["position"].as_array();
-        v3 position(position_array[0].value_or(0.0), position_array[1].value_or(0.0),
-                    position_array[2].value_or(0.0));
+                const auto& position_array = *obstacle["position"].as_array();
+                v3 position(position_array[0].value_or(0.0), position_array[1].value_or(0.0),
+                            position_array[2].value_or(0.0));
 
-        // Parse model
-        Model model = LoadModel(obstacle["model"].value_or(""));
+                // Parse model
+                Model model = LoadModel(obstacle["model"].value_or(""));
 
-        fluid.add_obstacle(position, size, model);
+                fluid.add_obstacle(position, size, model);
+            }
+    } catch (const toml::parse_error& err) {
+        std::cerr << "Failed to parse config file: " << err.what() << std::endl;
     }
 
     bool cursor = false;
@@ -74,7 +79,6 @@ int main(int argc, char* argv[]) {
         bool show_density_float = false;
         bool show_vel_arrows = false;
         bool show_bounds = false;
-        bool gravity = false;
     } settings;
 
     /* Main loop */
@@ -98,32 +102,22 @@ int main(int argc, char* argv[]) {
         if (IsKeyPressed(KEY_ESCAPE)) {
             if (cursor) {
                 DisableCursor();
-                HideCursor();
             } else {
                 EnableCursor();
-                ShowCursor();
             }
 
             cursor = !cursor;
         }
 
-        if (IsKeyDown(KEY_G)) {
-            fluid.add_velocity(v3(12.0f, 12.0f, 12.0f), v3(0.0f, -9.81f, 0.0f));
-        }
-
         /* Update sim */
         fluid.step();
 
-        // Sort cell by distance to camera. This is important for backface rendering
+        /* Sort cell by distance to camera. This is important for backface rendering */
         std::vector<Cell> cells;
         for (float z = 0.0f; z < fluid.container_size; z++) {
             for (float y = 0.0f; y < fluid.container_size; y++) {
                 for (float x = 0.0f; x < fluid.container_size; x++) {
                     v3 position(x, y, z);
-
-                    if (settings.gravity) {
-                        fluid.add_velocity(position, v3(0.0f, -9.81f, 0.0f));
-                    }
 
                     if (fluid.get_density(position) > 0.01f ||
                         fluid.get_state(position) != CellType::FLUID) {
@@ -142,6 +136,7 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+
         std::ranges::sort(cells, std::greater{}, &Cell::distanceSquared);
 
         /* Begin Drawing */
@@ -178,11 +173,11 @@ int main(int argc, char* argv[]) {
                     Color c = ColorFromHSV(hue, 1.0f, 1.0f);
                     Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
 
-                    if (!settings.show_density_float) {
-                        DrawCubeV(position, v3(fluid.fluid_size), color);
-                    } else {
+                    if (settings.show_density_float) {
                         draw_text_3d(TextFormat("%.1f", density), position, fluid.fluid_size * 10,
                                      WHITE);
+                    } else {
+                        DrawCubeV(position, v3(fluid.fluid_size), color);
                     }
                 }
             }
@@ -211,7 +206,6 @@ int main(int argc, char* argv[]) {
             rlImGuiBegin();
             ImGui::Begin("Fluid Simulation");
 
-            ImGui::Checkbox("Gravity", &settings.gravity);
             ImGui::Checkbox("Show models", &settings.show_models);
             ImGui::Checkbox("Show density with numbers", &settings.show_density_float);
             ImGui::Checkbox("Show velocity with arrows", &settings.show_vel_arrows);

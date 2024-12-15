@@ -1,5 +1,5 @@
 [[obstacle]]
-position = [10, 10, 10]
+position = [24, 24, 24]
 size = 5
 model = "resources/models/cube.obj"
 
