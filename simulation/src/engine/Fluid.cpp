@@ -1,5 +1,6 @@
 #include "../../include/engine/Fluid.hpp"
 
+#include <fcl/fcl.h>
 #include <omp.h>
 #include <raylib.h>
 #include <raymath.h>
@@ -157,7 +158,6 @@ void Fluid::lin_solve(FieldType b, Field<float>& f, Field<float>& f0, float a, f
     }
 }
 
-// new one, but also working
 void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ,
                     Field<float>& p, Field<float>& div) {
     // Calculate divergence
@@ -195,7 +195,6 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
     lin_solve(FieldType::DENSITY, p, div, 1, 6);
 
     // Adjust velocity based on the pressure gradient
-#pragma omp parallel for collapse(2)
     for (int k = 1; k < N - 1; k++) {
         for (int j = 1; j < N - 1; j++) {
             for (int i = 1; i < N - 1; i++) {
@@ -225,71 +224,6 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
     set_boundaries(FieldType::VY, velocY);
     set_boundaries(FieldType::VZ, velocZ);
 }
-
-/* void Fluid::set_boundaries(FieldType b, Field<float>& f) {
-    // Handle each face of the bounding box
-    for (int y = 1; y < N - 1; y++) {
-        for (int x = 1; x < N - 1; x++) {
-            if (state[IX(x, y, 0)] == CellType::SOLID) {
-                f[IX(x, y, 0)] = 0.0f;  // No velocity in solid cells
-            } else {
-                f[IX(x, y, 0)] = b == FieldType::VZ ? -f[IX(x, y, 1)] : f[IX(x, y, 1)];
-            }
-
-            if (state[IX(x, y, N - 1)] == CellType::SOLID) {
-                f[IX(x, y, N - 1)] = 0.0f;
-            } else {
-                f[IX(x, y, N - 1)] = b == FieldType::VZ ? -f[IX(x, y, N - 2)] : f[IX(x, y, N - 2)];
-            }
-        }
-    }
-
-    for (int z = 1; z < N - 1; z++) {
-        for (int x = 1; x < N - 1; x++) {
-            if (state[IX(x, 0, z)] == CellType::SOLID) {
-                f[IX(x, 0, z)] = 0.0f;
-            } else {
-                f[IX(x, 0, z)] = b == FieldType::VY ? -f[IX(x, 1, z)] : f[IX(x, 1, z)];
-            }
-
-            if (state[IX(x, N - 1, z)] == CellType::SOLID) {
-                f[IX(x, N - 1, z)] = 0.0f;
-            } else {
-                f[IX(x, N - 1, z)] = b == FieldType::VY ? -f[IX(x, N - 2, z)] : f[IX(x, N - 2, z)];
-            }
-        }
-    }
-
-    for (int z = 1; z < N - 1; z++) {
-        for (int y = 1; y < N - 1; y++) {
-            if (state[IX(0, y, z)] == CellType::SOLID) {
-                f[IX(0, y, z)] = 0.0f;
-            } else {
-                f[IX(0, y, z)] = b == FieldType::VX ? -f[IX(1, y, z)] : f[IX(1, y, z)];
-            }
-
-            if (state[IX(N - 1, y, z)] == CellType::SOLID) {
-                f[IX(N - 1, y, z)] = 0.0f;
-            } else {
-                f[IX(N - 1, y, z)] = b == FieldType::VX ? -f[IX(N - 2, y, z)] : f[IX(N - 2, y, z)];
-            }
-        }
-    }
-
-    // Corner handling: Handle boundary geometry
-    f[IX(0, 0, 0)] = 0.33f * (f[IX(1, 0, 0)] + f[IX(0, 1, 0)] + f[IX(0, 0, 1)]);
-    f[IX(0, N - 1, 0)] = 0.33f * (f[IX(1, N - 1, 0)] + f[IX(0, N - 2, 0)] + f[IX(0, N - 1, 1)]);
-    f[IX(0, 0, N - 1)] = 0.33f * (f[IX(1, 0, N - 1)] + f[IX(0, 1, N - 1)] + f[IX(0, 0, N - 2)]);
-    f[IX(0, N - 1, N - 1)] =
-        0.33f * (f[IX(1, N - 1, N - 1)] + f[IX(0, N - 2, N - 1)] + f[IX(0, N - 1, N - 2)]);
-    f[IX(N - 1, 0, 0)] = 0.33f * (f[IX(N - 2, 0, 0)] + f[IX(N - 1, 1, 0)] + f[IX(N - 1, 0, 1)]);
-    f[IX(N - 1, N - 1, 0)] =
-        0.33f * (f[IX(N - 2, N - 1, 0)] + f[IX(N - 1, N - 2, 0)] + f[IX(N - 1, N - 1, 1)]);
-    f[IX(N - 1, 0, N - 1)] =
-        0.33f * (f[IX(N - 2, 0, N - 1)] + f[IX(N - 1, 1, N - 1)] + f[IX(N - 1, 0, N - 2)]);
-    f[IX(N - 1, N - 1, N - 1)] = 0.33f * (f[IX(N - 2, N - 1, N - 1)] + f[IX(N - 1, N - 2, N - 1)] +
-                                          f[IX(N - 1, N - 1, N - 2)]);
-} */
 
 void Fluid::set_boundaries(FieldType b, Field<float>& f) {
     // Handle each face of the bounding box
@@ -403,35 +337,73 @@ void Fluid::add_obstacle(v3 position, float size, Model model) {
     is_boundary_dirty = true;
 }
 
-void Fluid::voxelize(Obstacle obstacle) {
+/* void Fluid::voxelize(Obstacle obstacle) {
+    BoundingBox model = {obstacle.position - obstacle.size / 2,
+                         obstacle.position + obstacle.size / 2};
+
     for (int z = 0; z < N; z++) {
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
-                BoundingBox cell = {v3(x, y, z), v3(x, y, z) + v3(1)};
-                BoundingBox model = {obstacle.position - obstacle.size / 2,
-                                     obstacle.position + obstacle.size / 2};
+                v3 cell_min = v3(x, y, z);
+                v3 cell_max = cell_min + v3(1);
 
-                if (!((cell.min.x <= model.max.x && cell.max.x >= model.min.x) &&
-                      (cell.min.y <= model.max.y && cell.max.y >= model.min.y) &&
-                      (cell.min.z <= model.max.z && cell.max.z >= model.min.z))) {
-                    state[IXv(cell.min)] = CellType::FLUID;
+                BoundingBox cell = {cell_min, cell_max};
+
+                if (!(cell.min.x <= model.max.x && cell.max.x >= model.min.x &&
+                      cell.min.y <= model.max.y && cell.max.y >= model.min.y &&
+                      cell.min.z <= model.max.z && cell.max.z >= model.min.z)) {
+                    state[IX(x, y, z)] = CellType::FLUID;
                     continue;
                 }
 
                 if (cell.min.x >= model.min.x && cell.max.x <= model.max.x &&
                     cell.min.y >= model.min.y && cell.max.y <= model.max.y &&
                     cell.min.z >= model.min.z && cell.max.z <= model.max.z) {
-                    state[IXv(cell.min)] = CellType::SOLID;
+                    state[IX(x, y, z)] = CellType::SOLID;
+                    printf("%d, %d, %d: SOLID\n", x, y, z);
                     continue;
                 }
 
-                state[IXv(cell.min)] = CellType::CUT_CELL;
+                state[IX(x, y, z)] = CellType::CUT_CELL;
+                printf("%d, %d, %d: CUT_CELL\n", x, y, z);
+            }
+        }
+    }
+} */
+
+void Fluid::voxelize(Obstacle obstacle) {
+    // Compute the obstacle's bounding box
+    BoundingBox model = {obstacle.position - obstacle.size / 2.0f,
+                         obstacle.position + obstacle.size / 2.0f};
+
+    for (int z = 0; z < N; z++) {
+        for (int y = 0; y < N; y++) {
+            for (int x = 0; x < N; x++) {
+                // Define the bounding box of the voxel cell
+                v3 position(x, y, z);
+                BoundingBox cellBox = {position, position + v3(1)};
+
+                // Calculate the bounding box of the model
+                // Check if the model's bounding box is entirely outside the cell
+                if (!CheckCollisionBoxes(model, cellBox)) {
+                    state[IX(x, y, z)] = CellType::FLUID;
+                }
+
+                if ((model.min.x >= cellBox.min.x && model.min.x <= cellBox.max.x &&
+                     model.min.y >= cellBox.min.y && model.min.y <= cellBox.max.y &&
+                     model.min.z >= cellBox.min.z && model.min.z <= cellBox.max.z) &&
+                    (model.max.x >= cellBox.min.x && model.max.x <= cellBox.max.x &&
+                     model.max.y >= cellBox.min.y && model.max.y <= cellBox.max.y &&
+                     model.max.z >= cellBox.min.z && model.max.z <= cellBox.max.z)) {
+                    state[IX(x, y, z)] = CellType::SOLID;
+                }
+
+                // If neither, it must be partially inside
+                state[IX(x, y, z)] = CellType::CUT_CELL;
             }
         }
     }
 }
-
-CellType Fluid::get_state(v3 position) { return state[IXv(position)]; }
 
 float Fluid::get_fractional_volume(v3 position) {
     BoundingBox cell = {position, position + v3(1)};
@@ -439,19 +411,17 @@ float Fluid::get_fractional_volume(v3 position) {
 
     // Loop through all obstacles
     for (const Obstacle& obstacle : obstacles) {
-        BoundingBox obs = {v3(obstacle.position.x - obstacle.size / 2.0f,
-                              obstacle.position.y - obstacle.size / 2.0f,
-                              obstacle.position.z - obstacle.size / 2.0f),
-                           v3(obstacle.position.x + obstacle.size / 2.0f,
-                              obstacle.position.y + obstacle.size / 2.0f,
-                              obstacle.position.z + obstacle.size / 2.0f)};
+        BoundingBox obs = {
+            obstacle.position - v3(obstacle.size / 2.0f),
+            obstacle.position + v3(obstacle.size / 2.0f),
+        };
 
         // Calculate intersection bounds
         BoundingBox intersect = {
             v3(std::max(cell.min.x, obs.min.x), std::max(cell.min.y, obs.min.y),
                std::max(cell.min.z, obs.min.z)),
             v3(std::min(cell.max.x, obs.max.x), std::min(cell.max.y, obs.max.y),
-               std::min(cell.max.y, obs.max.z))};
+               std::min(cell.max.z, obs.max.z))};
 
         // Calculate intersection dimensions
         float dx = std::max(0.0f, intersect.max.x - intersect.min.x);
@@ -466,3 +436,5 @@ float Fluid::get_fractional_volume(v3 position) {
     float cell_volume = 1.0f;  // Each cell is a unit cube
     return 1.0f - (total_intersection_volume / cell_volume);
 }
+
+CellType Fluid::get_state(v3 position) { return state[IXv(position)]; }

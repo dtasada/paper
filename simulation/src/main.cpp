@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
     SetTargetFPS(FPS);
     SetExitKey(KEY_Q);
     DisableCursor();
+    HideCursor();
 
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);
@@ -79,6 +80,9 @@ int main(int argc, char* argv[]) {
         bool show_density_float = false;
         bool show_vel_arrows = false;
         bool show_bounds = false;
+        bool show_cell_borders = false;
+        bool show_bounds_solid = false;
+        bool show_bounds_cut_cell = false;
     } settings;
 
     /* Main loop */
@@ -102,8 +106,10 @@ int main(int argc, char* argv[]) {
         if (IsKeyPressed(KEY_ESCAPE)) {
             if (cursor) {
                 DisableCursor();
+                HideCursor();
             } else {
                 EnableCursor();
+                ShowCursor();
             }
 
             cursor = !cursor;
@@ -112,12 +118,22 @@ int main(int argc, char* argv[]) {
         /* Update sim */
         fluid.step();
 
+        /* Begin Drawing */
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        BeginMode3D(camera);
+
         /* Sort cell by distance to camera. This is important for backface rendering */
         std::vector<Cell> cells;
         for (float z = 0.0f; z < fluid.container_size; z++) {
             for (float y = 0.0f; y < fluid.container_size; y++) {
                 for (float x = 0.0f; x < fluid.container_size; x++) {
                     v3 position(x, y, z);
+
+                    if (settings.show_cell_borders) {
+                        DrawCubeWiresV(position + fluid.fluid_size / 2, v3(fluid.fluid_size), RED);
+                    }
 
                     if (fluid.get_density(position) > 0.01f ||
                         fluid.get_state(position) != CellType::FLUID) {
@@ -139,12 +155,6 @@ int main(int argc, char* argv[]) {
 
         std::ranges::sort(cells, std::greater{}, &Cell::distanceSquared);
 
-        /* Begin Drawing */
-        BeginDrawing();
-        ClearBackground(BLACK);
-
-        BeginMode3D(camera);
-
         DrawCubeWiresV(containerCenter, containerSize, RED);
 
         // Render cubes
@@ -160,41 +170,43 @@ int main(int argc, char* argv[]) {
 
             float density = fluid.get_density(position);
             CellType state = fluid.get_state(position);
-            if (density > 0.01f) {
-                if (settings.show_vel_arrows) {
-                    BeginBlendMode(BLEND_SUBTRACT_COLORS);
-                    DrawCylinderEx(position, position + (fluid.get_velocity(position) * 100),
-                                   density / 100.f, density / 100.f, 10, RED);
-                    BeginBlendMode(BLEND_ALPHA);
-                } else {
-                    // get color of cube
-                    float norm = std::min(density / 100.0f, 1.0f);
-                    float hue = (1.0f - norm) * 0.66f * 360.0f;
-                    Color c = ColorFromHSV(hue, 1.0f, 1.0f);
-                    Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
 
-                    if (settings.show_density_float) {
-                        draw_text_3d(TextFormat("%.1f", density), position, fluid.fluid_size * 10,
-                                     WHITE);
-                    } else {
-                        DrawCubeV(position, v3(fluid.fluid_size), color);
-                    }
-                }
-            }
-
-            if (settings.show_bounds) {
-                switch (state) {
-                    case CellType::SOLID:
-                        DrawCubeV(position, v3(fluid.fluid_size), WHITE);
-                        break;
-                    case CellType::CUT_CELL:
+            switch (state) {
+                case CellType::SOLID:
+                    if (settings.show_bounds_solid)
+                        DrawCubeV(position, v3(fluid.fluid_size), BLUE);
+                    break;
+                case CellType::CUT_CELL:
+                    if (settings.show_bounds_cut_cell)
                         DrawCubeV(position, v3(fluid.fluid_size), GREEN);
-                        break;
-                    default:
-                        break;
-                }
+                    break;
+                case CellType::FLUID: {
+                    if (density > 0.01f) {
+                        if (settings.show_vel_arrows) {
+                            BeginBlendMode(BLEND_SUBTRACT_COLORS);
+                            DrawCylinderEx(position,
+                                           position + (fluid.get_velocity(position) * 100),
+                                           density / 100.f, density / 100.f, 10, RED);
+                            BeginBlendMode(BLEND_ALPHA);
+                        } else {
+                            // get color of cube
+                            float norm = std::min(density / 100.0f, 1.0f);
+                            float hue = (1.0f - norm) * 0.66f * 360.0f;
+                            Color c = ColorFromHSV(hue, 1.0f, 1.0f);
+                            Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
+
+                            if (settings.show_density_float) {
+                                draw_text_3d(TextFormat("%.1f", density), position,
+                                             fluid.fluid_size * 10, WHITE);
+                            } else {
+                                DrawCubeV(position, v3(fluid.fluid_size), color);
+                            }
+                        }
+                    }
+                } break;
             }
         }
+
         EndBlendMode();
 
         EndMode3D();
@@ -209,7 +221,10 @@ int main(int argc, char* argv[]) {
             ImGui::Checkbox("Show models", &settings.show_models);
             ImGui::Checkbox("Show density with numbers", &settings.show_density_float);
             ImGui::Checkbox("Show velocity with arrows", &settings.show_vel_arrows);
-            ImGui::Checkbox("Show bounds", &settings.show_bounds);
+            // ImGui::Checkbox("Show bounds", &settings.show_bounds);
+            ImGui::Checkbox("Show bounds SOLID", &settings.show_bounds_solid);
+            ImGui::Checkbox("Show bounds CUT_CELL", &settings.show_bounds_cut_cell);
+            ImGui::Checkbox("Show cell borders", &settings.show_cell_borders);
 
             ImGui::Checkbox("Camera Orthograhic", &settings.should_orthographic);
             camera.projection =

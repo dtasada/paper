@@ -78,3 +78,5 @@ class Fluid {
     float get_fractional_volume(v3 position);
     CellType get_state(v3 position);
 };
+
+bool point_in_box(v3 point, BoundingBox box);

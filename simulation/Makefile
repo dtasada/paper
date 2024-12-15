@@ -8,8 +8,8 @@ out = ./paper
 flags = -std=c++23 -Wall -O3 -g -fopenmp
 linker = -lraylib -limgui
 
-# cc = g++
-cc = clang++
+cc = g++
+# cc = clang++
 
 build:
 	$(cc) $(flags) \
