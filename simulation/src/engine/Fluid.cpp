@@ -1,12 +1,12 @@
 #include "../../include/engine/Fluid.hpp"
 
-#include <fcl/fcl.h>
 #include <omp.h>
 #include <raylib.h>
 #include <raymath.h>
 
 #include <algorithm>
 #include <cstring>
+#include <memory>
 #include <vector>
 
 #include "../../include/engine/Engine.hpp"
@@ -34,9 +34,7 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     is_boundary_dirty = true;
 }
 
-Fluid::~Fluid(void) {
-    for (const Obstacle& obstacle : obstacles) UnloadModel(obstacle.model);
-}
+Fluid::~Fluid(void) {}
 
 float Fluid::get_density(v3 position) { return density[IXv(position)]; }
 v3 Fluid::get_velocity(v3 position) {
@@ -331,75 +329,59 @@ void Fluid::step() {
 }
 
 void Fluid::add_obstacle(v3 position, float size, Model model) {
-    Obstacle obstacle = {position, size, model};
+    Obstacle obstacle(position, size, model);
     obstacles.push_back(obstacle);
     voxelize(obstacle);
     is_boundary_dirty = true;
 }
 
-/* void Fluid::voxelize(Obstacle obstacle) {
-    BoundingBox model = {obstacle.position - obstacle.size / 2,
-                         obstacle.position + obstacle.size / 2};
-
-    for (int z = 0; z < N; z++) {
-        for (int y = 0; y < N; y++) {
-            for (int x = 0; x < N; x++) {
-                v3 cell_min = v3(x, y, z);
-                v3 cell_max = cell_min + v3(1);
-
-                BoundingBox cell = {cell_min, cell_max};
-
-                if (!(cell.min.x <= model.max.x && cell.max.x >= model.min.x &&
-                      cell.min.y <= model.max.y && cell.max.y >= model.min.y &&
-                      cell.min.z <= model.max.z && cell.max.z >= model.min.z)) {
-                    state[IX(x, y, z)] = CellType::FLUID;
-                    continue;
-                }
-
-                if (cell.min.x >= model.min.x && cell.max.x <= model.max.x &&
-                    cell.min.y >= model.min.y && cell.max.y <= model.max.y &&
-                    cell.min.z >= model.min.z && cell.max.z <= model.max.z) {
-                    state[IX(x, y, z)] = CellType::SOLID;
-                    printf("%d, %d, %d: SOLID\n", x, y, z);
-                    continue;
-                }
-
-                state[IX(x, y, z)] = CellType::CUT_CELL;
-                printf("%d, %d, %d: CUT_CELL\n", x, y, z);
-            }
-        }
-    }
-} */
-
 void Fluid::voxelize(Obstacle obstacle) {
-    // Compute the obstacle's bounding box
-    BoundingBox model = {obstacle.position - obstacle.size / 2.0f,
-                         obstacle.position + obstacle.size / 2.0f};
-
     for (int z = 0; z < N; z++) {
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
-                // Define the bounding box of the voxel cell
-                v3 position(x, y, z);
-                BoundingBox cellBox = {position, position + v3(1)};
+                // Define the voxel's position and size
+                v3 cell_position(x + 0.5f, y + 0.5f, z + 0.5f);  // Center of the voxel
+                v3 cell_size(1.0f, 1.0f, 1.0f);                  // Voxel dimensions
 
-                // Calculate the bounding box of the model
-                // Check if the model's bounding box is entirely outside the cell
-                if (!CheckCollisionBoxes(model, cellBox)) {
+                // Create the voxel geometry and wrap it in a shared_ptr
+                auto cell_box_ptr =
+                    std::make_shared<fcl::Boxf>(cell_size.x, cell_size.y, cell_size.z);
+
+                // Create transforms for the voxel and obstacle
+                fcl::Transform3f cell_transform(
+                    fcl::Translation3f(cell_position.x, cell_position.y, cell_position.z));
+                fcl::Transform3f obstacle_transform(fcl::Translation3f(
+                    obstacle.position.x, obstacle.position.y, obstacle.position.z));
+
+                // Create FCL collision objects
+                fcl::CollisionObject<float> voxel_obj(cell_box_ptr, cell_transform);
+                // fcl::CollisionObject<float> obstacle_obj(obstacle.geom, obstacle_transform);
+                fcl::CollisionObject<float> obstacle_obj(
+                    std::shared_ptr<fcl::BVHModel<fcl::OBBf>>(obstacle.geom.get()),
+                    obstacle_transform);
+
+                // Collision request and result
+                fcl::CollisionRequest<float> collision_request;
+                fcl::CollisionResult<float> collision_result;
+
+                // Perform collision query
+                fcl::collide(&voxel_obj, &obstacle_obj, collision_request, collision_result);
+
+                // Classification logic
+                if (collision_result.isCollision()) {
+                    // Check if the voxel is fully contained in the obstacle
+                    fcl::AABBf cell_aabb(cell_position - (cell_size / 2),
+                                         cell_position + (cell_size / 2));
+
+                    if (cell_aabb.center().cwiseAbs().array().all() <=
+                        obstacle.geom->aabb_center.cwiseAbs().array().all()) {
+                        state[IX(x, y, z)] = CellType::SOLID;
+                    } else {
+                        state[IX(x, y, z)] = CellType::CUT_CELL;
+                    }
+                } else {
                     state[IX(x, y, z)] = CellType::FLUID;
                 }
-
-                if ((model.min.x >= cellBox.min.x && model.min.x <= cellBox.max.x &&
-                     model.min.y >= cellBox.min.y && model.min.y <= cellBox.max.y &&
-                     model.min.z >= cellBox.min.z && model.min.z <= cellBox.max.z) &&
-                    (model.max.x >= cellBox.min.x && model.max.x <= cellBox.max.x &&
-                     model.max.y >= cellBox.min.y && model.max.y <= cellBox.max.y &&
-                     model.max.z >= cellBox.min.z && model.max.z <= cellBox.max.z)) {
-                    state[IX(x, y, z)] = CellType::SOLID;
-                }
-
-                // If neither, it must be partially inside
-                state[IX(x, y, z)] = CellType::CUT_CELL;
             }
         }
     }
@@ -410,7 +392,7 @@ float Fluid::get_fractional_volume(v3 position) {
     float total_intersection_volume = 0.0f;
 
     // Loop through all obstacles
-    for (const Obstacle& obstacle : obstacles) {
+    for (Obstacle& obstacle : obstacles) {
         BoundingBox obs = {
             obstacle.position - v3(obstacle.size / 2.0f),
             obstacle.position + v3(obstacle.size / 2.0f),

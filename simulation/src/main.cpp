@@ -1,6 +1,7 @@
 #include <imgui.h>
 #include <raylib.h>
 #include <raymath.h>
+#include <rlImGui.h>
 #include <rlgl.h>
 #include <sys/cdefs.h>
 
@@ -10,12 +11,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <toml++/toml.hpp>
 #include <vector>
 
 #include "../include/engine/Engine.hpp"
 #include "../include/engine/Fluid.hpp"
-#include "../lib/rlImGui/rlImGui.h"
-#include "../lib/tomlplusplus/toml.hpp"
 
 #define FPS 60.0f
 
@@ -77,7 +77,6 @@ int main(int argc, char* argv[]) {
     struct {
         bool show_models = true;
         bool should_orthographic = true;
-        bool show_density_float = false;
         bool show_vel_arrows = false;
         bool show_bounds = false;
         bool show_cell_borders = false;
@@ -195,12 +194,7 @@ int main(int argc, char* argv[]) {
                             Color c = ColorFromHSV(hue, 1.0f, 1.0f);
                             Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
 
-                            if (settings.show_density_float) {
-                                draw_text_3d(TextFormat("%.1f", density), position,
-                                             fluid.fluid_size * 10, WHITE);
-                            } else {
-                                DrawCubeV(position, v3(fluid.fluid_size), color);
-                            }
+                            DrawCubeV(position, v3(fluid.fluid_size), color);
                         }
                     }
                 } break;
@@ -219,7 +213,6 @@ int main(int argc, char* argv[]) {
             ImGui::Begin("Fluid Simulation");
 
             ImGui::Checkbox("Show models", &settings.show_models);
-            ImGui::Checkbox("Show density with numbers", &settings.show_density_float);
             ImGui::Checkbox("Show velocity with arrows", &settings.show_vel_arrows);
             // ImGui::Checkbox("Show bounds", &settings.show_bounds);
             ImGui::Checkbox("Show bounds SOLID", &settings.show_bounds_solid);
