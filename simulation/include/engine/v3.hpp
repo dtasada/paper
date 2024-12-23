@@ -29,6 +29,8 @@ struct v3 {
 
     v3 operator*=(const float& other);
     v3 operator/=(const float& other);
+    v3 operator+=(const float& other);
+    v3 operator-=(const float& other);
 
     std::string to_string(void) const;
 

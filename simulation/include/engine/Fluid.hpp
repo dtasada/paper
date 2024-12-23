@@ -74,8 +74,8 @@ class Fluid {
     void step(void);
 
     // geometry
-    void add_obstacle(v3 position, float size, Model model);
-    void voxelize(Obstacle obstacle);
+    void add_obstacle(v3 position, Model model);
+    void voxelize(Obstacle& obstacle);
     float get_fractional_volume(v3 position);
     CellType get_state(v3 position);
 };

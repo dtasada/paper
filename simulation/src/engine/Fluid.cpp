@@ -1,13 +1,6 @@
 #include "../../include/engine/Fluid.hpp"
 
-#include <omp.h>
-#include <raylib.h>
-#include <raymath.h>
-
-#include <algorithm>
-#include <cstring>
-#include <memory>
-#include <vector>
+#include <iostream>
 
 #include "../../include/engine/Engine.hpp"
 
@@ -193,25 +186,25 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
     lin_solve(FieldType::DENSITY, p, div, 1, 6);
 
     // Adjust velocity based on the pressure gradient
-    for (int k = 1; k < N - 1; k++) {
-        for (int j = 1; j < N - 1; j++) {
-            for (int i = 1; i < N - 1; i++) {
-                if (state[IX(i, j, k)] == CellType::SOLID) {
-                    velocX[IX(i, j, k)] = 0;
-                    velocY[IX(i, j, k)] = 0;
-                    velocZ[IX(i, j, k)] = 0;
-                } else if (state[IX(i, j, k)] == CellType::CUT_CELL) {
-                    float fraction = get_fractional_volume(v3(i, j, k));
-                    velocX[IX(i, j, k)] -=
-                        0.5f * fraction * (p[IX(i + 1, j, k)] - p[IX(i - 1, j, k)]) * N;
-                    velocY[IX(i, j, k)] -=
-                        0.5f * fraction * (p[IX(i, j + 1, k)] - p[IX(i, j - 1, k)]) * N;
-                    velocZ[IX(i, j, k)] -=
-                        0.5f * fraction * (p[IX(i, j, k + 1)] - p[IX(i, j, k - 1)]) * N;
+    for (int z = 1; z < N - 1; z++) {
+        for (int y = 1; y < N - 1; y++) {
+            for (int x = 1; x < N - 1; x++) {
+                if (state[IX(x, y, z)] == CellType::SOLID) {
+                    velocX[IX(x, y, z)] = 0;
+                    velocY[IX(x, y, z)] = 0;
+                    velocZ[IX(x, y, z)] = 0;
+                } else if (state[IX(x, y, z)] == CellType::CUT_CELL) {
+                    float fraction = get_fractional_volume(v3(x, y, z));
+                    velocX[IX(x, y, z)] -=
+                        0.5f * fraction * (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
+                    velocY[IX(x, y, z)] -=
+                        0.5f * fraction * (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
+                    velocZ[IX(x, y, z)] -=
+                        0.5f * fraction * (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
                 } else {  // FLUID cells
-                    velocX[IX(i, j, k)] -= 0.5f * (p[IX(i + 1, j, k)] - p[IX(i - 1, j, k)]) * N;
-                    velocY[IX(i, j, k)] -= 0.5f * (p[IX(i, j + 1, k)] - p[IX(i, j - 1, k)]) * N;
-                    velocZ[IX(i, j, k)] -= 0.5f * (p[IX(i, j, k + 1)] - p[IX(i, j, k - 1)]) * N;
+                    velocX[IX(x, y, z)] -= 0.5f * (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
+                    velocY[IX(x, y, z)] -= 0.5f * (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
+                    velocZ[IX(x, y, z)] -= 0.5f * (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
                 }
             }
         }
@@ -328,53 +321,44 @@ void Fluid::step() {
     advect(FieldType::DENSITY, density, s, vx, vy, vz);
 }
 
-void Fluid::add_obstacle(v3 position, float size, Model model) {
-    Obstacle obstacle(position, size, model);
-    obstacles.push_back(obstacle);
-    voxelize(obstacle);
+void Fluid::add_obstacle(v3 position, Model model) {
+    obstacles.emplace_back(position, model);
+    voxelize(obstacles.back());
     is_boundary_dirty = true;
 }
 
-void Fluid::voxelize(Obstacle obstacle) {
+void Fluid::voxelize(Obstacle& obstacle) {
     for (int z = 0; z < N; z++) {
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
-                // Define the voxel's position and size
-                v3 cell_position(x + 0.5f, y + 0.5f, z + 0.5f);  // Center of the voxel
-                v3 cell_size(1.0f, 1.0f, 1.0f);                  // Voxel dimensions
+                v3 cell_position(x, y, z);
+                v3 cell_size(1.0f, 1.0f, 1.0f);
+                fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
-                // Create the voxel geometry and wrap it in a shared_ptr
-                auto cell_box_ptr =
-                    std::make_shared<fcl::Boxf>(cell_size.x, cell_size.y, cell_size.z);
+                fcl::CollisionObjectf cell_obj(
+                    std::make_shared<fcl::Boxf>(cell_size),
+                    fcl::Transform3f(fcl::Translation3f(cell_position)));
+                fcl::CollisionObjectf obstacle_obj(
+                    obstacle.geom, fcl::Transform3f(fcl::Translation3f(obstacle.position)));
 
-                // Create transforms for the voxel and obstacle
-                fcl::Transform3f cell_transform(
-                    fcl::Translation3f(cell_position.x, cell_position.y, cell_position.z));
-                fcl::Transform3f obstacle_transform(fcl::Translation3f(
-                    obstacle.position.x, obstacle.position.y, obstacle.position.z));
-
-                // Create FCL collision objects
-                fcl::CollisionObject<float> voxel_obj(cell_box_ptr, cell_transform);
-                // fcl::CollisionObject<float> obstacle_obj(obstacle.geom, obstacle_transform);
-                fcl::CollisionObject<float> obstacle_obj(
-                    std::shared_ptr<fcl::BVHModel<fcl::OBBf>>(obstacle.geom.get()),
-                    obstacle_transform);
-
-                // Collision request and result
-                fcl::CollisionRequest<float> collision_request;
-                fcl::CollisionResult<float> collision_result;
-
-                // Perform collision query
-                fcl::collide(&voxel_obj, &obstacle_obj, collision_request, collision_result);
+                fcl::CollisionRequestf request;
+                fcl::CollisionResultf result;
 
                 // Classification logic
-                if (collision_result.isCollision()) {
+                fcl::collide(&cell_obj, &obstacle_obj, request, result);
+                std::cout << "cell_aabb: " << cell_aabb.center().cwiseAbs().array() << "\n";
+                std::cout << "obstacle.geom: " << obstacle.geom->aabb_center.cwiseAbs().array()
+                          << "\n";
+                std::cout << "all: "
+                          << (cell_aabb.center().cwiseAbs().array() <=
+                              obstacle.geom->aabb_center.cwiseAbs().array())
+                                 .all()
+                          << "\n";
+                if (result.isCollision()) {
                     // Check if the voxel is fully contained in the obstacle
-                    fcl::AABBf cell_aabb(cell_position - (cell_size / 2),
-                                         cell_position + (cell_size / 2));
-
-                    if (cell_aabb.center().cwiseAbs().array().all() <=
-                        obstacle.geom->aabb_center.cwiseAbs().array().all()) {
+                    if ((cell_aabb.center().cwiseAbs().array() <=
+                         obstacle.geom->aabb_center.cwiseAbs().array())
+                            .all()) {
                         state[IX(x, y, z)] = CellType::SOLID;
                     } else {
                         state[IX(x, y, z)] = CellType::CUT_CELL;
@@ -388,14 +372,14 @@ void Fluid::voxelize(Obstacle obstacle) {
 }
 
 float Fluid::get_fractional_volume(v3 position) {
-    BoundingBox cell = {position, position + v3(1)};
+    /* BoundingBox cell = {position, position + v3(1)};
     float total_intersection_volume = 0.0f;
 
     // Loop through all obstacles
     for (Obstacle& obstacle : obstacles) {
         BoundingBox obs = {
-            obstacle.position - v3(obstacle.size / 2.0f),
-            obstacle.position + v3(obstacle.size / 2.0f),
+            obstacle.position - v3(obstacle.scale / 2.0f),
+            obstacle.position + v3(obstacle.scale / 2.0f),
         };
 
         // Calculate intersection bounds
@@ -416,7 +400,8 @@ float Fluid::get_fractional_volume(v3 position) {
 
     // Fractional volume is the portion of the cell not occupied by obstacles
     float cell_volume = 1.0f;  // Each cell is a unit cube
-    return 1.0f - (total_intersection_volume / cell_volume);
+    return 1.0f - (total_intersection_volume / cell_volume); */
+    return 0.5f;
 }
 
 CellType Fluid::get_state(v3 position) { return state[IXv(position)]; }

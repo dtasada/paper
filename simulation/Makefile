@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := release
+
 src = src/*.cpp
 src_engine = src/engine/*.cpp
 in = $(src) $(src_engine) 
@@ -25,7 +27,7 @@ debug:
 		$(linker) \
 		-o $(out)
 
-run: debug
+run: release
 	$(out)
 
-build: debug
+build: release

@@ -8,9 +8,8 @@
 #include <memory>
 #include <vector>
 
-Obstacle::Obstacle(v3 position, float size, Model model) {
+Obstacle::Obstacle(v3 position, Model model) {
     this->position = position;
-    this->size = size;
     this->model = model;
 
     geom = mesh_to_bvh(model.meshes[0]);
@@ -18,12 +17,12 @@ Obstacle::Obstacle(v3 position, float size, Model model) {
 
 Obstacle::~Obstacle() { UnloadModel(model); }
 
-std::unique_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh) {
-    std::unique_ptr<fcl::BVHModel<fcl::OBBf>> model = std::make_unique<fcl::BVHModel<fcl::OBBf>>();
+std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh) {
+    std::shared_ptr<fcl::BVHModel<fcl::OBBf>> model = std::make_shared<fcl::BVHModel<fcl::OBBf>>();
 
-    if (!mesh.vertices) {
-        throw std::runtime_error("Mesh vertices are missing!");
-    }
+    if (!mesh.vertices) throw std::runtime_error("Mesh vertices are missing!");
+    if (mesh.triangleCount <= 0) throw std::runtime_error("Mesh has no triangles!");
+    if (mesh.vertexCount <= 0) throw std::runtime_error("Mesh has no vertices!");
 
     std::vector<fcl::Vector3f> vertices;
     for (int i = 0; i < mesh.vertexCount; i++) {
@@ -34,8 +33,15 @@ std::unique_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh) {
     }
 
     std::vector<int> triangles;
-    for (int i = 0; i < mesh.triangleCount * 3; i++) {
-        triangles.push_back(mesh.indices[i]);
+
+    if (mesh.indices) {
+        for (int i = 0; i < mesh.triangleCount * 3; i++) {
+            triangles.push_back(mesh.indices[i]);
+        }
+    } else {
+        for (int i = 0; i < mesh.vertexCount; i++) {
+            triangles.push_back(i);
+        }
     }
 
     model->beginModel();

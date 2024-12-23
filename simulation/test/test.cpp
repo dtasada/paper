@@ -20,8 +20,7 @@ int main() {
 
         ClearBackground(RAYWHITE);
         DrawGrid(10, 1.0f);
-        DrawCubeV({0.5f, 0.5f, 0.5f}, {1, 1, 1}, RED);
-        DrawModel(cube, {0.5f, 0.5f, 0.5f}, 2.0f, GREEN);
+        DrawModel(cube, {0, 0, 0}, 1.0f, GREEN);
 
         EndMode3D();
         EndDrawing();

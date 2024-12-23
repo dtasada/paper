@@ -17,14 +17,12 @@
 #include "../include/engine/Engine.hpp"
 #include "../include/engine/Fluid.hpp"
 
-#define FPS 60.0f
-
 int main(int argc, char* argv[]) {
     srand(time(nullptr));
 
     /* Raylib setup */
     InitWindow(1280, 720, "Fluid Grid");
-    SetTargetFPS(FPS);
+    SetTargetFPS(60);
     SetExitKey(KEY_Q);
     DisableCursor();
     HideCursor();
@@ -41,8 +39,8 @@ int main(int argc, char* argv[]) {
     float viscosity = 0.000001;  // Viscosity constant
 
     Fluid fluid(SIM_RES, 1.0f, diffusion, viscosity, dt);
-    v3 containerSize(fluid.container_size * fluid.fluid_size);
-    v3 containerCenter(containerSize * 0.5f);
+    v3 container_size(fluid.container_size * fluid.fluid_size);
+    v3 container_center(container_size * 0.5f);
 
     /* Parse config file */
     try {
@@ -50,16 +48,16 @@ int main(int argc, char* argv[]) {
         if (!config.empty())
             for (const auto& node : *config["obstacle"].as_array()) {
                 const auto& obstacle = *node.as_table();
-                const auto& size = obstacle["size"].value_or(1.0f);
 
                 const auto& position_array = *obstacle["position"].as_array();
                 v3 position(position_array[0].value_or(0.0), position_array[1].value_or(0.0),
                             position_array[2].value_or(0.0));
 
                 // Parse model
-                Model model = LoadModel(obstacle["model"].value_or(""));
+                Model model =
+                    LoadModel(obstacle["model"].value_or("No .obj file given in config.toml"));
 
-                fluid.add_obstacle(position, size, model);
+                fluid.add_obstacle(position, model);
             }
     } catch (const toml::parse_error& err) {
         std::cerr << "Failed to parse config file: " << err.what() << std::endl;
@@ -67,8 +65,8 @@ int main(int argc, char* argv[]) {
 
     bool cursor = false;
     Camera3D camera = {
-        .position = containerSize,
-        .target = containerCenter,
+        .position = container_size,
+        .target = container_center,
         .up = {0.0, 1.0, 0.0},
         .fovy = 45.0f,
         .projection = CAMERA_ORTHOGRAPHIC,
@@ -76,7 +74,7 @@ int main(int argc, char* argv[]) {
 
     struct {
         bool show_models = true;
-        bool should_orthographic = true;
+        bool camera_free = false;
         bool show_vel_arrows = false;
         bool show_bounds = false;
         bool show_cell_borders = false;
@@ -97,7 +95,7 @@ int main(int argc, char* argv[]) {
                 fluid.add_velocity(position, velocity_amount);
             }
 
-            UpdateCamera(&camera, CAMERA_THIRD_PERSON);
+            UpdateCamera(&camera, settings.camera_free ? CAMERA_FREE : CAMERA_THIRD_PERSON);
         }
 
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
@@ -134,12 +132,12 @@ int main(int argc, char* argv[]) {
                         DrawCubeWiresV(position + fluid.fluid_size / 2, v3(fluid.fluid_size), RED);
                     }
 
+                    // Skip cubes with very low density
                     if (fluid.get_density(position) > 0.01f ||
                         fluid.get_state(position) != CellType::FLUID) {
-                        // Skip cubes with very low density
                         v3 cube_position = position;
-                        cube_position = cube_position * v3(fluid.fluid_size);
-                        cube_position = cube_position + (fluid.fluid_size / 2);
+                        cube_position *= v3(fluid.fluid_size);
+                        cube_position += fluid.fluid_size / 2;
 
                         float dx = cube_position.x - camera.position.x;
                         float dy = cube_position.y - camera.position.y;
@@ -154,16 +152,17 @@ int main(int argc, char* argv[]) {
 
         std::ranges::sort(cells, std::greater{}, &Cell::distanceSquared);
 
-        DrawCubeWiresV(containerCenter, containerSize, RED);
+        DrawCubeWiresV(container_center, container_size, RED);
 
-        // Render cubes
         BeginBlendMode(BLEND_ALPHA);
+        // Render obstacles
         if (settings.show_models) {
             for (Obstacle& obstacle : fluid.obstacles) {
-                DrawModel(obstacle.model, obstacle.position, obstacle.size, RED);
+                DrawModel(obstacle.model, obstacle.position, 1.0f, RED);
             }
         }
 
+        // Render fluid
         for (const Cell& cell : cells) {
             v3 position = cell.position;
 
@@ -179,7 +178,7 @@ int main(int argc, char* argv[]) {
                     if (settings.show_bounds_cut_cell)
                         DrawCubeV(position, v3(fluid.fluid_size), GREEN);
                     break;
-                case CellType::FLUID: {
+                case CellType::FLUID:
                     if (density > 0.01f) {
                         if (settings.show_vel_arrows) {
                             BeginBlendMode(BLEND_SUBTRACT_COLORS);
@@ -197,7 +196,7 @@ int main(int argc, char* argv[]) {
                             DrawCubeV(position, v3(fluid.fluid_size), color);
                         }
                     }
-                } break;
+                    break;
             }
         }
 
@@ -214,14 +213,17 @@ int main(int argc, char* argv[]) {
 
             ImGui::Checkbox("Show models", &settings.show_models);
             ImGui::Checkbox("Show velocity with arrows", &settings.show_vel_arrows);
-            // ImGui::Checkbox("Show bounds", &settings.show_bounds);
             ImGui::Checkbox("Show bounds SOLID", &settings.show_bounds_solid);
             ImGui::Checkbox("Show bounds CUT_CELL", &settings.show_bounds_cut_cell);
             ImGui::Checkbox("Show cell borders", &settings.show_cell_borders);
 
-            ImGui::Checkbox("Camera Orthograhic", &settings.should_orthographic);
-            camera.projection =
-                settings.should_orthographic ? CAMERA_ORTHOGRAPHIC : CAMERA_PERSPECTIVE;
+            bool was_cam_free = settings.camera_free;
+            ImGui::Checkbox("Camera Free", &settings.camera_free);
+            camera.projection = settings.camera_free ? CAMERA_PERSPECTIVE : CAMERA_ORTHOGRAPHIC;
+            if (settings.camera_free && !was_cam_free) {
+                camera.position = container_size;
+                camera.target = container_center;
+            }
 
             ImGui::SliderFloat("Diffusion", &fluid.diffusion, 0.0f, 0.0001f);
 

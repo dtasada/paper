@@ -20,14 +20,13 @@ struct Cell {
 
 struct Obstacle {
     v3 position;
-    float size;
     Model model;
 
-    std::unique_ptr<fcl::BVHModel<fcl::OBBf>> geom;
+    std::shared_ptr<fcl::BVHModel<fcl::OBBf>> geom;
 
-    Obstacle(v3 position, float size, Model model);
+    Obstacle(v3 position, Model model);
     ~Obstacle();
 };
 
 int constrain(int val, int low, int high);
-std::unique_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh);
+std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh);
