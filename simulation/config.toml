@@ -1,7 +1,7 @@
 [[obstacle]]
-position = [20,20,20]
+position = [1,1,1]
 model = "resources/models/cube.obj"
 
-# [[obstacle]]
-# position = [10, 10, 10]
-# model = "resources/models/paper_airplane.obj"
+[[obstacle]]
+position = [0,0,0]
+model = "resources/models/paper_airplane.obj"

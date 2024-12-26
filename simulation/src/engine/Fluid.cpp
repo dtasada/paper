@@ -327,42 +327,72 @@ void Fluid::add_obstacle(v3 position, Model model) {
     is_boundary_dirty = true;
 }
 
+/* void Fluid::voxelize(Obstacle& obstacle) {
+     for (float z = 0.0f; z < N; z++) {
+         for (float y = 0.0f; y < N; y++) {
+             for (float x = 0.0f; x < N; x++) {
+                 v3 cell_position(x, y, z);
+                 v3 cell_size(1.0f, 1.0f, 1.0f);
+
+                 fcl::CollisionObjectf cell_obj(
+                     std::make_shared<fcl::Boxf>(cell_size),
+                     fcl::Transform3f(fcl::Translation3f(cell_position)));
+                 fcl::CollisionObjectf obstacle_obj(
+                     obstacle.geom, fcl::Transform3f(fcl::Translation3f(obstacle.position)));
+
+                 fcl::CollisionRequestf request;
+                 fcl::CollisionResultf result;
+
+                 // Classification logic
+                 fcl::collide(&cell_obj, &obstacle_obj, request, result);
+                 if (result.isCollision()) {
+                     fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
+                     fcl::AABBf obstacle_aabb = obstacle.geom->aabb_local;
+                     if (obstacle_aabb.contain(cell_aabb)) {
+                         state[IX(x, y, z)] = CellType::SOLID;
+                     } else {
+                         state[IX(x, y, z)] = CellType::CUT_CELL;
+                     }
+                 } else {
+                     state[IX(x, y, z)] = CellType::FLUID;
+                 }
+             }
+         }
+     }
+ } */
+
 void Fluid::voxelize(Obstacle& obstacle) {
+    // Retrieve the obstacle's bounding box
+    fcl::AABBf obstacle_aabb = obstacle.geom->aabb_local;  // Replace with the correct accessor
+
     for (int z = 0; z < N; z++) {
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
+                // Define the voxel's AABB
                 v3 cell_position(x, y, z);
                 v3 cell_size(1.0f, 1.0f, 1.0f);
                 fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
+                // Check for full containment (SOLID)
+                if (obstacle_aabb.contain(cell_aabb)) {
+                    state[IX(x, y, z)] = CellType::SOLID;
+                    continue;
+                }
+
+                // Perform collision query for partial intersection (CUT_CELL)
+                std::shared_ptr<fcl::Boxf> cell_geometry =
+                    std::make_shared<fcl::Boxf>(cell_size.x, cell_size.y, cell_size.z);
                 fcl::CollisionObjectf cell_obj(
-                    std::make_shared<fcl::Boxf>(cell_size),
-                    fcl::Transform3f(fcl::Translation3f(cell_position)));
+                    cell_geometry, fcl::Transform3f(fcl::Translation3f(cell_position)));
                 fcl::CollisionObjectf obstacle_obj(
                     obstacle.geom, fcl::Transform3f(fcl::Translation3f(obstacle.position)));
 
                 fcl::CollisionRequestf request;
                 fcl::CollisionResultf result;
-
-                // Classification logic
                 fcl::collide(&cell_obj, &obstacle_obj, request, result);
-                std::cout << "cell_aabb: " << cell_aabb.center().cwiseAbs().array() << "\n";
-                std::cout << "obstacle.geom: " << obstacle.geom->aabb_center.cwiseAbs().array()
-                          << "\n";
-                std::cout << "all: "
-                          << (cell_aabb.center().cwiseAbs().array() <=
-                              obstacle.geom->aabb_center.cwiseAbs().array())
-                                 .all()
-                          << "\n";
+
                 if (result.isCollision()) {
-                    // Check if the voxel is fully contained in the obstacle
-                    if ((cell_aabb.center().cwiseAbs().array() <=
-                         obstacle.geom->aabb_center.cwiseAbs().array())
-                            .all()) {
-                        state[IX(x, y, z)] = CellType::SOLID;
-                    } else {
-                        state[IX(x, y, z)] = CellType::CUT_CELL;
-                    }
+                    state[IX(x, y, z)] = CellType::CUT_CELL;
                 } else {
                     state[IX(x, y, z)] = CellType::FLUID;
                 }

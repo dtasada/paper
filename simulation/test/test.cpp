@@ -7,10 +7,9 @@ int main() {
         .position = {2.0f, 2.0f, 2.0f},
         .target = {0.0f, 0.0f, 0.0f},
         .up = {0.0f, 1.0f, 0.0f},
-        .fovy = 45.0f,
+        .fovy = 90.0f,
         .projection = CAMERA_PERSPECTIVE,
     };
-
     Model cube = LoadModel("cube.obj");
 
     while (!WindowShouldClose()) {
