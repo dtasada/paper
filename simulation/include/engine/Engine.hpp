@@ -28,5 +28,4 @@ struct Obstacle {
     ~Obstacle();
 };
 
-int constrain(int val, int low, int high);
 std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh);

@@ -1,4 +1,4 @@
-#include "../../include/engine/Engine.hpp"
+#include "../../include/engine/engine.hpp"
 
 #include <raylib.h>
 #include <raymath.h>
@@ -52,8 +52,5 @@ std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh) {
         model->addTriangle(vertices[idx1], vertices[idx2], vertices[idx3]);
     }
     model->endModel();
-
     return model;
 }
-
-int constrain(int val, int low, int high) { return std::min(std::max(val, low), high); }

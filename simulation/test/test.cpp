@@ -10,7 +10,9 @@ int main() {
         .fovy = 90.0f,
         .projection = CAMERA_PERSPECTIVE,
     };
+
     Model cube = LoadModel("cube.obj");
+    Model plane = LoadModel("plane.obj");
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -20,12 +22,14 @@ int main() {
         ClearBackground(RAYWHITE);
         DrawGrid(10, 1.0f);
         DrawModel(cube, {0, 0, 0}, 1.0f, GREEN);
+        DrawModel(plane, {4, 4, 4}, 1.0f, GREEN);
 
         EndMode3D();
         EndDrawing();
     }
 
     UnloadModel(cube);
+    UnloadModel(plane);
     CloseWindow();
     return 0;
 }

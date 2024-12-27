@@ -7,7 +7,7 @@
 #include <array>
 #include <vector>
 
-#include "Engine.hpp"
+#include "engine.hpp"
 
 #define IX(x, y, z)                                                    \
     std::clamp(int(x), 0, container_size - 1) +                        \
@@ -45,7 +45,21 @@ class Fluid {
     std::vector<v3> boundary_cells;
     std::vector<float> boundary_cache;
 
-    bool is_boundary_dirty = true;
+    bool is_boundary_dirty;
+
+    v3 get_position(int i);
+
+    void advect(FieldType b, Field<float>& d, Field<float>& d0, Field<float>& velocX,
+                Field<float>& velocY, Field<float>& velocZ);
+    void diffuse(FieldType b, Field<float>& x, Field<float>& x0, float diff);
+    void lin_solve(FieldType b, Field<float>& x, Field<float>& x0, float a, float c);
+    void project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ, Field<float>& p,
+                 Field<float>& div);
+    void set_boundaries(FieldType b, Field<float>& x);
+
+    // geometry
+    void voxelize(Obstacle& obstacle);
+    float get_fractional_volume(v3 position);
 
    public:
     int container_size;
@@ -56,27 +70,16 @@ class Fluid {
 
     Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
     ~Fluid(void);
-    float get_density(v3 position);
-    v3 get_velocity(v3 position);
-    v3 get_position(int i);
-    void reset(void);
 
+    void reset(void);
+    void step(void);
+    void add_obstacle(v3 position, Model model);
     void add_density(v3 position, float amount);
     void add_velocity(v3 position, v3 amount);
 
-    void advect(FieldType b, Field<float>& d, Field<float>& d0, Field<float>& velocX,
-                Field<float>& velocY, Field<float>& velocZ);
-    void diffuse(FieldType b, Field<float>& x, Field<float>& x0, float diff);
-    void lin_solve(FieldType b, Field<float>& x, Field<float>& x0, float a, float c);
-    void project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ, Field<float>& p,
-                 Field<float>& div);
-    void set_boundaries(FieldType b, Field<float>& x);
-    void step(void);
+    float get_density(v3 position);
+    v3 get_velocity(v3 position);
 
-    // geometry
-    void add_obstacle(v3 position, Model model);
-    void voxelize(Obstacle& obstacle);
-    float get_fractional_volume(v3 position);
     CellType get_state(v3 position);
 };
 

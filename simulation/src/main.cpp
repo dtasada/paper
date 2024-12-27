@@ -14,8 +14,8 @@
 #include <toml++/toml.hpp>
 #include <vector>
 
-#include "../include/engine/Engine.hpp"
 #include "../include/engine/Fluid.hpp"
+#include "../include/engine/engine.hpp"
 
 int main(int argc, char* argv[]) {
     srand(time(nullptr));
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
                 Model model =
                     LoadModel(obstacle["model"].value_or("No .obj file given in config.toml"));
 
-                fluid.add_obstacle(position, model);
+                fluid.add_obstacle(position, std::move(model));
             }
     } catch (const toml::parse_error& err) {
         std::cerr << "Failed to parse config file: " << err.what() << std::endl;
@@ -235,6 +235,7 @@ int main(int argc, char* argv[]) {
         EndDrawing();
     }
 
+    delete &fluid;
     rlImGuiShutdown();
     CloseWindow();
     return 0;
