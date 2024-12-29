@@ -3,5 +3,5 @@
 # model = "resources/models/cube.obj"
 
 [[obstacle]]
-position = [10,10,10]
-model = "resources/models/paper_airplane.obj"
+position = [12, 11.275, 12]
+model = "resources/models/untitled_textures/untitled_texures.obj"

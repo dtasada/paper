@@ -12,45 +12,51 @@ Obstacle::Obstacle(v3 position, Model model) {
     this->position = position;
     this->model = model;
 
-    geom = mesh_to_bvh(model.meshes[0]);
+    std::cout << "Meshes: " << model.meshCount << std::endl;
+    geom = mesh_to_bvh(model);
 }
 
 Obstacle::~Obstacle() { UnloadModel(model); }
 
-std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh) {
-    std::shared_ptr<fcl::BVHModel<fcl::OBBf>> model = std::make_shared<fcl::BVHModel<fcl::OBBf>>();
+std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Model& model) {
+    std::shared_ptr<fcl::BVHModel<fcl::OBBf>> bvh = std::make_shared<fcl::BVHModel<fcl::OBBf>>();
 
-    if (!mesh.vertices) throw std::runtime_error("Mesh vertices are missing!");
-    if (mesh.triangleCount <= 0) throw std::runtime_error("Mesh has no triangles!");
-    if (mesh.vertexCount <= 0) throw std::runtime_error("Mesh has no vertices!");
+    bvh->beginModel();
+    for (int m = 0; m < model.meshCount; m++) {
+        const Mesh& mesh = model.meshes[m];
 
-    std::vector<fcl::Vector3f> vertices;
-    for (int i = 0; i < mesh.vertexCount; i++) {
-        float x = mesh.vertices[i * 3];
-        float y = mesh.vertices[i * 3 + 1];
-        float z = mesh.vertices[i * 3 + 2];
-        vertices.emplace_back(x, y, z);
-    }
+        if (!mesh.vertices) throw std::runtime_error("Mesh vertices are missing!");
+        if (mesh.triangleCount <= 0) throw std::runtime_error("Mesh has no triangles!");
+        if (mesh.vertexCount <= 0) throw std::runtime_error("Mesh has no vertices!");
 
-    std::vector<int> triangles;
-
-    if (mesh.indices) {
-        for (int i = 0; i < mesh.triangleCount * 3; i++) {
-            triangles.push_back(mesh.indices[i]);
-        }
-    } else {
+        std::vector<fcl::Vector3f> vertices;
         for (int i = 0; i < mesh.vertexCount; i++) {
-            triangles.push_back(i);
+            float x = mesh.vertices[i * 3];
+            float y = mesh.vertices[i * 3 + 1];
+            float z = mesh.vertices[i * 3 + 2];
+            vertices.emplace_back(x, y, z);
+        }
+
+        std::vector<int> triangles;
+
+        if (mesh.indices) {
+            for (int i = 0; i < mesh.triangleCount * 3; i++) {
+                triangles.push_back(mesh.indices[i]);
+            }
+        } else {
+            for (int i = 0; i < mesh.vertexCount; i++) {
+                triangles.push_back(i);
+            }
+        }
+
+        for (size_t i = 0; i < triangles.size(); i += 3) {
+            int idx1 = triangles[i];
+            int idx2 = triangles[i + 1];
+            int idx3 = triangles[i + 2];
+            bvh->addTriangle(vertices[idx1], vertices[idx2], vertices[idx3]);
         }
     }
 
-    model->beginModel();
-    for (size_t i = 0; i < triangles.size(); i += 3) {
-        int idx1 = triangles[i];
-        int idx2 = triangles[i + 1];
-        int idx3 = triangles[i + 2];
-        model->addTriangle(vertices[idx1], vertices[idx2], vertices[idx3]);
-    }
-    model->endModel();
-    return model;
+    bvh->endModel();
+    return bvh;
 }

@@ -8,6 +8,7 @@ struct v3 {
     float x, y, z;
 
     v3(float x, float y, float z);
+    v3(fcl::Vector3f v);
     v3(Vector3 v);
     v3(void);              // starts a vector to {0, 0, 0}
     explicit v3(float v);  // vector with all values set to v

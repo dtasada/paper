@@ -31,6 +31,11 @@ using Field = std::array<T, FIELD_SIZE>;
 enum class FieldType { VX, VY, VZ, DENSITY };
 enum class CellType { SOLID, FLUID, CUT_CELL };
 
+union ShouldVoxelize {
+    bool False;
+    Obstacle* True;
+};
+
 class Fluid {
    private:
     float dt;   /** simulation timestep */
@@ -58,7 +63,6 @@ class Fluid {
     void set_boundaries(FieldType b, Field<float>& x);
 
     // geometry
-    void voxelize(Obstacle& obstacle);
     float get_fractional_volume(v3 position);
 
    public:
@@ -66,6 +70,7 @@ class Fluid {
     float fluid_size;
     float diffusion;
 
+    Obstacle* should_voxelize;
     std::vector<Obstacle> obstacles;
 
     Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
@@ -80,6 +85,7 @@ class Fluid {
     float get_density(v3 position);
     v3 get_velocity(v3 position);
 
+    void voxelize(Obstacle& obstacle);
     CellType get_state(v3 position);
 };
 

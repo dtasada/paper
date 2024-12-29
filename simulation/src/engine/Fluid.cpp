@@ -2,13 +2,11 @@
 
 #include <fcl/common/types.h>
 
-#include <iostream>
-
 #include "../../include/engine/engine.hpp"
 
 Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt) {
     this->container_size = container_size;
-    this->fluid_size = fluid_size;  // raylib coordinate size of a single cell
+    this->fluid_size = fluid_size;  // raylib world size of a single cell
     this->dt = dt;
     this->diffusion = diffusion;
     this->visc = viscosity;
@@ -27,6 +25,7 @@ Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscos
     boundary_cache = std::vector<float>();
     boundary_cells = std::vector<v3>();
     is_boundary_dirty = true;
+    should_voxelize = nullptr;
 }
 
 Fluid::~Fluid(void) {}
@@ -329,41 +328,8 @@ void Fluid::add_obstacle(v3 position, Model model) {
     is_boundary_dirty = true;
 }
 
-/* void Fluid::voxelize(Obstacle& obstacle) {
-    for (float z = 0.0f; z < N; z++) {
-        for (float y = 0.0f; y < N; y++) {
-            for (float x = 0.0f; x < N; x++) {
-                v3 cell_position(x, y, z);
-                v3 cell_size(1.0f, 1.0f, 1.0f);
-
-                fcl::CollisionObjectf cell_obj(
-                    std::make_shared<fcl::Boxf>(cell_size),
-                    fcl::Transform3f(fcl::Translation3f(cell_position)));
-                fcl::CollisionObjectf obstacle_obj(
-                    obstacle.geom, fcl::Transform3f(fcl::Translation3f(obstacle.position)));
-
-                fcl::CollisionRequestf request;
-                fcl::CollisionResultf result;
-
-                // Classification logic
-                fcl::collide(&cell_obj, &obstacle_obj, request, result);
-                if (result.isCollision()) {
-                    fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
-                    fcl::AABBf obstacle_aabb = obstacle.geom->aabb_local;
-                    if (obstacle_aabb.contain(cell_aabb)) {
-                        state[IX(x, y, z)] = CellType::SOLID;
-                    } else {
-                        state[IX(x, y, z)] = CellType::CUT_CELL;
-                    }
-                } else {
-                    state[IX(x, y, z)] = CellType::FLUID;
-                }
-            }
-        }
-    }
-} */
-
 void Fluid::voxelize(Obstacle& obstacle) {
+    printf("voxelizing\n");
     // Retrieve the obstacle's bounding box
     obstacle.geom->computeLocalAABB();
     fcl::AABBf obstacle_aabb(obstacle.geom->aabb_local.min_ + (fcl::Vector3f)obstacle.position,
@@ -403,39 +369,36 @@ void Fluid::voxelize(Obstacle& obstacle) {
             }
         }
     }
+    should_voxelize = nullptr;
 }
 
-float Fluid::get_fractional_volume(v3 position) {
-    BoundingBox cell = {position, position + v3(1)};
-    float total_intersection_volume = 0.0f;
+float Fluid::get_fractional_volume(v3 cell_position) {
+    v3 cell_size(1.0f, 1.0f, 1.0f);
+    fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
-    // Loop through all obstacles
     for (Obstacle& obstacle : obstacles) {
-        BoundingBox obs = {
-            obstacle.position - v3(0.5f),
-            obstacle.position + v3(0.5f),
-        };
+        obstacle.geom->computeLocalAABB();
+        fcl::AABBf obstacle_aabb(
+            obstacle.geom->aabb_local.min_ + (fcl::Vector3f)obstacle.position,
+            obstacle.geom->aabb_local.max_ + (fcl::Vector3f)obstacle.position);
 
-        // Calculate intersection bounds
-        BoundingBox intersect = {
-            v3(std::max(cell.min.x, obs.min.x), std::max(cell.min.y, obs.min.y),
-               std::max(cell.min.z, obs.min.z)),
-            v3(std::min(cell.max.x, obs.max.x), std::min(cell.max.y, obs.max.y),
-               std::min(cell.max.z, obs.max.z))};
+        fcl::AABBf intersection_aabb;
+        intersection_aabb.min_ = cell_aabb.min_.cwiseMax(obstacle_aabb.min_);
+        intersection_aabb.max_ = cell_aabb.max_.cwiseMin(obstacle_aabb.max_);
 
-        // Calculate intersection dimensions
-        float dx = std::max(0.0f, intersect.max.x - intersect.min.x);
-        float dy = std::max(0.0f, intersect.max.y - intersect.min.y);
-        float dz = std::max(0.0f, intersect.max.z - intersect.min.z);
+        fcl::Vector3f intersection_size = intersection_aabb.max_ - intersection_aabb.min_;
+        if (intersection_size[0] <= 0 || intersection_size[1] <= 0 || intersection_size[2] <= 0) {
+            return 0.0f;
+        }
 
-        // Add to total intersection volume
-        total_intersection_volume += dx * dy * dz;
+        float intersection_volume =
+            intersection_size[0] * intersection_size[1] * intersection_size[2];
+
+        float cell_volume = cell_size.x * cell_size.y * cell_size.z;
+        return intersection_volume / cell_volume;
     }
 
-    // Fractional volume is the portion of the cell not occupied by obstacles
-    float cell_volume = 1.0f;  // Each cell is a unit cube
-    return 1.0f - (total_intersection_volume / cell_volume);
-    // return 0.5f;
+    return 1.0f;
 }
 
 CellType Fluid::get_state(v3 position) { return state[IXv(position)]; }

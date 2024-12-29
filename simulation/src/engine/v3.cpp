@@ -9,6 +9,7 @@
 
 v3::v3(float x, float y, float z) : x(x), y(y), z(z) {};
 v3::v3(float v) : x(v), y(v), z(v) {};
+v3::v3(fcl::Vector3f v) : x(v.x()), y(v.y()), z(v.z()) {};
 v3::v3(Vector3 v) : x(v.x), y(v.y), z(v.z) {};
 v3::v3() : v3(0) {};
 

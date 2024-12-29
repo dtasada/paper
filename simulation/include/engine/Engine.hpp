@@ -28,4 +28,4 @@ struct Obstacle {
     ~Obstacle();
 };
 
-std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Mesh& mesh);
+std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Model& mesh);

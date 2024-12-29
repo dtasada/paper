@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) {
         // Render obstacles
         if (settings.show_models) {
             for (Obstacle& obstacle : fluid.obstacles) {
-                DrawModel(obstacle.model, obstacle.position, 1.0f, RED);
+                DrawModel(obstacle.model, obstacle.position, 1.0f, WHITE);
             }
         }
 
@@ -227,9 +227,25 @@ int main(int argc, char* argv[]) {
 
             ImGui::SliderFloat("Diffusion", &fluid.diffusion, 0.0f, 0.0001f);
 
+            for (Obstacle& obstacle : fluid.obstacles) {
+                v3 old_pos = obstacle.position;
+                ImGui::SliderFloat("Object X", &obstacle.position.x, 0.0f, fluid.container_size);
+                ImGui::SliderFloat("Object Y", &obstacle.position.y, 0.0f, fluid.container_size);
+                ImGui::SliderFloat("Object Z", &obstacle.position.z, 0.0f, fluid.container_size);
+                if (old_pos != obstacle.position) {
+                    fluid.should_voxelize = &obstacle;
+                }
+            }
+
             ImGui::End();
             ImGui::Render();
             rlImGuiEnd();
+        }
+
+        if (fluid.should_voxelize) {
+            if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) {
+                fluid.voxelize(*fluid.should_voxelize);
+            }
         }
 
         EndDrawing();
