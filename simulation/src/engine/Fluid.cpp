@@ -4,28 +4,24 @@
 
 #include "../../include/engine/engine.hpp"
 
-Fluid::Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt) {
+Fluid::Fluid(int container_size, float scaling, float diffusion, float viscosity, float dt) {
     this->container_size = container_size;
-    this->fluid_size = fluid_size;  // raylib world size of a single cell
+    this->scaling = scaling;  // raylib world size of a single cell
     this->dt = dt;
     this->diffusion = diffusion;
     this->visc = viscosity;
 
-    s = Field<float>();
-    density = Field<float>();
-    vx = Field<float>();
-    vy = Field<float>();
-    vz = Field<float>();
-    vx0 = Field<float>();
-    vy0 = Field<float>();
-    vz0 = Field<float>();
-    state = Field<CellType>();
-    state.fill(CellType::FLUID);
+    s = Field<float>(N3);
+    density = Field<float>(N3);
+    vx = Field<float>(N3);
+    vy = Field<float>(N3);
+    vz = Field<float>(N3);
+    vx0 = Field<float>(N3);
+    vy0 = Field<float>(N3);
+    vz0 = Field<float>(N3);
+    state = Field<CellType>(N3, CellType::FLUID);
 
-    boundary_cache = std::vector<float>();
-    boundary_cells = std::vector<v3>();
-    is_boundary_dirty = true;
-    should_voxelize = nullptr;
+    should_voxelize = false;
 }
 
 Fluid::~Fluid(void) {}
@@ -40,16 +36,17 @@ v3 Fluid::get_velocity(v3 position) {
 }
 
 void Fluid::reset(void) {
-    float base = 0.0f;
+    s = Field<float>(N3);
+    density = Field<float>(N3);
+    vx = Field<float>(N3);
+    vy = Field<float>(N3);
+    vz = Field<float>(N3);
+    vx0 = Field<float>(N3);
+    vy0 = Field<float>(N3);
+    vz0 = Field<float>(N3);
+    state = Field<CellType>(N3, CellType::FLUID);
 
-    s.fill(base);
-    density.fill(base);
-    vx.fill(base);
-    vy.fill(base);
-    vz.fill(base);
-    vx0.fill(base);
-    vy0.fill(base);
-    vz0.fill(base);
+    voxelize_all();
 }
 
 void Fluid::add_density(v3 position, float amount) { this->density[IXv(position)] += amount; }
@@ -313,7 +310,6 @@ void Fluid::step() {
 void Fluid::add_obstacle(v3 position, Model model) {
     obstacles.emplace_back(position, model);
     voxelize(obstacles.back());
-    is_boundary_dirty = true;
 }
 
 void Fluid::voxelize(Obstacle& obstacle) {
@@ -353,7 +349,12 @@ void Fluid::voxelize(Obstacle& obstacle) {
             }
         }
     }
-    should_voxelize = nullptr;
+
+    should_voxelize = false;
+}
+
+void Fluid::voxelize_all() {
+    for (Obstacle& obstacle : obstacles) voxelize(obstacle);
 }
 
 float Fluid::get_fractional_volume(v3 cell_position) {

@@ -4,7 +4,6 @@
 #include <raymath.h>
 #include <rlgl.h>
 
-#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -12,7 +11,6 @@ Obstacle::Obstacle(v3 position, Model model) {
     this->position = position;
     this->model = model;
 
-    std::cout << "Meshes: " << model.meshCount << std::endl;
     geom = mesh_to_bvh(model);
 }
 

@@ -1,3 +1,10 @@
+[settings]
+resolution = 24
+scaling = 1.0
+diffusion = 0         # Diffusion constant
+dt = 1.0             # Timestep
+viscosity = 0.000001  # Viscosity constant
+
 # [[obstacle]]
 # position = [4,4,4]
 # model = "resources/models/cube.obj"

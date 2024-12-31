@@ -33,19 +33,16 @@ int main(int argc, char* argv[]) {
     /* ImGui setup */
     rlImGuiSetup(true);
 
-    /* Fluid sim setup */
-    float diffusion = 0;         // Diffusion constant
-    float dt = 1.0f;             // Timestep
-    float viscosity = 0.000001;  // Viscosity constant
-
-    Fluid fluid(SIM_RES, 1.0f, diffusion, viscosity, dt);
-    v3 container_size(fluid.container_size * fluid.fluid_size);
-    v3 container_center(container_size * 0.5f);
-
     /* Parse config file */
+    Fluid* fluid = nullptr;
     try {
         auto config = toml::parse_file("config.toml");
-        if (!config.empty())
+        if (!config.empty()) {
+            fluid = new Fluid(config["settings"]["resolution"].value_or(24),
+                              config["settings"]["scaling"].value_or(1.0f),
+                              config["settings"]["diffusion"].value_or(0.0f),
+                              config["settings"]["viscosity"].value_or(0.000001f),
+                              config["settings"]["dt"].value_or(1.0f));
             for (const auto& node : *config["obstacle"].as_array()) {
                 const auto& obstacle = *node.as_table();
 
@@ -53,15 +50,18 @@ int main(int argc, char* argv[]) {
                 v3 position(position_array[0].value_or(0.0), position_array[1].value_or(0.0),
                             position_array[2].value_or(0.0));
 
-                // Parse model
                 Model model =
                     LoadModel(obstacle["model"].value_or("No .obj file given in config.toml"));
 
-                fluid.add_obstacle(position, std::move(model));
+                fluid->add_obstacle(position, std::move(model));
             }
+        }
     } catch (const toml::parse_error& err) {
         std::cerr << "Failed to parse config file: " << err.what() << std::endl;
     }
+
+    v3 container_size(fluid->container_size * fluid->scaling);
+    v3 container_center(container_size * 0.5f);
 
     bool cursor = false;
     Camera3D camera = {
@@ -89,17 +89,17 @@ int main(int argc, char* argv[]) {
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 v3 position(1, 1, 1);
                 float density_amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 100 : 200;
-                fluid.add_density(position, density_amount);
+                fluid->add_density(position, density_amount);
 
                 v3 velocity_amount(4, 4, 4);
-                fluid.add_velocity(position, velocity_amount);
+                fluid->add_velocity(position, velocity_amount);
             }
 
             UpdateCamera(&camera, settings.camera_free ? CAMERA_FREE : CAMERA_THIRD_PERSON);
         }
 
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
-        if (IsKeyPressed(KEY_R)) fluid.reset();
+        if (IsKeyPressed(KEY_R)) fluid->reset();
         if (IsKeyPressed(KEY_ESCAPE)) {
             if (cursor) {
                 DisableCursor();
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
         }
 
         /* Update sim */
-        fluid.step();
+        fluid->step();
 
         /* Begin Drawing */
         BeginDrawing();
@@ -123,28 +123,29 @@ int main(int argc, char* argv[]) {
 
         /* Sort cell by distance to camera. This is important for backface rendering */
         std::vector<Cell> cells;
-        for (float z = 0.0f; z < fluid.container_size; z++) {
-            for (float y = 0.0f; y < fluid.container_size; y++) {
-                for (float x = 0.0f; x < fluid.container_size; x++) {
+        for (float z = 0.0f; z < fluid->container_size; z++) {
+            for (float y = 0.0f; y < fluid->container_size; y++) {
+                for (float x = 0.0f; x < fluid->container_size; x++) {
                     v3 position(x, y, z);
 
                     if (settings.show_cell_borders) {
-                        DrawCubeWiresV(position + fluid.fluid_size / 2, v3(fluid.fluid_size), RED);
+                        DrawCubeWiresV(position * fluid->scaling + fluid->scaling / 2,
+                                       v3(fluid->scaling), RED);
                     }
 
                     // Skip cubes with very low density
-                    if (fluid.get_density(position) > 0.01f ||
-                        fluid.get_state(position) != CellType::FLUID) {
+                    if (fluid->get_density(position) > 0.01f ||
+                        fluid->get_state(position) != CellType::FLUID) {
                         v3 cube_position = position;
-                        cube_position *= v3(fluid.fluid_size);
-                        cube_position += fluid.fluid_size / 2;
+                        cube_position *= v3(fluid->scaling);
+                        cube_position += fluid->scaling / 2;
 
                         float dx = cube_position.x - camera.position.x;
                         float dy = cube_position.y - camera.position.y;
                         float dz = cube_position.z - camera.position.z;
                         float distanceSquared = dx * dx + dy * dy + dz * dz;
 
-                        cells.push_back({cube_position, distanceSquared});
+                        cells.emplace_back(cube_position, distanceSquared);
                     }
                 }
             }
@@ -157,8 +158,9 @@ int main(int argc, char* argv[]) {
         BeginBlendMode(BLEND_ALPHA);
         // Render obstacles
         if (settings.show_models) {
-            for (Obstacle& obstacle : fluid.obstacles) {
-                DrawModel(obstacle.model, obstacle.position, 1.0f, WHITE);
+            for (Obstacle& obstacle : fluid->obstacles) {
+                DrawModel(obstacle.model, obstacle.position * fluid->scaling, fluid->scaling,
+                          WHITE);
             }
         }
 
@@ -166,24 +168,23 @@ int main(int argc, char* argv[]) {
         for (const Cell& cell : cells) {
             v3 position = cell.position;
 
-            float density = fluid.get_density(position);
-            CellType state = fluid.get_state(position);
+            float density = fluid->get_density(position);
+            CellType state = fluid->get_state(position);
 
             switch (state) {
                 case CellType::SOLID:
-                    if (settings.show_bounds_solid)
-                        DrawCubeV(position, v3(fluid.fluid_size), BLUE);
+                    if (settings.show_bounds_solid) DrawCubeV(position, v3(fluid->scaling), BLUE);
                     break;
                 case CellType::CUT_CELL:
                     if (settings.show_bounds_cut_cell)
-                        DrawCubeV(position, v3(fluid.fluid_size), GREEN);
+                        DrawCubeV(position, v3(fluid->scaling), GREEN);
                     break;
                 case CellType::FLUID:
                     if (density > 0.01f) {
                         if (settings.show_vel_arrows) {
                             BeginBlendMode(BLEND_SUBTRACT_COLORS);
                             DrawCylinderEx(position,
-                                           position + (fluid.get_velocity(position) * 100),
+                                           position + (fluid->get_velocity(position) * 100),
                                            density / 100.f, density / 100.f, 10, RED);
                             BeginBlendMode(BLEND_ALPHA);
                         } else {
@@ -193,7 +194,7 @@ int main(int argc, char* argv[]) {
                             Color c = ColorFromHSV(hue, 1.0f, 1.0f);
                             Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
 
-                            DrawCubeV(position, v3(fluid.fluid_size), color);
+                            DrawCubeV(position, v3(fluid->scaling), color);
                         }
                     }
                     break;
@@ -205,7 +206,10 @@ int main(int argc, char* argv[]) {
         EndMode3D();
 
         DrawFPS(10, 10);
+        if (fluid->should_voxelize) DrawText("Voxelizing...", 10, 30, 20, WHITE);
 
+        bool should_reset = false;
+        bool should_rescale = false;
         if (cursor) {
             /* Render UI */
             rlImGuiBegin();
@@ -225,16 +229,24 @@ int main(int argc, char* argv[]) {
                 camera.target = container_center;
             }
 
-            ImGui::SliderFloat("Diffusion", &fluid.diffusion, 0.0f, 0.0001f);
+            ImGui::SliderFloat("Camera FOV", &camera.fovy, 30.0f, 160.0f);
 
-            for (Obstacle& obstacle : fluid.obstacles) {
+            ImGui::SliderFloat("Diffusion", &fluid->diffusion, 0.0f, 0.0001f);
+
+            int old_container_size = fluid->container_size;
+            ImGui::SliderInt("Container size", &fluid->container_size, 1, 64);
+            should_reset = old_container_size != fluid->container_size;
+
+            int old_scaling = fluid->scaling;
+            ImGui::SliderFloat("Scaling", &fluid->scaling, 0.1f, 10.0f);
+            should_rescale = old_scaling != fluid->scaling;
+
+            for (Obstacle& obstacle : fluid->obstacles) {
                 v3 old_pos = obstacle.position;
-                ImGui::SliderFloat("Object X", &obstacle.position.x, 0.0f, fluid.container_size);
-                ImGui::SliderFloat("Object Y", &obstacle.position.y, 0.0f, fluid.container_size);
-                ImGui::SliderFloat("Object Z", &obstacle.position.z, 0.0f, fluid.container_size);
-                if (old_pos != obstacle.position) {
-                    fluid.should_voxelize = &obstacle;
-                }
+                ImGui::SliderFloat("Object X", &obstacle.position.x, 0.0f, fluid->container_size);
+                ImGui::SliderFloat("Object Y", &obstacle.position.y, 0.0f, fluid->container_size);
+                ImGui::SliderFloat("Object Z", &obstacle.position.z, 0.0f, fluid->container_size);
+                if (old_pos != obstacle.position) fluid->should_voxelize = true;
             }
 
             ImGui::End();
@@ -242,11 +254,12 @@ int main(int argc, char* argv[]) {
             rlImGuiEnd();
         }
 
-        if (fluid.should_voxelize) {
-            if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) {
-                // #pragma omp parallel single
-                fluid.voxelize(*fluid.should_voxelize);
-            }
+        if (fluid->should_voxelize && IsMouseButtonUp(MOUSE_BUTTON_LEFT)) fluid->voxelize_all();
+
+        if (should_reset || should_rescale) {
+            container_size = v3(fluid->container_size * fluid->scaling);
+            container_center = v3(container_size * 0.5f);
+            if (should_reset) fluid->reset();
         }
 
         EndDrawing();
