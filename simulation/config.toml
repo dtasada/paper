@@ -2,6 +2,10 @@
 # position = [4,4,4]
 # model = "resources/models/cube.obj"
 
+# [[obstacle]]
+# position = [12, 11.275, 12]
+# model = "resources/models/untitled_textures/untitled_texures.obj"
+
 [[obstacle]]
-position = [12, 11.275, 12]
-model = "resources/models/untitled_textures/untitled_texures.obj"
+position = [12, 12, 12]
+model = "resources/models/torus.obj"

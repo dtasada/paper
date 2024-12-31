@@ -63,61 +63,46 @@ void Fluid::add_velocity(v3 position, v3 amount) {
 
 void Fluid::advect(FieldType b, Field<float>& d, Field<float>& d0, Field<float>& velocX,
                    Field<float>& velocY, Field<float>& velocZ) {
-    float i0, i1, j0, j1, k0, k1;
-
     float dtx = dt * (N - 2);
     float dty = dt * (N - 2);
     float dtz = dt * (N - 2);
 
-    float s0, s1, t0, t1, u0, u1;
-    float tmp1, tmp2, tmp3, x, y, z;
-
-    float Nfloat = N;
-    float ifloat, jfloat, kfloat;
-    int i, j, k;
-
-    for (k = 1, kfloat = 1; k < N - 1; k++, kfloat++) {
-        for (j = 1, jfloat = 1; j < N - 1; j++, jfloat++) {
-            for (i = 1, ifloat = 1; i < N - 1; i++, ifloat++) {
-                tmp1 = dtx * velocX[IX(i, j, k)];
-                tmp2 = dty * velocY[IX(i, j, k)];
-                tmp3 = dtz * velocZ[IX(i, j, k)];
-                x = ifloat - tmp1;
-                y = jfloat - tmp2;
-                z = kfloat - tmp3;
+#pragma omp parallel for collapse(3)
+    for (int k = 1; k < N - 1; k++) {
+        for (int j = 1; j < N - 1; j++) {
+            for (int i = 1; i < N - 1; i++) {
+                float tmp1 = dtx * velocX[IX(i, j, k)];
+                float tmp2 = dty * velocY[IX(i, j, k)];
+                float tmp3 = dtz * velocZ[IX(i, j, k)];
+                float x = i - tmp1;
+                float y = j - tmp2;
+                float z = k - tmp3;
 
                 if (x < 0.5f) x = 0.5f;
-                if (x > Nfloat + 0.5f) x = Nfloat + 0.5f;
-                i0 = floorf(x);
-                i1 = i0 + 1.0f;
+                if (x > N + 0.5f) x = N + 0.5f;
+                float i0 = floorf(x);
+                float i1 = i0 + 1.0f;
                 if (y < 0.5f) y = 0.5f;
-                if (y > Nfloat + 0.5f) y = Nfloat + 0.5f;
-                j0 = floorf(y);
-                j1 = j0 + 1.0f;
+                if (y > N + 0.5f) y = N + 0.5f;
+                float j0 = floorf(y);
+                float j1 = j0 + 1.0f;
                 if (z < 0.5f) z = 0.5f;
-                if (z > Nfloat + 0.5f) z = Nfloat + 0.5f;
-                k0 = floorf(z);
-                k1 = k0 + 1.0f;
+                if (z > N + 0.5f) z = N + 0.5f;
+                float k0 = floorf(z);
+                float k1 = k0 + 1.0f;
 
-                s1 = x - i0;
-                s0 = 1.0f - s1;
-                t1 = y - j0;
-                t0 = 1.0f - t1;
-                u1 = z - k0;
-                u0 = 1.0f - u1;
-
-                int i0i = i0;
-                int i1i = i1;
-                int j0i = j0;
-                int j1i = j1;
-                int k0i = k0;
-                int k1i = k1;
+                float s1 = x - i0;
+                float s0 = 1.0f - s1;
+                float t1 = y - j0;
+                float t0 = 1.0f - t1;
+                float u1 = z - k0;
+                float u0 = 1.0f - u1;
 
                 d[IX(i, j, k)] =
-                    s0 * (t0 * (u0 * d0[IX(i0i, j0i, k0i)] + u1 * d0[IX(i0i, j0i, k1i)]) +
-                          (t1 * (u0 * d0[IX(i0i, j1i, k0i)] + u1 * d0[IX(i0i, j1i, k1i)]))) +
-                    s1 * (t0 * (u0 * d0[IX(i1i, j0i, k0i)] + u1 * d0[IX(i1i, j0i, k1i)]) +
-                          (t1 * (u0 * d0[IX(i1i, j1i, k0i)] + u1 * d0[IX(i1i, j1i, k1i)])));
+                    s0 * (t0 * (u0 * d0[IX(i0, j0, k0)] + u1 * d0[IX(i0, j0, k1)]) +
+                          (t1 * (u0 * d0[IX(i0, j1, k0)] + u1 * d0[IX(i0, j1, k1)]))) +
+                    s1 * (t0 * (u0 * d0[IX(i1, j0, k0)] + u1 * d0[IX(i1, j0, k1)]) +
+                          (t1 * (u0 * d0[IX(i1, j1, k0)] + u1 * d0[IX(i1, j1, k1)])));
             }
         }
     }
@@ -134,8 +119,8 @@ void Fluid::lin_solve(FieldType b, Field<float>& f, Field<float>& f0, float a, f
     float cRecip = 1.0f / c;
 
     for (int i = 0; i < 4; i++) {
-#pragma omp parallel for collapse(2)
         for (int z = 1; z < N - 1; z++) {
+#pragma omp parallel for collapse(2)
             for (int y = 1; y < N - 1; y++) {
                 for (int x = 1; x < N - 1; x++) {
                     f[IX(x, y, z)] =
@@ -219,6 +204,7 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
 
 void Fluid::set_boundaries(FieldType b, Field<float>& f) {
     // Handle each face of the bounding box
+#pragma omp parallel for collapse(2)
     for (int y = 1; y < N - 1; y++) {
         for (int x = 1; x < N - 1; x++) {
             int index0 = IX(x, y, 0);
@@ -243,6 +229,7 @@ void Fluid::set_boundaries(FieldType b, Field<float>& f) {
         }
     }
 
+#pragma omp parallel for collapse(2)
     for (int z = 1; z < N - 1; z++) {
         for (int x = 1; x < N - 1; x++) {
             int index0 = IX(x, 0, z);
@@ -267,6 +254,7 @@ void Fluid::set_boundaries(FieldType b, Field<float>& f) {
         }
     }
 
+#pragma omp parallel for collapse(2)
     for (int z = 1; z < N - 1; z++) {
         for (int y = 1; y < N - 1; y++) {
             int index0 = IX(0, y, z);
@@ -329,27 +317,23 @@ void Fluid::add_obstacle(v3 position, Model model) {
 }
 
 void Fluid::voxelize(Obstacle& obstacle) {
-    printf("voxelizing\n");
-    // Retrieve the obstacle's bounding box
     obstacle.geom->computeLocalAABB();
     fcl::AABBf obstacle_aabb(obstacle.geom->aabb_local.min_ + (fcl::Vector3f)obstacle.position,
                              obstacle.geom->aabb_local.max_ + (fcl::Vector3f)obstacle.position);
 
+#pragma omp parallel for collapse(3)
     for (int z = 0; z < N; z++) {
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
-                // Define the voxel's AABB
                 v3 cell_position(x, y, z);
                 v3 cell_size(1.0f, 1.0f, 1.0f);
                 fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
-                // Check for full containment (SOLID)
                 if (obstacle_aabb.contain(cell_aabb)) {
                     state[IXv(cell_position)] = CellType::SOLID;
                     continue;
                 }
 
-                // Perform collision query for partial intersection (CUT_CELL)
                 std::shared_ptr<fcl::Boxf> cell_geometry =
                     std::make_shared<fcl::Boxf>((fcl::Vector3f)cell_size);
                 fcl::CollisionObjectf cell_obj(

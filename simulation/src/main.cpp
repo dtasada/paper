@@ -244,6 +244,7 @@ int main(int argc, char* argv[]) {
 
         if (fluid.should_voxelize) {
             if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) {
+                // #pragma omp parallel single
                 fluid.voxelize(*fluid.should_voxelize);
             }
         }
