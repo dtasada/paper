@@ -33,6 +33,21 @@ int main(int argc, char* argv[]) {
     /* ImGui setup */
     rlImGuiSetup(true);
 
+    // ui settings
+    struct {
+        bool show_models = true;
+        bool camera_free = false;
+        bool show_vel_arrows = false;
+        bool show_bounds = false;
+        bool show_cell_borders = false;
+        bool show_bounds_solid = false;
+        bool show_bounds_cut_cell = false;
+        bool render_low_density = false;
+
+        v3 insert_position;
+        v3 insert_velocity;
+    } settings;
+
     /* Parse config file */
     Fluid* fluid = nullptr;
     try {
@@ -43,6 +58,17 @@ int main(int argc, char* argv[]) {
                               config["settings"]["diffusion"].value_or(0.0f),
                               config["settings"]["viscosity"].value_or(0.000001f),
                               config["settings"]["dt"].value_or(1.0f));
+
+            const auto& insert_position = *config["settings"]["insert_position"].as_array();
+            settings.insert_position =
+                v3(insert_position[0].value_or(1.0f), insert_position[1].value_or(1.0f),
+                   insert_position[2].value_or(1.0f));
+
+            const auto& insert_velocity = *config["settings"]["insert_velocity"].as_array();
+            settings.insert_velocity =
+                v3(insert_velocity[0].value_or(4.0f), insert_velocity[1].value_or(4.0f),
+                   insert_velocity[2].value_or(4.0f));
+
             for (const auto& node : *config["obstacle"].as_array()) {
                 const auto& obstacle = *node.as_table();
 
@@ -72,27 +98,15 @@ int main(int argc, char* argv[]) {
         .projection = CAMERA_ORTHOGRAPHIC,
     };
 
-    struct {
-        bool show_models = true;
-        bool camera_free = false;
-        bool show_vel_arrows = false;
-        bool show_bounds = false;
-        bool show_cell_borders = false;
-        bool show_bounds_solid = false;
-        bool show_bounds_cut_cell = false;
-    } settings;
-
     /* Main loop */
     while (!WindowShouldClose()) {
         /* Handle input */
         if (!cursor) {
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-                v3 position(1, 1, 1);
                 float density_amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 100 : 200;
-                fluid->add_density(position, density_amount);
+                fluid->add_density(settings.insert_position, density_amount);
 
-                v3 velocity_amount(4, 4, 4);
-                fluid->add_velocity(position, velocity_amount);
+                fluid->add_velocity(settings.insert_position, settings.insert_velocity);
             }
 
             UpdateCamera(&camera, settings.camera_free ? CAMERA_FREE : CAMERA_THIRD_PERSON);
@@ -121,7 +135,7 @@ int main(int argc, char* argv[]) {
 
         BeginMode3D(camera);
 
-        /* Sort cell by distance to camera. This is important for backface rendering */
+        // Sort cell by distance to camera. This is important for backface rendering
         std::vector<Cell> cells;
         for (float z = 0.0f; z < fluid->container_size; z++) {
             for (float y = 0.0f; y < fluid->container_size; y++) {
@@ -134,7 +148,7 @@ int main(int argc, char* argv[]) {
                     }
 
                     // Skip cubes with very low density
-                    if (fluid->get_density(position) > 0.01f ||
+                    if (fluid->get_density(position) > 0.01f || settings.render_low_density ||
                         fluid->get_state(position) != CellType::FLUID) {
                         v3 cube_position = position;
                         cube_position *= v3(fluid->scaling);
@@ -143,20 +157,25 @@ int main(int argc, char* argv[]) {
                         float dx = cube_position.x - camera.position.x;
                         float dy = cube_position.y - camera.position.y;
                         float dz = cube_position.z - camera.position.z;
-                        float distanceSquared = dx * dx + dy * dy + dz * dz;
+                        float distance_squared = dx * dx + dy * dy + dz * dz;
 
-                        cells.emplace_back(cube_position, distanceSquared);
+                        cells.emplace_back(cube_position, distance_squared);
                     }
                 }
             }
         }
 
-        std::ranges::sort(cells, std::greater{}, &Cell::distanceSquared);
+        std::ranges::sort(cells, std::greater{}, &Cell::distance_squared);
 
-        DrawCubeWiresV(container_center, container_size, RED);
+        DrawCubeWiresV(container_center, container_size, GRAY);
+        DrawLine3D(v3(0, 0, 0), v3(4, 0, 0), RED);
+        DrawLine3D(v3(0, 0, 0), v3(0, 4, 0), GREEN);
+        DrawLine3D(v3(0, 0, 0), v3(0, 0, 4), BLUE);
+        DrawCubeV(settings.insert_position + v3(fluid->scaling) / 2, v3(fluid->scaling),
+                  {255, 0, 0, 100});
 
+        /* Render obstacles */
         BeginBlendMode(BLEND_ALPHA);
-        // Render obstacles
         if (settings.show_models) {
             for (Obstacle& obstacle : fluid->obstacles) {
                 DrawModel(obstacle.model, obstacle.position * fluid->scaling, fluid->scaling,
@@ -164,7 +183,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        // Render fluid
+        /* Render fluid */
         for (const Cell& cell : cells) {
             v3 position = cell.position;
 
@@ -220,6 +239,7 @@ int main(int argc, char* argv[]) {
             ImGui::Checkbox("Show bounds SOLID", &settings.show_bounds_solid);
             ImGui::Checkbox("Show bounds CUT_CELL", &settings.show_bounds_cut_cell);
             ImGui::Checkbox("Show cell borders", &settings.show_cell_borders);
+            ImGui::Checkbox("Render low density", &settings.render_low_density);
 
             bool was_cam_free = settings.camera_free;
             ImGui::Checkbox("Camera Free", &settings.camera_free);
@@ -241,11 +261,13 @@ int main(int argc, char* argv[]) {
             ImGui::SliderFloat("Scaling", &fluid->scaling, 0.1f, 10.0f);
             should_rescale = old_scaling != fluid->scaling;
 
+            drag_v3("insert position", settings.insert_position, 1.0f, 1.0f,
+                    fluid->container_size);
+            drag_v3("insert velocity", settings.insert_velocity, 0.1f, -10.0f, 10.0f);
+
             for (Obstacle& obstacle : fluid->obstacles) {
                 v3 old_pos = obstacle.position;
-                ImGui::SliderFloat("Object X", &obstacle.position.x, 0.0f, fluid->container_size);
-                ImGui::SliderFloat("Object Y", &obstacle.position.y, 0.0f, fluid->container_size);
-                ImGui::SliderFloat("Object Z", &obstacle.position.z, 0.0f, fluid->container_size);
+                drag_v3("Obstacle position", obstacle.position, 0.1f, 1.0f, fluid->container_size);
                 if (old_pos != obstacle.position) fluid->should_voxelize = true;
             }
 

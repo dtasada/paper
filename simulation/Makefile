@@ -7,7 +7,7 @@ in = $(src) $(src_engine)
 out = ./paper
 
 release_flags = -std=c++23 -Wall -O3 -fopenmp
-debug_flags = -std=c++23 -Wall -g -fsanitize=address -fopenmp
+debug_flags = -std=c++23 -Wall -g -fopenmp
 linker = -lraylib -lrlimgui -limgui \
 		 -lfcl -lccd -ltomlplusplus
 

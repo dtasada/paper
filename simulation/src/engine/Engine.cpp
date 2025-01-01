@@ -1,5 +1,6 @@
 #include "../../include/engine/engine.hpp"
 
+#include <imgui.h>
 #include <raylib.h>
 #include <raymath.h>
 #include <rlgl.h>
@@ -57,4 +58,8 @@ std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Model& model) {
 
     bvh->endModel();
     return bvh;
+}
+
+bool drag_v3(const char* label, v3& v, float speed, float min, float max) {
+    return ImGui::DragFloat3(label, &v.x, speed, min, max);
 }

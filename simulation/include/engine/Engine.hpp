@@ -15,7 +15,7 @@
 
 struct Cell {
     v3 position;
-    float distanceSquared;  // Distance from the camera (squared)
+    float distance_squared;  // Distance from the camera (squared)
 };
 
 struct Obstacle {
@@ -29,3 +29,5 @@ struct Obstacle {
 };
 
 std::shared_ptr<fcl::BVHModel<fcl::OBBf>> mesh_to_bvh(const Model& mesh);
+
+bool drag_v3(const char* label, v3& v, float speed, float min, float max);
