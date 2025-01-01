@@ -200,7 +200,7 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
 }
 
 void Fluid::set_boundaries(FieldType b, Field<float>& f) {
-    // Handle each face of the bounding box
+// Handle each face of the bounding box
 #pragma omp parallel for collapse(2)
     for (int y = 1; y < N - 1; y++) {
         for (int x = 1; x < N - 1; x++) {
@@ -313,43 +313,55 @@ void Fluid::add_obstacle(v3 position, Model model) {
 }
 
 void Fluid::voxelize(Obstacle& obstacle) {
+    // Prepare the obstacle collision object
     obstacle.geom->computeLocalAABB();
-    fcl::AABBf obstacle_aabb(obstacle.geom->aabb_local.min_ + (fcl::Vector3f)obstacle.position,
-                             obstacle.geom->aabb_local.max_ + (fcl::Vector3f)obstacle.position);
+    fcl::CollisionObjectf obstacle_obj(obstacle.geom,
+                                       fcl::Transform3f(fcl::Translation3f(obstacle.position)));
 
 #pragma omp parallel for collapse(3)
     for (int z = 0; z < N; z++) {
         for (int y = 0; y < N; y++) {
             for (int x = 0; x < N; x++) {
+                // Define the voxel's position and size
                 v3 cell_position(x, y, z);
                 v3 cell_size(1.0f, 1.0f, 1.0f);
-                fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
-                if (obstacle_aabb.contain(cell_aabb)) {
-                    state[IXv(cell_position)] = CellType::SOLID;
-                    continue;
-                }
-
+                // Create a voxel collision object
                 std::shared_ptr<fcl::Boxf> cell_geometry =
                     std::make_shared<fcl::Boxf>((fcl::Vector3f)cell_size);
                 fcl::CollisionObjectf cell_obj(
                     cell_geometry, fcl::Transform3f(fcl::Translation3f(cell_position)));
-                fcl::CollisionObjectf obstacle_obj(
-                    obstacle.geom, fcl::Transform3f(fcl::Translation3f(obstacle.position)));
 
+                // Perform collision query
                 fcl::CollisionRequestf request;
                 fcl::CollisionResultf result;
                 fcl::collide(&cell_obj, &obstacle_obj, request, result);
 
+                // Classify the cell based on the collision result
                 if (result.isCollision()) {
-                    state[IXv(cell_position)] = CellType::CUT_CELL;
+                    // Check if all contact points are inside the voxel's AABB
+                    fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
+                    bool fully_inside = true;
+
+                    for (int i = 0; i < result.numContacts(); i++) {
+                        const auto& contact = result.getContact(i);
+                        if (!cell_aabb.contain(contact.pos)) {
+                            fully_inside = false;
+                            break;
+                        }
+                    }
+
+                    if (fully_inside) {
+                        state[IXv(cell_position)] = CellType::SOLID;
+                    } else {
+                        state[IXv(cell_position)] = CellType::CUT_CELL;
+                    }
                 } else {
                     state[IXv(cell_position)] = CellType::FLUID;
                 }
             }
         }
     }
-
     should_voxelize = false;
 }
 
@@ -362,7 +374,6 @@ float Fluid::get_fractional_volume(v3 cell_position) {
     fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
     for (Obstacle& obstacle : obstacles) {
-        obstacle.geom->computeLocalAABB();
         fcl::AABBf obstacle_aabb(
             obstacle.geom->aabb_local.min_ + (fcl::Vector3f)obstacle.position,
             obstacle.geom->aabb_local.max_ + (fcl::Vector3f)obstacle.position);

@@ -249,6 +249,11 @@ int main(int argc, char* argv[]) {
                 if (old_pos != obstacle.position) fluid->should_voxelize = true;
             }
 
+            if (ImGui::Button("Reset camera")) {
+                camera.position = container_size;
+                camera.target = container_center;
+            }
+
             ImGui::End();
             ImGui::Render();
             rlImGuiEnd();
@@ -265,7 +270,7 @@ int main(int argc, char* argv[]) {
         EndDrawing();
     }
 
-    delete &fluid;
+    delete fluid;
     rlImGuiShutdown();
     CloseWindow();
     return 0;
