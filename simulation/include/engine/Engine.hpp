@@ -21,10 +21,11 @@ struct Cell {
 struct Obstacle {
     v3 position;
     Model model;
+    std::string identifier;
 
     std::shared_ptr<fcl::BVHModel<fcl::OBBf>> geom;
 
-    Obstacle(v3 position, Model model);
+    Obstacle(v3 position, Model model, std::string identifier);
     ~Obstacle();
 };
 

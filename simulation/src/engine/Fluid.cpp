@@ -19,7 +19,9 @@ Fluid::Fluid(int container_size, float scaling, float diffusion, float viscosity
     vx0 = Field<float>(N3);
     vy0 = Field<float>(N3);
     vz0 = Field<float>(N3);
-    state = Field<CellType>(N3, CellType::FLUID);
+    state = Field<CellType>(N3, CellType::UNDEFINED);
+
+    obstacles = std::vector<std::unique_ptr<Obstacle>>();
 
     should_voxelize = false;
 }
@@ -307,9 +309,9 @@ void Fluid::step() {
     advect(FieldType::DENSITY, density, s, vx, vy, vz);
 }
 
-void Fluid::add_obstacle(v3 position, Model model) {
-    obstacles.emplace_back(position, model);
-    voxelize(obstacles.back());
+void Fluid::add_obstacle(std::unique_ptr<Obstacle> obstacle) {
+    obstacles.push_back(std::move(obstacle));
+    voxelize(*obstacles.back());
 }
 
 void Fluid::voxelize(Obstacle& obstacle) {
@@ -338,6 +340,7 @@ void Fluid::voxelize(Obstacle& obstacle) {
                 fcl::collide(&cell_obj, &obstacle_obj, request, result);
 
                 // Classify the cell based on the collision result
+                CellType current_state = state[IXv(cell_position)];
                 if (result.isCollision()) {
                     // Check if all contact points are inside the voxel's AABB
                     fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
@@ -357,26 +360,29 @@ void Fluid::voxelize(Obstacle& obstacle) {
                         state[IXv(cell_position)] = CellType::CUT_CELL;
                     }
                 } else {
-                    state[IXv(cell_position)] = CellType::FLUID;
+                    if (current_state == CellType::UNDEFINED)
+                        state[IXv(cell_position)] = CellType::FLUID;
                 }
             }
         }
+
+        should_voxelize = false;
     }
-    should_voxelize = false;
 }
 
 void Fluid::voxelize_all() {
-    for (Obstacle& obstacle : obstacles) voxelize(obstacle);
+    if (obstacles.empty()) state = Field<CellType>(N3, CellType::FLUID);
+    for (auto& obstacle : obstacles) voxelize(*obstacle);
 }
 
 float Fluid::get_fractional_volume(v3 cell_position) {
     v3 cell_size(1.0f, 1.0f, 1.0f);
     fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
-    for (Obstacle& obstacle : obstacles) {
+    for (auto& obstacle : obstacles) {
         fcl::AABBf obstacle_aabb(
-            obstacle.geom->aabb_local.min_ + (fcl::Vector3f)obstacle.position,
-            obstacle.geom->aabb_local.max_ + (fcl::Vector3f)obstacle.position);
+            obstacle->geom->aabb_local.min_ + (fcl::Vector3f)obstacle->position,
+            obstacle->geom->aabb_local.max_ + (fcl::Vector3f)obstacle->position);
 
         fcl::AABBf intersection_aabb;
         intersection_aabb.min_ = cell_aabb.min_.cwiseMax(obstacle_aabb.min_);

@@ -26,7 +26,7 @@ template <typename T>
 using Field = std::vector<T>;
 
 enum class FieldType { VX, VY, VZ, DENSITY };
-enum class CellType { SOLID, FLUID, CUT_CELL };
+enum class CellType { SOLID, FLUID, CUT_CELL, UNDEFINED };
 
 union ShouldVoxelize {
     bool False;
@@ -64,14 +64,14 @@ class Fluid {
     float diffusion;
 
     bool should_voxelize;
-    std::vector<Obstacle> obstacles;
+    std::vector<std::unique_ptr<Obstacle>> obstacles;
 
     Fluid(int container_size, float fluid_size, float diffusion, float viscosity, float dt);
     ~Fluid(void);
 
     void reset(void);
     void step(void);
-    void add_obstacle(v3 position, Model model);
+    void add_obstacle(std::unique_ptr<Obstacle> obstacle);
     void add_density(v3 position, float amount);
     void add_velocity(v3 position, v3 amount);
 

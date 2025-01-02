@@ -70,16 +70,18 @@ int main(int argc, char* argv[]) {
                    insert_velocity[2].value_or(4.0f));
 
             for (const auto& node : *config["obstacle"].as_array()) {
-                const auto& obstacle = *node.as_table();
+                const auto& obstacle_table = *node.as_table();
 
-                const auto& position_array = *obstacle["position"].as_array();
+                const auto& position_array = *obstacle_table["position"].as_array();
                 v3 position(position_array[0].value_or(0.0), position_array[1].value_or(0.0),
                             position_array[2].value_or(0.0));
 
-                Model model =
-                    LoadModel(obstacle["model"].value_or("No .obj file given in config.toml"));
-
-                fluid->add_obstacle(position, std::move(model));
+                std::unique_ptr<Obstacle> obstacle = std::make_unique<Obstacle>(
+                    position,
+                    LoadModel(
+                        obstacle_table["model"].value_or("No .obj file given in config.toml")),
+                    obstacle_table["identifier"].value_or(""));
+                fluid->add_obstacle(std::move(obstacle));
             }
         }
     } catch (const toml::parse_error& err) {
@@ -150,16 +152,16 @@ int main(int argc, char* argv[]) {
                     // Skip cubes with very low density
                     if (fluid->get_density(position) > 0.01f || settings.render_low_density ||
                         fluid->get_state(position) != CellType::FLUID) {
-                        v3 cube_position = position;
-                        cube_position *= v3(fluid->scaling);
-                        cube_position += fluid->scaling / 2;
+                        v3 cell_position = position;
+                        cell_position *= v3(fluid->scaling);
+                        cell_position += fluid->scaling / 2;
 
-                        float dx = cube_position.x - camera.position.x;
-                        float dy = cube_position.y - camera.position.y;
-                        float dz = cube_position.z - camera.position.z;
+                        float dx = cell_position.x - camera.position.x;
+                        float dy = cell_position.y - camera.position.y;
+                        float dz = cell_position.z - camera.position.z;
                         float distance_squared = dx * dx + dy * dy + dz * dz;
 
-                        cells.emplace_back(cube_position, distance_squared);
+                        cells.emplace_back(cell_position, distance_squared);
                     }
                 }
             }
@@ -177,8 +179,8 @@ int main(int argc, char* argv[]) {
         /* Render obstacles */
         BeginBlendMode(BLEND_ALPHA);
         if (settings.show_models) {
-            for (Obstacle& obstacle : fluid->obstacles) {
-                DrawModel(obstacle.model, obstacle.position * fluid->scaling, fluid->scaling,
+            for (auto& obstacle : fluid->obstacles) {
+                DrawModel(obstacle->model, obstacle->position * fluid->scaling, fluid->scaling,
                           WHITE);
             }
         }
@@ -199,22 +201,19 @@ int main(int argc, char* argv[]) {
                         DrawCubeV(position, v3(fluid->scaling), GREEN);
                     break;
                 case CellType::FLUID:
-                    if (density > 0.01f) {
-                        if (settings.show_vel_arrows) {
-                            BeginBlendMode(BLEND_SUBTRACT_COLORS);
-                            DrawCylinderEx(position,
-                                           position + (fluid->get_velocity(position) * 100),
-                                           density / 100.f, density / 100.f, 10, RED);
-                            BeginBlendMode(BLEND_ALPHA);
-                        } else {
-                            // get color of cube
-                            float norm = std::min(density / 100.0f, 1.0f);
-                            float hue = (1.0f - norm) * 0.66f * 360.0f;
-                            Color c = ColorFromHSV(hue, 1.0f, 1.0f);
-                            Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
+                    if (settings.show_vel_arrows) {
+                        BeginBlendMode(BLEND_SUBTRACT_COLORS);
+                        DrawCylinderEx(position, position + (fluid->get_velocity(position) * 100),
+                                       density / 100.f, density / 100.f, 10, RED);
+                        BeginBlendMode(BLEND_ALPHA);
+                    } else {
+                        // get color of cube
+                        float norm = std::min(density / 100.0f, 1.0f);
+                        float hue = (1.0f - norm) * 0.66f * 360.0f;
+                        Color c = ColorFromHSV(hue, 1.0f, 1.0f);
+                        Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
 
-                            DrawCubeV(position, v3(fluid->scaling), color);
-                        }
+                        DrawCubeV(position, v3(fluid->scaling), color);
                     }
                     break;
             }
@@ -265,10 +264,12 @@ int main(int argc, char* argv[]) {
                     fluid->container_size);
             drag_v3("insert velocity", settings.insert_velocity, 0.1f, -10.0f, 10.0f);
 
-            for (Obstacle& obstacle : fluid->obstacles) {
-                v3 old_pos = obstacle.position;
-                drag_v3("Obstacle position", obstacle.position, 0.1f, 1.0f, fluid->container_size);
-                if (old_pos != obstacle.position) fluid->should_voxelize = true;
+            for (int i = 0; i < fluid->obstacles.size(); i++) {
+                auto& obstacle = fluid->obstacles[i];
+                v3 old_pos = obstacle->position;
+                drag_v3(TextFormat("Obstacle %s position", obstacle->identifier.c_str()),
+                        obstacle->position, 0.1f, 1.0f, fluid->container_size);
+                if (old_pos != obstacle->position) fluid->should_voxelize = true;
             }
 
             if (ImGui::Button("Reset camera")) {
