@@ -19,7 +19,7 @@
         (std::clamp(int((vec).z), 0, container_size - 1) * container_size * container_size)
 
 #define N container_size
-#define N3 (container_size * container_size * container_size)
+#define N3 (N * N * N)
 
 /** contains an vector of size N^3, with flexible size at runtime, but behaves as an array */
 template <typename T>
@@ -27,11 +27,6 @@ using Field = std::vector<T>;
 
 enum class FieldType { VX, VY, VZ, DENSITY };
 enum class CellType { SOLID, FLUID, CUT_CELL, UNDEFINED };
-
-union ShouldVoxelize {
-    bool False;
-    Obstacle* True;
-};
 
 class Fluid {
    private:

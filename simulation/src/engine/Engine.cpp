@@ -8,9 +8,11 @@
 #include <memory>
 #include <vector>
 
-Obstacle::Obstacle(v3 position, Model model, std::string identifier) {
+Obstacle::Obstacle(v3 position, v3 scaling, Model model, bool enabled, std::string identifier) {
     this->position = position;
+    this->scaling = scaling;
     this->model = std::move(model);
+    this->enabled = enabled;
     this->identifier = identifier;
 
     geom = mesh_to_bvh(model);

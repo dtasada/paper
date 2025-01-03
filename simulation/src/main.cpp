@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     HideCursor();
 
     SetTraceLogLevel(LOG_WARNING);
-    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 
     /* ImGui setup */
     rlImGuiSetup(true);
@@ -73,14 +73,28 @@ int main(int argc, char* argv[]) {
                 const auto& obstacle_table = *node.as_table();
 
                 const auto& position_array = *obstacle_table["position"].as_array();
-                v3 position(position_array[0].value_or(0.0), position_array[1].value_or(0.0),
-                            position_array[2].value_or(0.0));
+                v3 position(position_array[0].value_or(0.0f), position_array[1].value_or(0.0f),
+                            position_array[2].value_or(0.0f));
+
+                // Check if "scaling" is a valid array
+                v3 scaling(1.0f, 1.0f, 1.0f);  // Default scaling values
+                if (auto scaling_array = obstacle_table["scaling"].as_array()) {
+                    scaling = v3(scaling_array->at(0).value_or(1.0f),
+                                 scaling_array->at(1).value_or(1.0f),
+                                 scaling_array->at(2).value_or(1.0f));
+                }
 
                 std::unique_ptr<Obstacle> obstacle = std::make_unique<Obstacle>(
-                    position,
+                    position, scaling,
                     LoadModel(
                         obstacle_table["model"].value_or("No .obj file given in config.toml")),
-                    obstacle_table["identifier"].value_or(""));
+                    obstacle_table["enabled"].value_or(false),
+                    obstacle_table["identifier"].value_or("no identifier"));
+
+                obstacle->model.transform = MatrixMultiply(
+                    obstacle->model.transform,
+                    MatrixScale(obstacle->scaling.x, obstacle->scaling.y, obstacle->scaling.z));
+
                 fluid->add_obstacle(std::move(obstacle));
             }
         }
@@ -105,9 +119,8 @@ int main(int argc, char* argv[]) {
         /* Handle input */
         if (!cursor) {
             if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-                float density_amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 100 : 200;
-                fluid->add_density(settings.insert_position, density_amount);
-
+                float amount = IsMouseButtonDown(MOUSE_BUTTON_LEFT) ? 100 : 200;
+                fluid->add_density(settings.insert_position, amount);
                 fluid->add_velocity(settings.insert_position, settings.insert_velocity);
             }
 
@@ -180,8 +193,9 @@ int main(int argc, char* argv[]) {
         BeginBlendMode(BLEND_ALPHA);
         if (settings.show_models) {
             for (auto& obstacle : fluid->obstacles) {
-                DrawModel(obstacle->model, obstacle->position * fluid->scaling, fluid->scaling,
-                          WHITE);
+                if (obstacle->enabled)
+                    DrawModel(obstacle->model, obstacle->position * fluid->scaling, fluid->scaling,
+                              WHITE);
             }
         }
 
@@ -200,21 +214,24 @@ int main(int argc, char* argv[]) {
                     if (settings.show_bounds_cut_cell)
                         DrawCubeV(position, v3(fluid->scaling), GREEN);
                     break;
-                case CellType::FLUID:
+                case CellType::FLUID: {
+                    // get color of cube
+                    float norm = std::min(density / 100.0f, 1.0f);
+                    float hue = (1.0f - norm) * 0.66f * 360.0f;
+                    Color c = ColorFromHSV(hue, 1.0f, 1.0f);
                     if (settings.show_vel_arrows) {
-                        BeginBlendMode(BLEND_SUBTRACT_COLORS);
+                        Color color = {c.r, c.g, c.b, 255};
                         DrawCylinderEx(position, position + (fluid->get_velocity(position) * 100),
-                                       density / 100.f, density / 100.f, 10, RED);
-                        BeginBlendMode(BLEND_ALPHA);
+                                       density / 100.f, density / 100.f, 10, color);
                     } else {
-                        // get color of cube
-                        float norm = std::min(density / 100.0f, 1.0f);
-                        float hue = (1.0f - norm) * 0.66f * 360.0f;
-                        Color c = ColorFromHSV(hue, 1.0f, 1.0f);
                         Color color = {c.r, c.g, c.b, static_cast<uint8_t>(norm * 255)};
-
                         DrawCubeV(position, v3(fluid->scaling), color);
                     }
+                    break;
+                }
+                case CellType::UNDEFINED:
+                    TraceLog(LOG_WARNING, "Voxelization failed, undefined cells!");
+                    DrawCubeV(position, v3(fluid->scaling), RED);
                     break;
             }
         }
@@ -229,35 +246,35 @@ int main(int argc, char* argv[]) {
         bool should_reset = false;
         bool should_rescale = false;
         if (cursor) {
-            /* Render UI */
+            /* Render GUI */
             rlImGuiBegin();
             ImGui::Begin("Fluid Simulation");
 
-            ImGui::Checkbox("Show models", &settings.show_models);
-            ImGui::Checkbox("Show velocity with arrows", &settings.show_vel_arrows);
-            ImGui::Checkbox("Show bounds SOLID", &settings.show_bounds_solid);
-            ImGui::Checkbox("Show bounds CUT_CELL", &settings.show_bounds_cut_cell);
-            ImGui::Checkbox("Show cell borders", &settings.show_cell_borders);
-            ImGui::Checkbox("Render low density", &settings.render_low_density);
+            ImGui::Checkbox("show models", &settings.show_models);
+            ImGui::Checkbox("show velocity with arrows", &settings.show_vel_arrows);
+            ImGui::Checkbox("show bounds SOLID", &settings.show_bounds_solid);
+            ImGui::Checkbox("show bounds CUT_CELL", &settings.show_bounds_cut_cell);
+            ImGui::Checkbox("show cell borders", &settings.show_cell_borders);
+            ImGui::Checkbox("render low density", &settings.render_low_density);
 
             bool was_cam_free = settings.camera_free;
-            ImGui::Checkbox("Camera Free", &settings.camera_free);
+            ImGui::Checkbox("camera Free", &settings.camera_free);
             camera.projection = settings.camera_free ? CAMERA_PERSPECTIVE : CAMERA_ORTHOGRAPHIC;
             if (settings.camera_free && !was_cam_free) {
                 camera.position = container_size;
                 camera.target = container_center;
             }
 
-            ImGui::SliderFloat("Camera FOV", &camera.fovy, 30.0f, 160.0f);
+            ImGui::SliderFloat("camera FOV", &camera.fovy, 30.0f, 160.0f);
 
-            ImGui::SliderFloat("Diffusion", &fluid->diffusion, 0.0f, 0.0001f);
+            ImGui::SliderFloat("fluid diffusion", &fluid->diffusion, 0.0f, 0.0001f);
 
             int old_container_size = fluid->container_size;
-            ImGui::SliderInt("Container size", &fluid->container_size, 1, 64);
+            ImGui::SliderInt("container size", &fluid->container_size, 1, 64);
             should_reset = old_container_size != fluid->container_size;
 
             int old_scaling = fluid->scaling;
-            ImGui::SliderFloat("Scaling", &fluid->scaling, 0.1f, 10.0f);
+            ImGui::SliderFloat("container scaling", &fluid->scaling, 0.1f, 10.0f);
             should_rescale = old_scaling != fluid->scaling;
 
             drag_v3("insert position", settings.insert_position, 1.0f, 1.0f,
@@ -266,10 +283,32 @@ int main(int argc, char* argv[]) {
 
             for (int i = 0; i < fluid->obstacles.size(); i++) {
                 auto& obstacle = fluid->obstacles[i];
+                bool was_enabled = obstacle->enabled;
                 v3 old_pos = obstacle->position;
-                drag_v3(TextFormat("Obstacle %s position", obstacle->identifier.c_str()),
-                        obstacle->position, 0.1f, 1.0f, fluid->container_size);
-                if (old_pos != obstacle->position) fluid->should_voxelize = true;
+                v3 old_scaling = obstacle->scaling;
+                if (obstacle->enabled) {
+                    ImGui::PushID(i);
+                    ImGui::Checkbox("##", &obstacle->enabled);
+                    ImGui::PopID();
+
+                    ImGui::SameLine();
+                    drag_v3(TextFormat("%s position", obstacle->identifier.c_str()),
+                            obstacle->position, 0.1f, 1.0f, fluid->container_size);
+
+                    drag_v3(TextFormat("%s transform", obstacle->identifier.c_str()),
+                            obstacle->scaling, 0.1f, 0.1f, 10.0f);
+                } else {
+                    ImGui::Checkbox(TextFormat("%s enabled", obstacle->identifier.c_str()),
+                                    &obstacle->enabled);
+                }
+
+                if (old_pos != obstacle->position || was_enabled != obstacle->enabled ||
+                    old_scaling != obstacle->scaling)
+                    fluid->should_voxelize = true;
+
+                if (old_scaling != obstacle->scaling)
+                    obstacle->model.transform =
+                        MatrixScale(obstacle->scaling.x, obstacle->scaling.y, obstacle->scaling.z);
             }
 
             if (ImGui::Button("Reset camera")) {

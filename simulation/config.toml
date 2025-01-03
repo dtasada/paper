@@ -8,17 +8,29 @@ viscosity = 0.000001  # Viscosity constant
 insert_position = [12, 12, 1]
 insert_velocity = [0, 0, 5]
 
-# [[obstacle]]
-# position = [12, 12, 14]
-# model = "resources/models/untitled_textures/untitled_texures.obj"
-# identifier = "plane"
+[[obstacle]]
+position = [12, 12, 14]
+model = "resources/models/untitled_textures/untitled_texures.obj"
+identifier = "plane"
+scaling = [1, 1, 1]
+enabled = true
+
+[[obstacle]]
+position = [12, 4, 12]
+model = "resources/models/pyramid/pyramid.obj"
+identifier = "pyramid"
+
+[[obstacle]]
+position = [12, 12, 12]
+model = "resources/models/paper_airplane/plane.obj"
+identifier = "paper_plane"
 
 [[obstacle]]
 position = [1,1,1]
 model = "resources/models/cube.obj"
 identifier = "cube"
 
-# [[obstacle]]
-# position = [12, 12, 12]
-# model = "resources/models/torus.obj"
-# identifier = "torus"
+[[obstacle]]
+position = [12, 12, 12]
+model = "resources/models/torus.obj"
+identifier = "torus"
