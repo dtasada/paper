@@ -38,4 +38,7 @@ struct v3 {
     operator Vector3() const;
     operator fcl::Vector3f() const;
     explicit operator float*() const;
+
+   public:
+    float volume() const;
 };

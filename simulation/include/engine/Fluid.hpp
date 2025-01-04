@@ -39,6 +39,7 @@ class Fluid {
     Field<float> vx0, vy0, vz0; /** backup velocity fields */
 
     Field<CellType> state;  // cell state field
+    Field<float> volume;    // cell volume field
 
     v3 get_position(int i);
 
@@ -49,9 +50,6 @@ class Fluid {
     void project(Field<float>& velocX, Field<float>& velocY, Field<float>& velocZ, Field<float>& p,
                  Field<float>& div);
     void set_boundaries(FieldType b, Field<float>& x);
-
-    // geometry
-    float get_fractional_volume(v3 position);
 
    public:
     int container_size;
@@ -70,6 +68,7 @@ class Fluid {
     void add_density(v3 position, float amount);
     void add_velocity(v3 position, v3 amount);
 
+    float get_volume(v3 position);
     float get_density(v3 position);
     v3 get_velocity(v3 position);
 

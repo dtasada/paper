@@ -230,8 +230,8 @@ int main(int argc, char* argv[]) {
                     break;
                 }
                 case CellType::UNDEFINED:
-                    TraceLog(LOG_WARNING, "Voxelization failed, undefined cells!");
-                    DrawCubeV(position, v3(fluid->scaling), RED);
+                    // TraceLog(LOG_WARNING, "Voxelization failed, undefined cells!");
+                    // DrawCubeV(position, v3(fluid->scaling), RED);
                     break;
             }
         }
@@ -303,12 +303,12 @@ int main(int argc, char* argv[]) {
                 }
 
                 if (old_pos != obstacle->position || was_enabled != obstacle->enabled ||
-                    old_scaling != obstacle->scaling)
+                    old_scaling != obstacle->scaling) {
+                    if (old_scaling != obstacle->scaling)
+                        obstacle->model.transform = MatrixScale(
+                            obstacle->scaling.x, obstacle->scaling.y, obstacle->scaling.z);
                     fluid->should_voxelize = true;
-
-                if (old_scaling != obstacle->scaling)
-                    obstacle->model.transform =
-                        MatrixScale(obstacle->scaling.x, obstacle->scaling.y, obstacle->scaling.z);
+                }
             }
 
             if (ImGui::Button("Reset camera")) {

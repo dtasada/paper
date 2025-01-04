@@ -38,3 +38,4 @@ v3::operator Vector3() const { return {x, y, z}; }
 v3::operator float*() const { return new float[3]{x, y, z}; }
 
 std::string v3::to_string() const { return std::format("v3({:.1f}, {:.1f}, {:.1f})", x, y, z); }
+float v3::volume() const { return x * y * z; };

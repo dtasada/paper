@@ -20,6 +20,7 @@ Fluid::Fluid(int container_size, float scaling, float diffusion, float viscosity
     vy0 = Field<float>(N3);
     vz0 = Field<float>(N3);
     state = Field<CellType>(N3, CellType::UNDEFINED);
+    volume = Field<float>(N3);
 
     obstacles = std::vector<std::unique_ptr<Obstacle>>();
 
@@ -144,7 +145,7 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
                     div[IX(x, y, z)] = 0;  // No divergence in solid cells
                     p[IX(x, y, z)] = 0;    // Pressure is also zero
                 } else if (state[IX(x, y, z)] == CellType::CUT_CELL) {
-                    float fraction = get_fractional_volume(v3(x, y, z));
+                    float fraction = volume[IX(x, y, z)];
                     div[IX(x, y, z)] = -0.5f * fraction *
                                        (velocX[IX(x + 1, y, z)] - velocX[IX(x - 1, y, z)] +
                                         velocY[IX(x, y + 1, z)] - velocY[IX(x, y - 1, z)] +
@@ -179,7 +180,7 @@ void Fluid::project(Field<float>& velocX, Field<float>& velocY, Field<float>& ve
                     velocY[IX(x, y, z)] = 0;
                     velocZ[IX(x, y, z)] = 0;
                 } else if (state[IX(x, y, z)] == CellType::CUT_CELL) {
-                    float fraction = get_fractional_volume(v3(x, y, z));
+                    float fraction = volume[IX(x, y, z)];
                     velocX[IX(x, y, z)] -=
                         0.5f * fraction * (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
                     velocY[IX(x, y, z)] -=
@@ -314,62 +315,6 @@ void Fluid::add_obstacle(std::unique_ptr<Obstacle> obstacle) {
     voxelize_all();
 }
 
-/* void Fluid::voxelize(Obstacle& obstacle) {
-    // Prepare the obstacle collision object
-    obstacle.geom->computeLocalAABB();
-    fcl::CollisionObjectf obstacle_obj(obstacle.geom,
-                                       fcl::Transform3f(fcl::Translation3f(obstacle.position)));
-
-#pragma omp parallel for collapse(3)
-    for (int z = 0; z < N; z++) {
-        for (int y = 0; y < N; y++) {
-            for (int x = 0; x < N; x++) {
-                // Define the voxel's position and size
-                v3 cell_position(x, y, z);
-                v3 cell_size(1.0f, 1.0f, 1.0f);
-
-                // Create a voxel collision object
-                std::shared_ptr<fcl::Boxf> cell_geometry =
-                    std::make_shared<fcl::Boxf>((fcl::Vector3f)cell_size);
-                fcl::CollisionObjectf cell_obj(
-                    cell_geometry, fcl::Transform3f(fcl::Translation3f(cell_position)));
-
-                // Perform collision query
-                fcl::CollisionRequestf request;
-                fcl::CollisionResultf result;
-                fcl::collide(&cell_obj, &obstacle_obj, request, result);
-
-                // Classify the cell based on the collision result
-                CellType current_state = state[IXv(cell_position)];
-                if (result.isCollision()) {
-                    // Check if all contact points are inside the voxel's AABB
-                    fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
-                    bool fully_inside = true;
-
-                    for (int i = 0; i < result.numContacts(); i++) {
-                        const auto& contact = result.getContact(i);
-                        if (!cell_aabb.contain(contact.pos)) {
-                            fully_inside = false;
-                            break;
-                        }
-                    }
-
-                    if (fully_inside) {
-                        state[IXv(cell_position)] = CellType::SOLID;
-                    } else {
-                        state[IXv(cell_position)] = CellType::CUT_CELL;
-                    }
-                } else {
-                    if (current_state == CellType::UNDEFINED)
-                        state[IXv(cell_position)] = CellType::FLUID;
-                }
-            }
-        }
-    }
-
-    should_voxelize = false;
-} */
-
 void Fluid::voxelize(Obstacle& obstacle) {
     // Prepare the obstacle collision object
     obstacle.geom->computeLocalAABB();
@@ -439,23 +384,25 @@ void Fluid::voxelize(Obstacle& obstacle) {
 
 void Fluid::voxelize_all() {
     bool no_obstacles = true;
-    for (auto& obstacle : obstacles)
+    for (auto& obstacle : obstacles) {
         if (obstacle->enabled) {
             no_obstacles = false;
             break;
         }
+    }
 
     if (no_obstacles) {
         should_voxelize = false;
         state = Field<CellType>(N3, CellType::FLUID);
     } else {
         state = Field<CellType>(N3, CellType::UNDEFINED);
+#pragma omp parallel for
         for (auto& obstacle : obstacles)
             if (obstacle->enabled) voxelize(*obstacle);
     }
 }
 
-float Fluid::get_fractional_volume(v3 cell_position) {
+float Fluid::get_volume(v3 cell_position) {
     v3 cell_size(1.0f, 1.0f, 1.0f);
     fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
@@ -482,5 +429,7 @@ float Fluid::get_fractional_volume(v3 cell_position) {
 
     return 1.0f;
 }
+
+// float Fluid::get_volume(v3 cell_position) { return volume[IXv(cell_position)]; }
 
 CellType Fluid::get_state(v3 position) { return state[IXv(position)]; }
