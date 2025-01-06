@@ -16,7 +16,8 @@
 \usepackage{titlesec}
 \usepackage{url}
 \usepackage{physics}
-\usepackage{fontspec}
+\usepackage{subcaption}
+\usepackage{float}
 \usepackage[normalem]{ulem}
 \usepackage[backend=biber, style=apa]{biblatex}
 \usepackage[
@@ -29,7 +30,6 @@ citecolor=blue,
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
-\setmonofont{CaskaydiaCove Nerd Font}
 \lstset{
 	aboveskip=3mm,
 	basicstyle={\small\ttfamily},
@@ -195,6 +195,24 @@ The second equation represents the change of this density.
 The reader is not expected to fully understand these equations because they are, as mentioned earlier,
 very difficult to understand. But it should be noted that the two equations above look a lot like eachother,
 as this was helpful in developing the simulation. (\cite{josstam})
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+	\centering
+	\includegraphics[width=5cm]{resources/collocated_grid_2.png}
+	\caption{Collocated grid}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+	\centering
+	\includegraphics[width=5cm]{resources/staggered_grid_2.png}
+	\caption{Staggered grid}
+\end{subfigure}
+\caption{Computational grids}
+\end{figure}
+
+There are two different types of velocity vector fields we can use: collocated and staggered.
+In the collocated grid all the variables are stored in the center of the cell. 
+Whereas in the staggered grid the scalar variables are stored at the center but the velocity variable is stored at the cell face.
 
 \subsubsection{The Implementation}
 Our code is structured as follows:
