@@ -33,6 +33,9 @@ v3 v3::operator/=(const float& other) { return *this = *this / other; }
 v3 v3::operator+=(const float& other) { return *this = *this + other; }
 v3 v3::operator-=(const float& other) { return *this = *this - other; }
 
+bool v3::operator==(const v3& other) const { return x == other.x && y == other.y && z == other.z; }
+bool v3::operator!=(const v3& other) const { return !(*this == other); }
+
 v3::operator fcl::Vector3f() const { return fcl::Vector3f(x, y, z); }
 v3::operator Vector3() const { return {x, y, z}; }
 v3::operator float*() const { return new float[3]{x, y, z}; }

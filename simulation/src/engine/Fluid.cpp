@@ -360,7 +360,7 @@ void Fluid::voxelize(Obstacle& obstacle) {
                     for (int i = 0; i < result.numContacts(); i++) {
                         const auto& contact = result.getContact(i);
                         std::cout << "Contact Point: " << contact.pos.transpose() << std::endl;
-                        if (!cell_aabb.contains(contact.pos)) {
+                        if (!cell_aabb.contain(contact.pos)) {
                             fully_inside = false;
                             break;
                         }

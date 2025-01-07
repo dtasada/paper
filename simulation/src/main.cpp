@@ -230,8 +230,8 @@ int main(int argc, char* argv[]) {
                     break;
                 }
                 case CellType::UNDEFINED:
-                    // TraceLog(LOG_WARNING, "Voxelization failed, undefined cells!");
-                    // DrawCubeV(position, v3(fluid->scaling), RED);
+                    TraceLog(LOG_WARNING, "Voxelization failed, undefined cells!");
+                    DrawCubeV(position, v3(fluid->scaling), RED);
                     break;
             }
         }
