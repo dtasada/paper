@@ -24,6 +24,7 @@ colorlinks=true,
 linkcolor=blue,
 urlcolor=cyan,
 citecolor=blue,
+breaklinks=true,
 ]{hyperref} % For hyperlinks
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -32,7 +33,7 @@ citecolor=blue,
 \setmonofont{CaskaydiaCove Nerd Font}
 \lstset{
 	aboveskip=3mm,
-	basicstyle={\small\ttfamily},
+	basicstyle=\ttfamily\small,
 	belowskip=3mm,
 	breakatwhitespace=true,
 	breaklines=true,
@@ -52,6 +53,7 @@ citecolor=blue,
 \titleformat{\chapter}[display]
 {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
 \titlespacing{\chapter}{0pt}{0pt}{0pt}
+\sloppy
 
 % Title and Author
 \title{Computational Fluid Dynamics With a Paper Airplane}
@@ -77,11 +79,27 @@ citecolor=blue,
 % Introduction
 \section{Introduction}
 This thesis covers the simulation of the aerodynamics of an airplane, using
-our own Computation Fluid Dynamics (or CFD) model.
+our own Computational Fluid Dynamics model (CFD).
 
-The goal is to calculate the ideal shape of an airplane for its aerodynamic
-performance. We aim to do this by creating a Machine Learning model, and feed
-it the results of the CFD, which should result in our final model.
+The goal is to simulate the airflow around an airplane's body. CFD is a
+branch of fluid mechanics that uses numerical methods and algorithms to solve
+and analyze problems that involve fluid flows. It is used in many fields,
+including aerospace engineering, automotive engineering, and meteorology.
+
+The application of CFD to an airplane is important because it allows testing
+of a model's aerodynamic performance without building a physical model, or
+have to set up a wind tunnel. The practical alternative is much more expensive
+and time-consuming.
+
+The final aim is to determine how the shape of an airplane's body affects its
+performance. Part of the project is to dynamically generate 3D models of
+airplanes, and simulate the airflow around them. The intention is to use
+machine learning to optimize the shape of the airplane's body to maximize
+performance.
+
+CFD is challenging in the sense that it requires a good understanding of fluid
+dynamics, as well as a good understanding of the math involved. CFD is also
+very expensive from a computational perspective, so code optimization is important.
 
 The thesis questions are the following:
 \begin{itemize}
@@ -94,29 +112,27 @@ The thesis questions are the following:
 % Execution
 \section{Execution}
 \subsection{Preliminary: Lagrangian Fluid Simulation}
-Our first attempt at a fluid simulator was using a technique called Lagrangian
-fluid simulation. This involves simulating the fluid as a particle collision
-simulation. It regards fluid dynamics, as particle physics, where every air
-molecule is a "particle". We start with a container, and a bunch of air molecules,
-all of which interact with each other to create a fluid. This interaction is
-effectively the collisions between particles. It turns out that simulating
-particle dynamics in two dimensions is pretty straightforward. But when you
-throw in that Z-axis, it gets a lot harder. The main article we used for this is
-\hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution} (\cite{hakenberg}).
+One method of simulating fluid dynamics is the Lagrangian method. This method
+models the fluid as a particle collision system, where the air is represented by
+particles that interact with each other to emulate a fluid. Our implementation
+is based on \hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution}
+(\cite{hakenberg}). We used this paper as a guide for all the math involved.
 
-Here is a set of formulas necessary to perform the calculations that describe
-the behavior of a pair particle before and after their collision:
+The math relies on the momentum, inertia, and velocity of the particles to
+calculate the collision normal and point of contact. The collision normal is
+the direction in which the particles are moving away from each other, and the
+point of contact is the point at which the particles collide.
 
 The following variables are necessary to perform the calculations:
 \[
 \begin{array}{ll}
-    \text{Inertia tensor $I$ } (kg\cdot m^2): & L = \frac{L}{\omega}; \\
-    \text{Angular momentum $L$ } (kg\cdot m^2/s): & L = mvr; \\
+	\text{Angular momentum $L$ } (kg\cdot m^2/s): & L = mvr; \\
+	\text{Inertia tensor $I$ } (kg\cdot m^2): & I = \frac{L}{\omega}; \\
     \text{Angular velocity $\omega$ } (rad/s): & \omega = \frac{\Delta \theta}{\Delta t}; \\
 
 	\\
 
-	\text{Collision normal} (n \in \mathbb{R}^3) \text{ in world coordinates away from body 1}; \\
+	\text{Collision normal} (n \in \mathbb{R}^3) \text{ in world coordinates away from body}; \\
 	\text{Point of contact } (r_i \in \mathbb{R}^3) \text{ in world coordinates with respect to $p_i$}; \\
 	\text{Orientation } (R_i \in SO(3)) \text{ transforming from object to world coordinates}; \\
 \end{array}
@@ -145,47 +161,52 @@ The following formulas represent the relation between particles:
 \end{array}
 \]
 
-After lots of trial and error, we were able to successfully implement the math.
-We did this using Go and raylib, and the code is available at
-\verb|github.com/dtasada/paper| at the \verb|lagrangian-go| branch.
-But we encountered a simple issue where the particles would phase into each other,
-rendering the particle simulation worthless.
-This could be because of a too small time step, or a logic error in the collision
-detection. This should be fixable by adding more simulation steps, which means
-that each particles solves its collisions more than once per collision, but we
-weren't able to successfully implement this. In the end, we ended up scrapping
-the Lagrangian simulation model.
+This was implemented using Go and raylib, and the code is available at
+\href{www.github.com/dtasada/paper}{github.com/dtasada/paper} at the \lstinline{lagrangian-go} branch.
+
+When dealing with a lot of particles, the simulation stops performing as well,
+because the number of calculations and iterations of the formulas listed above
+has a time complexity of $O(n^2)$, where $n$ is the number of particles. This is
+because every particle handles collisions with every other particlee every
+single frame. This can be elegantly mitigated by implementing a three-dimensional
+grid system, where every particle is assigned to a cell in the grid. This way,
+particles only need to check for collisions with other particles in the same cell
+or neighboring cells. If the particles are evenly distributed within the container,
+each particle only needs to handle collisions with particles in its own cell, and
+its 26 neighboring cells. This reduces the time complexity to $O(n)$.
+
+The simulation was unstable at higher densities, where particles would phase
+into each other instead of cleanly bouncing. The bug is likely quite simple to
+fix, but we got distracted by another method. Despite the optimizations we
+made, Lagrangian simulation is still quite computationally expensive, and Go
+probably wasn't doing it any favors (Go isn't very memory efficient). In the
+end it was put aside, and the Lagrangian implementation was never completed.
 
 \subsection{Eulerian Fluid Simulation}
-Next we tried a method that we'd had our eyes on for a while. This was had
-originally been our first choice, but we switched to Lagrangian due to problems
-I'll explain shortly. It's called Eulerian fluid simulation, and the way this
-model works is that it sees fluid as a grid of cells that react to each other.
-Eulerian fluid simulation is an application of cellular automata, which is a
-computation model used in physics, biology, and many other applications.
+The other method is the Eulerian method. This method models the fluid as a
+cellular automata. The fluid is represented by a grid of cells, each of which
+has its own properties and interacts with its neighbor cells, creating a mesh.
 
-Our fluid simulation involves a two or three-dimensional grid of cells,
-each of which have velocity and density fields.
-Each frame, the cells interact with each other according to the
-\hyperlink{https://en.wikipedia.org/wiki/Navier\%E2\%80\%93Stokes_equations}{Navier-Stokes equations}.
+Our fluid simulation involves a three-dimensional grid of cells, each of which
+have velocity and density fields. Each frame, the cells interact with each
+other according to the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
 
-The math involved in the Navier-Stokes equations is very complex and
-difficult to understand without a good background in physics and differential
-equations. That is why we have humbly borrowed most of the math from Mike Ash's
-\hyperlink{https://mikeash.com/pyblog/fluid-simulation-for-dummies.html}{Fluid Simulation for Dummies}
-(\cite{mikeash}), which is in turn based on Jos Stam's brilliant work on
-\hyperlink{http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf}{Real-Time Fluid Dynamics for Games} (\cite{josstam}).
+The specific math involved in the base equations for the fluid simulation is
+quite complex, and we couldn't have derived it on our own, so we used
+Mike Ash's implementation \href{www.mikeash.com/pyblog/fluid-simulation-for-dummies.html}{\citefield{mikeash}{title}} (\cite{mikeash})
+as the bedrock of our program. Mike Ash's  which is in turn based on Jos Stam's
+brilliant work on \href{www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf}{\citefield{josstam}{title}} (\cite{josstam}).
 
 % Math
 \subsubsection{The Math}
-In Eularian fluid dynamics we represent fluids with a velocity vector field. This means we assign a velocity vector to every point in space.
+In Eulerian fluid dynamics we represent fluids with a velocity vector field. This means we assign a velocity vector to every point in space.
 The Navier-Stokes equations show us how these velocity vectors evolve over time with an infinitely small timestep.
 \[
-\begin{array}{ll}
-	\pdv{u}{t} = -(u \cdot \nabla)u + v\nabla^2 + f \\
-  \\
-  \pdv{\rho}{t} = -(u \cdot \nabla)\rho + k\nabla^2\rho + S
-\end{array}
+	\begin{array}{ll}
+		\pdv{u}{t} = -(u \cdot \nabla)u + v\nabla^2 + f \\
+		\\
+		\pdv{\rho}{t} = -(u \cdot \nabla)\rho + k\nabla^2\rho + S
+	\end{array}
 \]
 The first equation shows the change in velocity in a compact vector notation. 
 Unlike in Lagrangian fluid simulation, in Eularian fluid simulation the fluid is not represented by individual particles. 
@@ -199,23 +220,22 @@ as this was helpful in developing the simulation. (\cite{josstam})
 Our code is structured as follows:
 \dirtree{%
 	.1 paper.
+	.2 neural\DTcomment{Contains ML engine}.
 	.2 simulation/\DTcomment{Contains the physics simulation code}. 
 	.3 include/\DTcomment{Our own engine headers}.
-	.3 lib/\DTcomment{External libraries}.
 	.3 resources/\DTcomment{Resources like images, fonts, shaders}.
 	.3 src/\DTcomment{Actual engine source}.
 	.3 config.toml\DTcomment{Configuration file}.
 	.3 Makefile.
-	.2 neural\DTcomment{Contains ML engine}.
 }
 
-The code is written in C++, and uses the \hyperlink{https://www.raylib.com/}{raylib}
-library for easy 3D rendering.
-We originally wanted to use Go because of preference and developer ergonomics,
-which is what we did with the first Lagrangian model, but we ended up writing
-the physics simulation in C++ because of the way that Jos Stam's implementation
-utilizes 3D arrays, which we found not to be viable in Go, which is why we
-switched to the Lagrangian model in the first place.
+This codebase is written in C++, and uses the \hyperlink{https://www.raylib.com/}{raylib}
+because it's a really simple and powerful library that allows us to focus on the
+simulation itself, as it provides a bunch of tools to easily render 3D graphics.
+The reason this codebase is in C++ was initially because we never got the Eulerian
+model to work in Go, likely due to a mistake of our own. Nevertheless we think C++
+was the right choice, as it's more appropriate for the vector physics and low overhead
+we need for the simulation.
 
 The main class we use for the simulation is the \verb|Fluid| class. The implementation
 is available at \verb|/simulation/src/Fluid.cpp|. The interface is as follows: \\

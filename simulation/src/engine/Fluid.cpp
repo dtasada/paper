@@ -1,27 +1,25 @@
+#include "../../include/engine/engine.hpp"
 #include "../../include/engine/Fluid.hpp"
 
 #include <fcl/common/types.h>
 
-#include "../../include/engine/engine.hpp"
-
-Fluid::Fluid(int container_size, float scaling, float diffusion,
-             float viscosity, float dt) {
+Fluid::Fluid(int container_size, float scaling, float diffusion, float viscosity, float dt) {
     this->container_size = container_size;
-    this->scaling = scaling; // raylib world size of a single cell
-    this->dt = dt;
-    this->diffusion = diffusion;
-    this->visc = viscosity;
+    this->scaling        = scaling; // raylib world size of a single cell
+    this->dt             = dt;
+    this->diffusion      = diffusion;
+    this->visc           = viscosity;
 
-    s = Field<float>(N3);
+    s       = Field<float>(N3);
     density = Field<float>(N3);
-    vx = Field<float>(N3);
-    vy = Field<float>(N3);
-    vz = Field<float>(N3);
-    vx0 = Field<float>(N3);
-    vy0 = Field<float>(N3);
-    vz0 = Field<float>(N3);
-    state = Field<CellType>(N3, CellType::UNDEFINED);
-    volume = Field<float>(N3);
+    vx      = Field<float>(N3);
+    vy      = Field<float>(N3);
+    vz      = Field<float>(N3);
+    vx0     = Field<float>(N3);
+    vy0     = Field<float>(N3);
+    vz0     = Field<float>(N3);
+    state   = Field<CellType>(N3, CellType::UNDEFINED);
+    volume  = Field<float>(N3);
 
     obstacles = std::vector<std::unique_ptr<Obstacle>>();
 
@@ -31,6 +29,7 @@ Fluid::Fluid(int container_size, float scaling, float diffusion,
 Fluid::~Fluid(void) {}
 
 float Fluid::get_density(v3 position) { return density[IXv(position)]; }
+
 v3 Fluid::get_velocity(v3 position) {
     return {
         vx[IXv(position)],
@@ -40,22 +39,20 @@ v3 Fluid::get_velocity(v3 position) {
 }
 
 void Fluid::reset(void) {
-    s = Field<float>(N3);
+    s       = Field<float>(N3);
     density = Field<float>(N3);
-    vx = Field<float>(N3);
-    vy = Field<float>(N3);
-    vz = Field<float>(N3);
-    vx0 = Field<float>(N3);
-    vy0 = Field<float>(N3);
-    vz0 = Field<float>(N3);
-    state = Field<CellType>(N3, CellType::UNDEFINED);
+    vx      = Field<float>(N3);
+    vy      = Field<float>(N3);
+    vz      = Field<float>(N3);
+    vx0     = Field<float>(N3);
+    vy0     = Field<float>(N3);
+    vz0     = Field<float>(N3);
+    state   = Field<CellType>(N3, CellType::UNDEFINED);
 
     voxelize_all();
 }
 
-void Fluid::add_density(v3 position, float amount) {
-    this->density[IXv(position)] += amount;
-}
+void Fluid::add_density(v3 position, float amount) { this->density[IXv(position)] += amount; }
 
 void Fluid::add_velocity(v3 position, v3 amount) {
     int index = IXv(position);
@@ -64,9 +61,14 @@ void Fluid::add_velocity(v3 position, v3 amount) {
     vz[index] += amount.z;
 }
 
-void Fluid::advect(FieldType b, Field<float> &d, Field<float> &d0,
-                   Field<float> &velocX, Field<float> &velocY,
-                   Field<float> &velocZ) {
+void Fluid::advect(
+    FieldType     b,
+    Field<float> &d,
+    Field<float> &d0,
+    Field<float> &velocX,
+    Field<float> &velocY,
+    Field<float> &velocZ
+) {
     float dtx = dt * (N - 2);
     float dty = dt * (N - 2);
     float dtz = dt * (N - 2);
@@ -78,26 +80,20 @@ void Fluid::advect(FieldType b, Field<float> &d, Field<float> &d0,
                 float tmp1 = dtx * velocX[IX(i, j, k)];
                 float tmp2 = dty * velocY[IX(i, j, k)];
                 float tmp3 = dtz * velocZ[IX(i, j, k)];
-                float x = i - tmp1;
-                float y = j - tmp2;
-                float z = k - tmp3;
+                float x    = i - tmp1;
+                float y    = j - tmp2;
+                float z    = k - tmp3;
 
-                if (x < 0.5f)
-                    x = 0.5f;
-                if (x > N + 0.5f)
-                    x = N + 0.5f;
+                if (x < 0.5f) x = 0.5f;
+                if (x > N + 0.5f) x = N + 0.5f;
                 float i0 = floorf(x);
                 float i1 = i0 + 1.0f;
-                if (y < 0.5f)
-                    y = 0.5f;
-                if (y > N + 0.5f)
-                    y = N + 0.5f;
+                if (y < 0.5f) y = 0.5f;
+                if (y > N + 0.5f) y = N + 0.5f;
                 float j0 = floorf(y);
                 float j1 = j0 + 1.0f;
-                if (z < 0.5f)
-                    z = 0.5f;
-                if (z > N + 0.5f)
-                    z = N + 0.5f;
+                if (z < 0.5f) z = 0.5f;
+                if (z > N + 0.5f) z = N + 0.5f;
                 float k0 = floorf(z);
                 float k1 = k0 + 1.0f;
 
@@ -108,14 +104,13 @@ void Fluid::advect(FieldType b, Field<float> &d, Field<float> &d0,
                 float u1 = z - k0;
                 float u0 = 1.0f - u1;
 
-                d[IX(i, j, k)] = s0 * (t0 * (u0 * d0[IX(i0, j0, k0)] +
-                                             u1 * d0[IX(i0, j0, k1)]) +
-                                       (t1 * (u0 * d0[IX(i0, j1, k0)] +
-                                              u1 * d0[IX(i0, j1, k1)]))) +
-                                 s1 * (t0 * (u0 * d0[IX(i1, j0, k0)] +
-                                             u1 * d0[IX(i1, j0, k1)]) +
-                                       (t1 * (u0 * d0[IX(i1, j1, k0)] +
-                                              u1 * d0[IX(i1, j1, k1)])));
+                d[IX(i, j, k)]
+                    = s0
+                        * (t0 * (u0 * d0[IX(i0, j0, k0)] + u1 * d0[IX(i0, j0, k1)])
+                           + (t1 * (u0 * d0[IX(i0, j1, k0)] + u1 * d0[IX(i0, j1, k1)])))
+                    + s1
+                          * (t0 * (u0 * d0[IX(i1, j0, k0)] + u1 * d0[IX(i1, j0, k1)])
+                             + (t1 * (u0 * d0[IX(i1, j1, k0)] + u1 * d0[IX(i1, j1, k1)])));
             }
         }
     }
@@ -123,14 +118,12 @@ void Fluid::advect(FieldType b, Field<float> &d, Field<float> &d0,
     set_boundaries(b, d);
 }
 
-void Fluid::diffuse(FieldType b, Field<float> &x, Field<float> &x0,
-                    float diff) {
+void Fluid::diffuse(FieldType b, Field<float> &x, Field<float> &x0, float diff) {
     float a = dt * diff * pow(container_size - 2, 3);
     lin_solve(b, x, x0, a, 1 + 6 * a);
 }
 
-void Fluid::lin_solve(FieldType b, Field<float> &f, Field<float> &f0, float a,
-                      float c) {
+void Fluid::lin_solve(FieldType b, Field<float> &f, Field<float> &f0, float a, float c) {
     float cRecip = 1.0f / c;
 
     for (int i = 0; i < 4; i++) {
@@ -138,12 +131,12 @@ void Fluid::lin_solve(FieldType b, Field<float> &f, Field<float> &f0, float a,
 #pragma omp parallel for collapse(2)
             for (int y = 1; y < N - 1; y++) {
                 for (int x = 1; x < N - 1; x++) {
-                    f[IX(x, y, z)] =
-                        (f0[IX(x, y, z)] +
-                         a * (f[IX(x + 1, y, z)] + f[IX(x - 1, y, z)] +
-                              f[IX(x, y + 1, z)] + f[IX(x, y - 1, z)] +
-                              f[IX(x, y, z + 1)] + f[IX(x, y, z - 1)])) *
-                        cRecip;
+                    f[IX(x, y, z)] = (f0[IX(x, y, z)]
+                                      + a
+                                            * (f[IX(x + 1, y, z)] + f[IX(x - 1, y, z)]
+                                               + f[IX(x, y + 1, z)] + f[IX(x, y - 1, z)]
+                                               + f[IX(x, y, z + 1)] + f[IX(x, y, z - 1)]))
+                                   * cRecip;
                 }
             }
         }
@@ -151,31 +144,34 @@ void Fluid::lin_solve(FieldType b, Field<float> &f, Field<float> &f0, float a,
     }
 }
 
-void Fluid::project(Field<float> &velocX, Field<float> &velocY,
-                    Field<float> &velocZ, Field<float> &p, Field<float> &div) {
+void Fluid::project(
+    Field<float> &velocX,
+    Field<float> &velocY,
+    Field<float> &velocZ,
+    Field<float> &p,
+    Field<float> &div
+) {
     // Calculate divergence
     for (int z = 1; z < N - 1; z++) {
         for (int y = 1; y < N - 1; y++) {
             for (int x = 1; x < N - 1; x++) {
                 if (state[IX(x, y, z)] == CellType::SOLID) {
                     div[IX(x, y, z)] = 0; // No divergence in solid cells
-                    p[IX(x, y, z)] = 0;   // Pressure is also zero
+                    p[IX(x, y, z)]   = 0; // Pressure is also zero
                 } else if (state[IX(x, y, z)] == CellType::CUT_CELL) {
-                    float fraction = volume[IX(x, y, z)];
-                    div[IX(x, y, z)] =
-                        -0.5f * fraction *
-                        (velocX[IX(x + 1, y, z)] - velocX[IX(x - 1, y, z)] +
-                         velocY[IX(x, y + 1, z)] - velocY[IX(x, y - 1, z)] +
-                         velocZ[IX(x, y, z + 1)] - velocZ[IX(x, y, z - 1)]) /
-                        N;
+                    float fraction   = volume[IX(x, y, z)];
+                    div[IX(x, y, z)] = -0.5f * fraction
+                                     * (velocX[IX(x + 1, y, z)] - velocX[IX(x - 1, y, z)]
+                                        + velocY[IX(x, y + 1, z)] - velocY[IX(x, y - 1, z)]
+                                        + velocZ[IX(x, y, z + 1)] - velocZ[IX(x, y, z - 1)])
+                                     / N;
                     p[IX(x, y, z)] = 0;
                 } else { // FLUID cells
-                    div[IX(x, y, z)] =
-                        -0.5f *
-                        (velocX[IX(x + 1, y, z)] - velocX[IX(x - 1, y, z)] +
-                         velocY[IX(x, y + 1, z)] - velocY[IX(x, y - 1, z)] +
-                         velocZ[IX(x, y, z + 1)] - velocZ[IX(x, y, z - 1)]) /
-                        N;
+                    div[IX(x, y, z)] = -0.5f
+                                     * (velocX[IX(x + 1, y, z)] - velocX[IX(x - 1, y, z)]
+                                        + velocY[IX(x, y + 1, z)] - velocY[IX(x, y - 1, z)]
+                                        + velocZ[IX(x, y, z + 1)] - velocZ[IX(x, y, z - 1)])
+                                     / N;
                     p[IX(x, y, z)] = 0;
                 }
             }
@@ -199,22 +195,16 @@ void Fluid::project(Field<float> &velocX, Field<float> &velocY,
                     velocZ[IX(x, y, z)] = 0;
                 } else if (state[IX(x, y, z)] == CellType::CUT_CELL) {
                     float fraction = volume[IX(x, y, z)];
-                    velocX[IX(x, y, z)] -=
-                        0.5f * fraction *
-                        (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
-                    velocY[IX(x, y, z)] -=
-                        0.5f * fraction *
-                        (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
-                    velocZ[IX(x, y, z)] -=
-                        0.5f * fraction *
-                        (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
+                    velocX[IX(x, y, z)]
+                        -= 0.5f * fraction * (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
+                    velocY[IX(x, y, z)]
+                        -= 0.5f * fraction * (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
+                    velocZ[IX(x, y, z)]
+                        -= 0.5f * fraction * (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
                 } else { // FLUID cells
-                    velocX[IX(x, y, z)] -=
-                        0.5f * (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
-                    velocY[IX(x, y, z)] -=
-                        0.5f * (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
-                    velocZ[IX(x, y, z)] -=
-                        0.5f * (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
+                    velocX[IX(x, y, z)] -= 0.5f * (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
+                    velocY[IX(x, y, z)] -= 0.5f * (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
+                    velocZ[IX(x, y, z)] -= 0.5f * (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
                 }
             }
         }
@@ -226,7 +216,7 @@ void Fluid::project(Field<float> &velocX, Field<float> &velocY,
     set_boundaries(FieldType::VZ, velocZ);
 }
 
-void Fluid::set_boundaries(FieldType b, Field<float> &f) {
+void        Fluid::set_boundaries(FieldType b, Field<float> &f) {
 // Handle each face of the bounding box
 #pragma omp parallel for collapse(2)
     for (int y = 1; y < N - 1; y++) {
@@ -303,25 +293,19 @@ void Fluid::set_boundaries(FieldType b, Field<float> &f) {
     }
 
     // Handle corners (ensure no fluid leakage)
-    f[IX(0, 0, 0)] = 0.33f * (f[IX(1, 0, 0)] + f[IX(0, 1, 0)] + f[IX(0, 0, 1)]);
-    f[IX(0, N - 1, 0)] =
-        0.33f * (f[IX(1, N - 1, 0)] + f[IX(0, N - 2, 0)] + f[IX(0, N - 1, 1)]);
-    f[IX(0, 0, N - 1)] =
-        0.33f * (f[IX(1, 0, N - 1)] + f[IX(0, 1, N - 1)] + f[IX(0, 0, N - 2)]);
-    f[IX(0, N - 1, N - 1)] =
-        0.33f * (f[IX(1, N - 1, N - 1)] + f[IX(0, N - 2, N - 1)] +
-                 f[IX(0, N - 1, N - 2)]);
-    f[IX(N - 1, 0, 0)] =
-        0.33f * (f[IX(N - 2, 0, 0)] + f[IX(N - 1, 1, 0)] + f[IX(N - 1, 0, 1)]);
-    f[IX(N - 1, N - 1, 0)] =
-        0.33f * (f[IX(N - 2, N - 1, 0)] + f[IX(N - 1, N - 2, 0)] +
-                 f[IX(N - 1, N - 1, 1)]);
-    f[IX(N - 1, 0, N - 1)] =
-        0.33f * (f[IX(N - 2, 0, N - 1)] + f[IX(N - 1, 1, N - 1)] +
-                 f[IX(N - 1, 0, N - 2)]);
-    f[IX(N - 1, N - 1, N - 1)] =
-        0.33f * (f[IX(N - 2, N - 1, N - 1)] + f[IX(N - 1, N - 2, N - 1)] +
-                 f[IX(N - 1, N - 1, N - 2)]);
+    f[IX(0, 0, 0)]     = 0.33f * (f[IX(1, 0, 0)] + f[IX(0, 1, 0)] + f[IX(0, 0, 1)]);
+    f[IX(0, N - 1, 0)] = 0.33f * (f[IX(1, N - 1, 0)] + f[IX(0, N - 2, 0)] + f[IX(0, N - 1, 1)]);
+    f[IX(0, 0, N - 1)] = 0.33f * (f[IX(1, 0, N - 1)] + f[IX(0, 1, N - 1)] + f[IX(0, 0, N - 2)]);
+    f[IX(0, N - 1, N - 1)]
+        = 0.33f * (f[IX(1, N - 1, N - 1)] + f[IX(0, N - 2, N - 1)] + f[IX(0, N - 1, N - 2)]);
+    f[IX(N - 1, 0, 0)] = 0.33f * (f[IX(N - 2, 0, 0)] + f[IX(N - 1, 1, 0)] + f[IX(N - 1, 0, 1)]);
+    f[IX(N - 1, N - 1, 0)]
+        = 0.33f * (f[IX(N - 2, N - 1, 0)] + f[IX(N - 1, N - 2, 0)] + f[IX(N - 1, N - 1, 1)]);
+    f[IX(N - 1, 0, N - 1)]
+        = 0.33f * (f[IX(N - 2, 0, N - 1)] + f[IX(N - 1, 1, N - 1)] + f[IX(N - 1, 0, N - 2)]);
+    f[IX(N - 1, N - 1, N - 1)]
+        = 0.33f
+        * (f[IX(N - 2, N - 1, N - 1)] + f[IX(N - 1, N - 2, N - 1)] + f[IX(N - 1, N - 1, N - 2)]);
 }
 
 void Fluid::step() {
@@ -350,7 +334,9 @@ void Fluid::voxelize(Obstacle &obstacle) {
     // Prepare the obstacle collision object
     obstacle.geom->computeLocalAABB();
     fcl::CollisionObjectf obstacle_obj(
-        obstacle.geom, fcl::Transform3f(fcl::Translation3f(obstacle.position)));
+        obstacle.geom,
+        fcl::Transform3f(fcl::Translation3f(obstacle.position))
+    );
 
 #pragma omp parallel for collapse(3)
     for (int z = 0; z < N; z++) {
@@ -361,15 +347,16 @@ void Fluid::voxelize(Obstacle &obstacle) {
                 v3 cell_size(1.0f, 1.0f, 1.0f);
 
                 // Create a voxel collision object
-                auto cell_geometry = std::make_shared<fcl::Boxf>(
-                    cell_size.x, cell_size.y, cell_size.z);
+                auto cell_geometry
+                    = std::make_shared<fcl::Boxf>(cell_size.x, cell_size.y, cell_size.z);
                 fcl::CollisionObjectf cell_obj(
                     cell_geometry,
-                    fcl::Transform3f(fcl::Translation3f(cell_position)));
+                    fcl::Transform3f(fcl::Translation3f(cell_position))
+                );
 
                 // Perform collision query
                 fcl::CollisionRequestf request;
-                fcl::CollisionResultf result;
+                fcl::CollisionResultf  result;
                 fcl::collide(&cell_obj, &obstacle_obj, request, result);
 
                 // Classification logic
@@ -422,39 +409,36 @@ void Fluid::voxelize_all() {
 
     if (no_obstacles) {
         should_voxelize = false;
-        state = Field<CellType>(N3, CellType::FLUID);
+        state           = Field<CellType>(N3, CellType::FLUID);
     } else {
         state = Field<CellType>(N3, CellType::UNDEFINED);
 #pragma omp parallel for
         for (auto &obstacle : obstacles)
-            if (obstacle->enabled)
-                voxelize(*obstacle);
+            if (obstacle->enabled) voxelize(*obstacle);
     }
 }
 
 float Fluid::get_volume(v3 cell_position) {
-    v3 cell_size(1.0f, 1.0f, 1.0f);
+    v3         cell_size(1.0f, 1.0f, 1.0f);
     fcl::AABBf cell_aabb(cell_position, cell_position + cell_size);
 
     for (auto &obstacle : obstacles) {
-        fcl::AABBf obstacle_aabb(obstacle->geom->aabb_local.min_ +
-                                     (fcl::Vector3f)obstacle->position,
-                                 obstacle->geom->aabb_local.max_ +
-                                     (fcl::Vector3f)obstacle->position);
+        fcl::AABBf obstacle_aabb(
+            obstacle->geom->aabb_local.min_ + (fcl::Vector3f)obstacle->position,
+            obstacle->geom->aabb_local.max_ + (fcl::Vector3f)obstacle->position
+        );
 
         fcl::AABBf intersection_aabb;
         intersection_aabb.min_ = cell_aabb.min_.cwiseMax(obstacle_aabb.min_);
         intersection_aabb.max_ = cell_aabb.max_.cwiseMin(obstacle_aabb.max_);
 
-        fcl::Vector3f intersection_size =
-            intersection_aabb.max_ - intersection_aabb.min_;
-        if (intersection_size[0] <= 0 || intersection_size[1] <= 0 ||
-            intersection_size[2] <= 0) {
+        fcl::Vector3f intersection_size = intersection_aabb.max_ - intersection_aabb.min_;
+        if (intersection_size[0] <= 0 || intersection_size[1] <= 0 || intersection_size[2] <= 0) {
             return 0.0f;
         }
 
-        float intersection_volume =
-            intersection_size[0] * intersection_size[1] * intersection_size[2];
+        float intersection_volume
+            = intersection_size[0] * intersection_size[1] * intersection_size[2];
 
         float cell_volume = cell_size.x * cell_size.y * cell_size.z;
         return intersection_volume / cell_volume;
