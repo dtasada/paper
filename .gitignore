@@ -8,3 +8,4 @@ thesis/*
 !thesis/resources
 !thesis/references.bib
 !thesis/Thesis.pdf
+!thesis/Thesis.bbl

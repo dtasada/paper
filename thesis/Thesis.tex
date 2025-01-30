@@ -7,6 +7,7 @@
 \usepackage{bibentry}
 \usepackage{color}
 \usepackage{dirtree}
+\usepackage{float}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{hyphenat}
@@ -17,6 +18,8 @@
 \usepackage{url}
 \usepackage{physics}
 \usepackage{fontspec}
+\usepackage{wrapfig}
+\usepackage{subcaption}
 \usepackage[normalem]{ulem}
 \usepackage[backend=biber, style=apa]{biblatex}
 \usepackage[
@@ -74,7 +77,9 @@ breaklinks=true,
 \end{abstract}
 
 % Table of Contents
+\pagebreak
 \tableofcontents
+\pagebreak
 
 % Introduction
 \section{Introduction}
@@ -182,10 +187,12 @@ made, Lagrangian simulation is still quite computationally expensive, and Go
 probably wasn't doing it any favors (Go isn't very memory efficient). In the
 end it was put aside, and the Lagrangian implementation was never completed.
 
+\pagebreak
 \subsection{Eulerian Fluid Simulation}
 The other method is the Eulerian method. This method models the fluid as a
 cellular automata. The fluid is represented by a grid of cells, each of which
-has its own properties and interacts with its neighbor cells, creating a mesh.
+has its own properties and interacts with its neighbor cells, creating a Cartesian
+mesh-style field.
 
 Our fluid simulation involves a three-dimensional grid of cells, each of which
 have velocity and density fields. Each frame, the cells interact with each
@@ -194,7 +201,7 @@ other according to the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes
 The specific math involved in the base equations for the fluid simulation is
 quite complex, and we couldn't have derived it on our own, so we used
 Mike Ash's implementation \href{www.mikeash.com/pyblog/fluid-simulation-for-dummies.html}{\citefield{mikeash}{title}} (\cite{mikeash})
-as the bedrock of our program. Mike Ash's  which is in turn based on Jos Stam's
+as the bedrock of our program. Mike Ash's code is in turn based on Jos Stam's
 brilliant work on \href{www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf}{\citefield{josstam}{title}} (\cite{josstam}).
 
 % Math
@@ -217,7 +224,8 @@ very difficult to understand. But it should be noted that the two equations abov
 as this was helpful in developing the simulation. (\cite{josstam})
 
 \subsubsection{The Implementation}
-Our code is structured as follows:
+\paragraph{Introduction to the code}\mbox{} \\
+Our project is structured as follows:
 \dirtree{%
 	.1 paper.
 	.2 neural\DTcomment{Contains ML engine}.
@@ -229,7 +237,7 @@ Our code is structured as follows:
 	.3 Makefile.
 }
 
-This codebase is written in C++, and uses the \hyperlink{https://www.raylib.com/}{raylib}
+This codebase is written in C++ and uses \href{https://www.raylib.com/}{raylib} again
 because it's a really simple and powerful library that allows us to focus on the
 simulation itself, as it provides a bunch of tools to easily render 3D graphics.
 The reason this codebase is in C++ was initially because we never got the Eulerian
@@ -237,83 +245,112 @@ model to work in Go, likely due to a mistake of our own. Nevertheless we think C
 was the right choice, as it's more appropriate for the vector physics and low overhead
 we need for the simulation.
 
-The main class we use for the simulation is the \verb|Fluid| class. The implementation
-is available at \verb|/simulation/src/Fluid.cpp|. The interface is as follows: \\
-\begin{center}
+The main fluid simulation object we use for the simulation is the \lstinline{Fluid} class.
+The implementation is is available at \lstinline{/simulation/src/Fluid.cpp}.
+The interface is as follows:
+
+\begin{figure}[H]
+	\centering
 	\includegraphics[width=\textwidth]{resources/Fluid.png}
-\end{center}
+	\caption{Fluid class diagram}
+\end{figure}
 
-The class contains the cell property fields as well as all the functions related
-to the physics simulation, including the advection, diffusion and projection procedures.
-With this we have a basic working fluid simulator.
+This class contains the vector fields for the container as well as all the
+functions related to the physics simulation, including the advection, diffusion
+and projection procedures. These functions are the core of the CFD and
+this is the part that we borrowed from Mike Ash.
 
-The next step is to add geometry. We did this by adding a boolean field to the
-Fluid properties and some getters and setters.
-\begin{lstlisting}
-class Fluid {
-   private:
-	// rest of private members
-	bool *solid;
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[height=1.65in]{resources/core1.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[height=1.65in]{resources/core2.png}
+    \end{subfigure}
+	\caption{Basic fluid simulation}
+\end{figure}
 
-   public:
-	// rest of public members
-	bool is_solid(v3 position);
-	void set_solid(v3 position, bool set);
-}
-\end{lstlisting}
-Then we change the advection and boundary handling functions to account for
-solid boundaries. This is done by checking whether each cell is solid, and if
-so, the cell properties aren't advected.
+\paragraph{Voxelizing Geometry}\mbox{} \\
+The next step is to implement geometry collision. The graphics library we're using,
+Raylib, has a function to load geometry from object files. Loading in a torus is
+easy enough, but the real challenge lies in communicating to the CFD that there's
+a torus in a given position and it behaving correspondingly.
 
-\begin{lstlisting}
-// in advection function, for each cell:
-if (solid[IX(i, j, k)]) {
-	if (b != FieldType::DENSITY) {  // For velocity components
-		d[IX(i, j, k)] = 0;
-	}
-	continue;
-}
+First, the 3D object that Raylib loads has to be converted to a BVH (Bounding Volume
+Hierarchy) object. This is a tree structure that contains the object's geometry in
+a way that makes it easy to check if a point is inside the object. This format
+is what FCL (\href{https://github.com/flexible-collision-library/fcl}{Flexible Collision Library})
+uses to check for collisions. We are using FCL to easily process flexible
+collisions between 3D objects.
 
-// in boundary function, for each cell:
-if (solid[IX(x, y, z)]) {
-	// For velocity components, enforce no-slip condition
-	if (b == FieldType::VX) f[IX(x, y, z)] = 0;  // x velocity
-	if (b == FieldType::VY) f[IX(x, y, z)] = 0;  // y velocity
-	if (b == FieldType::VZ) f[IX(x, y, z)] = 0;  // z velocity
+The next step is to write a voxelization function. Voxelization takes a 3D
+object's mesh data and checks the previously established 3D vector fields to see which
+if the object is in a given cell. FCL performs collision detection between two 3D objects.
+In this case those two objects are our obstacle (like a torus or a plane), and
+whichever cell is being iterated over. If the object is in a cell, we can pass a
+condition to the CFD. This is done for every cell in the grid, and the result
+is a 3D boolean array that represents the object. The source code is at \lstinline{Fluid::voxelize}.
+Each obstacle is passed to this function, and as a result we get a 3D boolean
+field saved at \lstinline{Fluid::state}. Below is a figure of the voxel map,
+with cells classified as solid highlighted in blue.
 
-	// For density and pressure, use average of neighboring
-	// non-solid cells
-	if (b == FieldType::DENSITY) {
-		float sum = 0;
-		int count = 0;
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[height=1.65in]{resources/voxelize1.png}%
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[height=1.65in]{resources/voxelize2.png}%
+    \end{subfigure}
+    \caption{Voxel map}
+\end{figure}
 
-		if (!solid[IX(x-1, y, z)]) { sum += f[IX(x-1, y, z)]; count++; }
-		if (!solid[IX(x+1, y, z)]) { sum += f[IX(x+1, y, z)]; count++; }
-		if (!solid[IX(x, y-1, z)]) { sum += f[IX(x, y-1, z)]; count++; }
-		if (!solid[IX(x, y+1, z)]) { sum += f[IX(x, y+1, z)]; count++; }
-		if (!solid[IX(x, y, z-1)]) { sum += f[IX(x, y, z-1)]; count++; }
-		if (!solid[IX(x, y, z+1)]) { sum += f[IX(x, y, z+1)]; count++; }
+This is called the Cut-Cell method. The reason we even need this is because
+the more obvious option is to set up the grid to be high resolution so the voxels
+are small enough to accurately approximate an arbitrarily complex object.
+The reason this isn't viable is purely due to performance. This might be reasonable
+with a supercomputer, but for our purposes we'd just like to optimize.
 
-		f[IX(x, y, z)] = count > 0 ? sum / count : f[IX(x, y, z)];
-	}
-}
-\end{lstlisting}
+Another method would be to implement an AMR (Adaptive Mesh Refinement) system,
+which would adapt the mesh's resolution based on what's in a given region. So this would
+generate a high resolution grid around an obstacle's bounds, and a low resolution
+grid in any empty space. This is an interesting concept, but we would have to
+rewrite some of the fluid math code to make the irregular grid work, and it seems
+like a lot of work, so we stuck with the Cut-Cell method. TODO: finish this
 
-This allows us to add a cube of a given size at a given position, which the
-fluid will treat as a solid object. Unfortunately, a plane is more complex than
-a cube. There are a few ways to handle this. The most obvious and least efficient
-is to raise the resolution of the grid. Currently we've been experimenting with a
-24x24x24 or a 32x32x32 grid, and that's already not as performant as we'd like.
-A 24x24x24 grid has to iterate $24^3 = 13824$ times per frame. And to simulate
-complex shapes, the higher resolution the better. But simply increasing the
-resolution to something like 128x128x128 or higher just isn't viable.
+\paragraph{Implementing obstacle collision}\mbox{} \\
+Each cell of the grid is now one of three states: \lstinline{FLUID},
+\lstinline{SOLID}, or \lstinline{CUT_CELL}. This method of classifying cells
+into the three states is called the \href{https://www.sciencedirect.com/science/article/pii/S0307904X00000056}{Cut-Cell method}.
+\begin{enumerate}
+	\item{Fluid cells}
+		\begin{itemize}
+			\item{Cells that are fully inside a fluid region}
+			\item{Normal Navier-Stokes equations apply}
+		\end{itemize}
+	\item{Solid cells}
+		\begin{itemize}
+			\item{Cells thar are fully inside an obstacle}
+			\item{Applies no-slip condition: velocity is zero}
+		\end{itemize}
+	\item{Cut-cells}
+		\begin{itemize}
+			\item{Cells partially inside an object}
+			\item{Modify fluid calculations}
+		\end{itemize}
+\end{enumerate}
 
-We're still implementing this at the time of writing the concept, but the goal
-is to use the method explained above in combination with the Cut-Cell method,
-which will dynamically create more of these cells along the borders of the model,
-in this case a plane. This would create a high-resolution grid near the important
-and complex areas of the simulation, while preserving resources by keeping the
-unimportant areas (like large patches of just air) from being computed.
+TODO: FINISH EXPLAINING CUT-CELL
+
+TODO: EXPLAIN OUR FAILURES
+TODO: EXPLAIN POSSIBLE FIXES AND WHAT SHOULD BE FINISHED/IMPROVED
 
 % Results
 \section{Results}

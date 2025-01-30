@@ -9,5 +9,6 @@ for header in $headers; do
 	echo "header $header"
 	echo "rootname $rootname"
 	hpp2plantuml -i "$header" -o "$rootname"
-	plantuml -t png "$rootname"
+	plantuml "$rootname"
+	rm $rootname
 done

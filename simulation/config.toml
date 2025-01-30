@@ -5,8 +5,10 @@ diffusion = 0         # Diffusion constant
 dt = 1.0             # Timestep
 viscosity = 0.000001  # Viscosity constant
 
-insert_position = [12, 12, 1]
-insert_velocity = [0, 0, 5]
+# insert_position = [12, 12, 1]
+# insert_velocity = [0, 0, 5]
+insert_position = [1, 1, 1]
+insert_velocity = [4, 4, 4]
 
 [[obstacle]]
 position = [12, 12, 14]
