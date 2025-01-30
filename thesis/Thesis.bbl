@@ -50,6 +50,38 @@
       \verb www.mikeash.com/pyblog/fluid-simulation-for-dummies.html
       \endverb
     \endentry
+    \entry{brener}{video}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=dd29b5c6a77d570e4520509adfc0518d}{%
+           family={d'Lélis},
+           familyi={d\bibinitperiod},
+           given={Brener},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{fullhash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{bibnamehash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{authorbibnamehash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{authornamehash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{authorfullhash}{dd29b5c6a77d570e4520509adfc0518d}
+      \field{sortinit}{d}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Semi Lagrangian Scheme - A Visual Explanation}
+      \field{year}{2022}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.youtu.be/kvBRFxRIJuY
+      \endverb
+      \verb{url}
+      \verb www.youtu.be/kvBRFxRIJuY
+      \endverb
+    \endentry
     \entry{braincells}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=1b59471e6d6ef93fbff5d0137200633a}{%
@@ -73,10 +105,10 @@
       \field{year}{2021}
       \true{nocite}
       \verb{urlraw}
-      \verb https://www.youtube.com/watch?v=uG2mPez44eY
+      \verb www.youtu.be/uG2mPez44eY
       \endverb
       \verb{url}
-      \verb https://www.youtube.com/watch?v=uG2mPez44eY
+      \verb www.youtu.be/uG2mPez44eY
       \endverb
     \endentry
     \entry{gradience}{video}{}
@@ -157,8 +189,10 @@
       \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \field{extraname}{1}
       \field{sortinit}{I}
       \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradate}{1}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
       \true{uniqueprimaryauthor}
@@ -172,6 +206,46 @@
       \endverb
       \verb{url}
       \verb www.researchgate.net/publication/222518000
+      \endverb
+    \endentry
+    \entry{amr}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=2aa6d9615885bdded7a7e2a72b17155a}{%
+           family={Ingram},
+           familyi={I\bibinitperiod},
+           given={David\bibnamedelima Mark},
+           giveni={D\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=1c913d1fa84bc1fc6e05488226e73a20}{%
+           family={Causon},
+           familyi={C\bibinitperiod},
+           given={D.M.},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{fullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{bibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \field{extraname}{2}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradate}{2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{A Cartesian cut cell method for incompressible viscous flow}
+      \field{year}{2003}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
     \entry{seblague}{video}{}
@@ -260,12 +334,11 @@
       \field{labeltitlesource}{title}
       \field{title}{17 - How to write an Eulerian fluid simulator with 200 lines of code.}
       \field{year}{2022}
-      \true{nocite}
       \verb{urlraw}
-      \verb https://www.youtube.com/watch?v=iKAVRgIrUOU
+      \verb www.youtu.be/iKAVRgIrUOU
       \endverb
       \verb{url}
-      \verb https://www.youtube.com/watch?v=iKAVRgIrUOU
+      \verb www.youtu.be/iKAVRgIrUOU
       \endverb
     \endentry
     \entry{codingchallenge}{video}{}
@@ -392,6 +465,37 @@
       \verb www.physics.weber.edu/schroeder/javacourse/LatticeBoltzmann.pdf
       \endverb
     \endentry
+    \entry{gaussseidel}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
+           family={Wikipedia},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{extraname}{1}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradate}{1}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Gauss–Seidel method}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Gauss–Seidel_method#References
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method#References
+      \endverb
+    \endentry
     \entry{navierstokes}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
@@ -404,8 +508,10 @@
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{extraname}{2}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradate}{2}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
       \true{uniqueprimaryauthor}
@@ -486,6 +592,38 @@
       \verb www.mikeash.com/pyblog/fluid-simulation-for-dummies.html
       \endverb
     \endentry
+    \entry{brener}{video}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=dd29b5c6a77d570e4520509adfc0518d}{%
+           family={d'Lélis},
+           familyi={d\bibinitperiod},
+           given={Brener},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{fullhash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{bibnamehash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{authorbibnamehash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{authornamehash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{authorfullhash}{dd29b5c6a77d570e4520509adfc0518d}
+      \field{sortinit}{d}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Semi Lagrangian Scheme - A Visual Explanation}
+      \field{year}{2022}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.youtu.be/kvBRFxRIJuY
+      \endverb
+      \verb{url}
+      \verb www.youtu.be/kvBRFxRIJuY
+      \endverb
+    \endentry
     \entry{braincells}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=1b59471e6d6ef93fbff5d0137200633a}{%
@@ -509,10 +647,10 @@
       \field{year}{2021}
       \true{nocite}
       \verb{urlraw}
-      \verb https://www.youtube.com/watch?v=uG2mPez44eY
+      \verb www.youtu.be/uG2mPez44eY
       \endverb
       \verb{url}
-      \verb https://www.youtube.com/watch?v=uG2mPez44eY
+      \verb www.youtu.be/uG2mPez44eY
       \endverb
     \endentry
     \entry{gradience}{video}{}
@@ -593,8 +731,10 @@
       \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \field{extraname}{1}
       \field{sortinit}{I}
       \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradate}{1}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
       \true{uniqueprimaryauthor}
@@ -608,6 +748,46 @@
       \endverb
       \verb{url}
       \verb www.researchgate.net/publication/222518000
+      \endverb
+    \endentry
+    \entry{amr}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=2aa6d9615885bdded7a7e2a72b17155a}{%
+           family={Ingram},
+           familyi={I\bibinitperiod},
+           given={David\bibnamedelima Mark},
+           giveni={D\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=1c913d1fa84bc1fc6e05488226e73a20}{%
+           family={Causon},
+           familyi={C\bibinitperiod},
+           given={D.M.},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{fullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{bibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \field{extraname}{2}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradate}{2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{A Cartesian cut cell method for incompressible viscous flow}
+      \field{year}{2003}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
     \entry{seblague}{video}{}
@@ -696,12 +876,11 @@
       \field{labeltitlesource}{title}
       \field{title}{17 - How to write an Eulerian fluid simulator with 200 lines of code.}
       \field{year}{2022}
-      \true{nocite}
       \verb{urlraw}
-      \verb https://www.youtube.com/watch?v=iKAVRgIrUOU
+      \verb www.youtu.be/iKAVRgIrUOU
       \endverb
       \verb{url}
-      \verb https://www.youtube.com/watch?v=iKAVRgIrUOU
+      \verb www.youtu.be/iKAVRgIrUOU
       \endverb
     \endentry
     \entry{codingchallenge}{video}{}
@@ -828,6 +1007,37 @@
       \verb www.physics.weber.edu/schroeder/javacourse/LatticeBoltzmann.pdf
       \endverb
     \endentry
+    \entry{gaussseidel}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
+           family={Wikipedia},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{extraname}{1}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradate}{1}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Gauss–Seidel method}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Gauss–Seidel_method#References
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method#References
+      \endverb
+    \endentry
     \entry{navierstokes}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
@@ -840,8 +1050,10 @@
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{extraname}{2}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradate}{2}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
       \true{uniqueprimaryauthor}

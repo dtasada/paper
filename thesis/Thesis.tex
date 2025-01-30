@@ -20,6 +20,7 @@
 \usepackage{fontspec}
 \usepackage{wrapfig}
 \usepackage{subcaption}
+\usepackage{float}
 \usepackage[normalem]{ulem}
 \usepackage[backend=biber, style=apa]{biblatex}
 \usepackage[
@@ -33,7 +34,6 @@ breaklinks=true,
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
-\setmonofont{CaskaydiaCove Nerd Font}
 \lstset{
 	aboveskip=3mm,
 	basicstyle=\ttfamily\small,
@@ -71,6 +71,8 @@ breaklinks=true,
 
 % Title and abstract
 \maketitle
+
+\pagebreak
 \begin{abstract}
 	In this paper, we investigate the relationship between an airplane's shape
 	and its performance. Our results show that \dots
@@ -115,8 +117,8 @@ The thesis questions are the following:
 \end{itemize}
 
 % Execution
-\section{Execution}
-\subsection{Preliminary: Lagrangian Fluid Simulation}
+\pagebreak
+\section{Preliminary: Lagrangian Fluid Simulation}
 One method of simulating fluid dynamics is the Lagrangian method. This method
 models the fluid as a particle collision system, where the air is represented by
 particles that interact with each other to emulate a fluid. Our implementation
@@ -188,7 +190,7 @@ probably wasn't doing it any favors (Go isn't very memory efficient). In the
 end it was put aside, and the Lagrangian implementation was never completed.
 
 \pagebreak
-\subsection{Eulerian Fluid Simulation}
+\section{Execution: Eulerian Fluid Simulation}
 The other method is the Eulerian method. This method models the fluid as a
 cellular automata. The fluid is represented by a grid of cells, each of which
 has its own properties and interacts with its neighbor cells, creating a Cartesian
@@ -205,7 +207,7 @@ as the bedrock of our program. Mike Ash's code is in turn based on Jos Stam's
 brilliant work on \href{www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf}{\citefield{josstam}{title}} (\cite{josstam}).
 
 % Math
-\subsubsection{The Math}
+\subsection{The Math} \label{math}
 In Eulerian fluid dynamics we represent fluids with a velocity vector field. This means we assign a velocity vector to every point in space.
 The Navier-Stokes equations show us how these velocity vectors evolve over time with an infinitely small timestep.
 \[
@@ -215,16 +217,121 @@ The Navier-Stokes equations show us how these velocity vectors evolve over time 
 		\pdv{\rho}{t} = -(u \cdot \nabla)\rho + k\nabla^2\rho + S
 	\end{array}
 \]
-The first equation shows the change in velocity in a compact vector notation. 
+The first equation returns the change in velocity in a vector notation. 
 Unlike in Lagrangian fluid simulation, in Eularian fluid simulation the fluid is not represented by individual particles. 
 Thats why, instead, fluid density is used, which tells us the amount of particles present in a point in space. 
-The second equation represents the change of this density. 
-The reader is not expected to fully understand these equations because they are, as mentioned earlier,
-very difficult to understand. But it should be noted that the two equations above look a lot like eachother,
+The second equation shows us the change of this density. 
+Although to understand the math behind this simulation it isn't needed to fully understand these equations, it should be noted that the two equations above look a lot like each other,
 as this was helpful in developing the simulation. (\cite{josstam})
 
-\subsubsection{The Implementation}
-\paragraph{Introduction to the code}\mbox{} \\
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+	\centering
+	\includegraphics[width=5cm]{resources/collocated_grid_2.png}
+	\caption{Collocated grid}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+	\centering
+	\includegraphics[width=5cm]{resources/staggered_grid_2.png}
+	\caption{Staggered grid}
+\end{subfigure}
+\caption{Computational grids}
+\end{figure}
+
+There are two different types of velocity vector fields we can use: collocated and staggered.
+In the collocated grid all the variables are stored in the center of the cell. 
+Whereas in the staggered grid the scalar variables are stored at the center but the velocity variable is stored at the cell face. 
+Usually the use of a staggered grid is preferred, because its easier to see how much fluid flows from one cell to another. (\cite{tenminute})
+However because Mike Ash and Jos Stam used a collocated grid in their works we decided to use the same grid for simpliciy sake.
+
+\subsection{Density Solver} \label{density}
+
+First, lets look at the density solver. The density solver follows three steps: first adding forces, secondly diffusion and lastly moving the densities. 
+If we look at the density equation in figure 1, we see that the change in density in a single time steps is influenced by three terms. 
+The first term states that the density should follow the velocity field,
+the second term represents the density's rate of diffusion
+and the third term says that the density can increase due to sources. 
+The density solver will apply these terms in reverse order. 
+So, as stated before, first the forces are added, then the diffusion is applied and finally the densities are moved.
+
+\subsubsection{Adding forces}
+The first step is adding forces from a source. In our case forces will be added if the user clicks on the screen.
+If that happens we will simply add a constant amount of density to the intial density. So:
+\[
+\begin{array}{ll}
+  \rho_{t+dt} = \rho_t + S \cdot dt
+\end{array}
+\]
+
+\subsubsection{Diffusion}
+The second step is diffusion.
+Diffusion is the process where spread the fluid from high density cells to low density cells.
+The diffusion happens at a constant rate that we will call \textit{D}. 
+Now we can simply calculate the diffusion rate \textit{a} by multiplying it with the time step:
+\[
+\begin{array}{ll}
+  a = dt \cdot D
+\end{array}
+\]
+If we take a look at a single cell, we'll see that it exchanges densities with its four neighbors.
+The total difference of the densities between the cell and its neighbours can be calculated by the following formula,
+where $\rho_{x, y}$ is the current density of the cell at position $(x, y)$:
+\[
+\begin{array}{ll}
+	\rho_{x+1, y} + \rho_{x-1, y} + \rho_{x, y+1} + \rho_{x, y-1} - 4 \cdot \rho_{x, y}
+\end{array}
+\]
+By multiplying the difference in densities with the diffusion rate \textit{a} and adding it to the current density, we calculate new density of the cell. 
+This can be seen in the following formula, where P$_{x, y}$ is equal to the density of cell at position (x, y) after the time step:
+\[
+\begin{array}{ll}
+	P_{x, y} = \rho_{x, y} + a \cdot (\rho_{x+1, y} + \rho_{x-1, y} + \rho_{x, y+1} + \rho_{x, y-1} - 4 \cdot \rho_{x, y})
+\end{array}
+\]
+But here we run into a problem. If the diffusion rate is big enough the density in a cell might end up becoming negative.
+Imagine, for example, a situation wehere the diffusion rate is equal to 1,  the density of a cell is 1 and the densities of its neighbors are all 0. This means that the density of the cell will become -3.
+This of course is not possible.
+The solution to this problem is to find the density of the cell when being diffused backwards in time. Which results in the following equation:
+\[
+\begin{array}{ll}
+	\rho_{x, y} = P_{x, y} + a \cdot (P_{x+1, y} + P_{x-1, y} + P_{x, y+1} + P_{x, y-1} - 4 \cdot P_{x, y})
+\end{array}	
+\]
+To solve this system of lineair equations for the unknowns P$_{x, y}$ the \hyperlink{https://en.wikipedia.org/wiki/Gauss–Seidel_method}{Gauss-Seidel method} is used. 
+(\cite{josstam}
+
+\subsubsection{Advection}
+The final step of the density solver is moving the densities following the velocity field.
+Because you can't really move grid cells, we will use a technique where we represent a density as a set of particles.
+An obvious way to move the densities is to act like the center of a cell is a particle and move it through the velocity field.
+But because we have to convert the particles back to a grid, we will use a different method. 
+This method is called semi-lagrangian advection.
+We will first look at the particles that end up at the center of a cell and use the velocity of the cell to trace the particles one time step back in time.
+Then we will look at where the particles end up and calculate the weighted average of the densities of the four closest cells from a particle and set this as the new density of the current cell. 
+To do this we need to use two different grids: one that contains all the density values from the previous time step
+and on that contains the new density values. (\cite{josstam})
+
+\subsection{Velocity Solver}
+Now we will look at the velocity solver. Just like with the density solver if we look at the equations in section \ref{math}
+we see that the change in velocity in a single time step is influenced by three factors. 
+These are: the addition of forces, viscous diffusion and self-advection. 
+Because the velocity equation looks so much like the density equation we can use the same steps that we're shown in section \ref{density} to solve it.
+The only difference is that the velocity solver has an extra step called projection.
+
+\subsubsection{Projection}
+This step ensures that mass is conserved. 
+The law of conservation of mass is an important property of real-life fluids.
+The projection step will be the last step that is executed because the previous steps might not always conserve mass.
+To make the fluid mass conserving we will use a mathematical concept called Hodge decomposition.
+Hodge composition states that every vector field is the sum of a mass conserving field and a gradient field.
+So all we have to do is compute a gradient field and subtract it from the velocity field. 
+The gradient field 
+Computing the gradient field involves the solution of a lineair system called a Poisson equation.
+To solve this system we will we again use the Gauss-Seidel method that was also mentioned in section \ref{density} in the diffusion step. (\cite{josstam})
+
+\subsection{The Implementation}
+\subsubsection{Introduction to the code}
 Our project is structured as follows:
 \dirtree{%
 	.1 paper.
@@ -274,7 +381,7 @@ this is the part that we borrowed from Mike Ash.
 	\caption{Basic fluid simulation}
 \end{figure}
 
-\paragraph{Voxelizing Geometry}\mbox{} \\
+\subsubsection{Voxelizing Geometry}
 The next step is to implement geometry collision. The graphics library we're using,
 Raylib, has a function to load geometry from object files. Loading in a torus is
 easy enough, but the real challenge lies in communicating to the CFD that there's
@@ -325,7 +432,7 @@ grid in any empty space. This is an interesting concept, but we would have to
 rewrite some of the fluid math code to make the irregular grid work, and it seems
 like a lot of work, so we stuck with the Cut-Cell method. TODO: finish this
 
-\paragraph{Implementing obstacle collision}\mbox{} \\
+\subsubsection{Implementing obstacle collision}
 Each cell of the grid is now one of three states: \lstinline{FLUID},
 \lstinline{SOLID}, or \lstinline{CUT_CELL}. This method of classifying cells
 into the three states is called the \href{https://www.sciencedirect.com/science/article/pii/S0307904X00000056}{Cut-Cell method}.
