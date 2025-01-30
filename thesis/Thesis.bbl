@@ -50,6 +50,38 @@
       \verb www.mikeash.com/pyblog/fluid-simulation-for-dummies.html
       \endverb
     \endentry
+    \entry{amr}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e2ceeea38f8620383cfbd3e99c5c0cd8}{%
+           family={contributors},
+           familyi={c\bibinitperiod},
+           given={Wikipedia},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{fullhash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{bibnamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{authorbibnamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{authornamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{authorfullhash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \field{sortinit}{c}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Adaptive mesh refinement}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \endverb
+    \endentry
     \entry{brener}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=dd29b5c6a77d570e4520509adfc0518d}{%
@@ -189,10 +221,8 @@
       \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \field{extraname}{1}
       \field{sortinit}{I}
       \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
-      \field{extradate}{1}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
       \true{uniqueprimaryauthor}
@@ -206,46 +236,6 @@
       \endverb
       \verb{url}
       \verb www.researchgate.net/publication/222518000
-      \endverb
-    \endentry
-    \entry{amr}{article}{}
-      \name{author}{2}{}{%
-        {{un=0,uniquepart=base,hash=2aa6d9615885bdded7a7e2a72b17155a}{%
-           family={Ingram},
-           familyi={I\bibinitperiod},
-           given={David\bibnamedelima Mark},
-           giveni={D\bibinitperiod\bibinitdelim M\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=1c913d1fa84bc1fc6e05488226e73a20}{%
-           family={Causon},
-           familyi={C\bibinitperiod},
-           given={D.M.},
-           giveni={D\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{fullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{bibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \field{extraname}{2}
-      \field{sortinit}{I}
-      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
-      \field{extradate}{2}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{A Cartesian cut cell method for incompressible viscous flow}
-      \field{year}{2003}
-      \true{nocite}
-      \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
-      \endverb
-      \verb{url}
-      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
     \entry{seblague}{video}{}
@@ -592,6 +582,38 @@
       \verb www.mikeash.com/pyblog/fluid-simulation-for-dummies.html
       \endverb
     \endentry
+    \entry{amr}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e2ceeea38f8620383cfbd3e99c5c0cd8}{%
+           family={contributors},
+           familyi={c\bibinitperiod},
+           given={Wikipedia},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{fullhash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{bibnamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{authorbibnamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{authornamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{authorfullhash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \field{sortinit}{c}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Adaptive mesh refinement}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \endverb
+    \endentry
     \entry{brener}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=dd29b5c6a77d570e4520509adfc0518d}{%
@@ -731,10 +753,8 @@
       \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \field{extraname}{1}
       \field{sortinit}{I}
       \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
-      \field{extradate}{1}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
       \true{uniqueprimaryauthor}
@@ -748,46 +768,6 @@
       \endverb
       \verb{url}
       \verb www.researchgate.net/publication/222518000
-      \endverb
-    \endentry
-    \entry{amr}{article}{}
-      \name{author}{2}{}{%
-        {{un=0,uniquepart=base,hash=2aa6d9615885bdded7a7e2a72b17155a}{%
-           family={Ingram},
-           familyi={I\bibinitperiod},
-           given={David\bibnamedelima Mark},
-           giveni={D\bibinitperiod\bibinitdelim M\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=1c913d1fa84bc1fc6e05488226e73a20}{%
-           family={Causon},
-           familyi={C\bibinitperiod},
-           given={D.M.},
-           giveni={D\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{fullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{bibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
-      \field{extraname}{2}
-      \field{sortinit}{I}
-      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
-      \field{extradate}{2}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{A Cartesian cut cell method for incompressible viscous flow}
-      \field{year}{2003}
-      \true{nocite}
-      \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
-      \endverb
-      \verb{url}
-      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
     \entry{seblague}{video}{}
