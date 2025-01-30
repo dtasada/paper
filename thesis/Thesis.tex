@@ -164,37 +164,36 @@ I'll explain shortly. It's called Eulerian fluid simulation, and the way this
 model works is that it sees fluid as a grid of cells that react to each other.
 Eulerian fluid simulation is an application of cellular automata, which is a
 computation model used in physics, biology, and many other applications.
-
-Our fluid simulation involves a two or three-dimensional grid of cells,
-each of which have velocity and density fields.
+Our fluid simulation involves a three-dimensional grid of cells, altough we will explain the concepts that are used using a 2 dimensional grid.
+Each of the cells in the grid have a velocity and density component.
 Each frame, the cells interact with each other according to the
 \hyperlink{https://en.wikipedia.org/wiki/Navier\%E2\%80\%93Stokes_equations}{Navier-Stokes equations}.
-
 The math involved in the Navier-Stokes equations is very complex and
 difficult to understand without a good background in physics and differential
-equations. That is why we have humbly borrowed most of the math from Mike Ash's
+equations. That is why the reader is not expected to fully understand these equations. 
+Most of the math that we will explain is from Mike Ash's
 \hyperlink{https://mikeash.com/pyblog/fluid-simulation-for-dummies.html}{Fluid Simulation for Dummies}
 (\cite{mikeash}), which is in turn based on Jos Stam's brilliant work on
 \hyperlink{http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf}{Real-Time Fluid Dynamics for Games} (\cite{josstam}).
 
 % Math
-\subsubsection{The Math}
+\subsubsection{The Math} \label{math}
 In Eularian fluid dynamics we represent fluids with a velocity vector field. This means we assign a velocity vector to every point in space.
-The Navier-Stokes equations show us how these velocity vectors evolve over time with an infinitely small timestep.
+The Navier-Stokes equations show us how these velocity vectors evolve over time with an infinitely small time step.
 \[
 \begin{array}{ll}
-	\pdv{u}{t} = -(u \cdot \nabla)u + v\nabla^2 + f \\
+	\dv{u}{t} = -(u \cdot \nabla)u + v\nabla^2 + f \\
   \\
-  \pdv{\rho}{t} = -(u \cdot \nabla)\rho + k\nabla^2\rho + S
+  \dv{\rho}{t} = -(u \cdot \nabla)\rho + k\nabla^2\rho + S
 \end{array}
 \]
-The first equation shows the change in velocity in a compact vector notation. 
+The first equation returns the change in velocity in a vector notation. 
 Unlike in Lagrangian fluid simulation, in Eularian fluid simulation the fluid is not represented by individual particles. 
 Thats why, instead, fluid density is used, which tells us the amount of particles present in a point in space. 
-The second equation represents the change of this density. 
-The reader is not expected to fully understand these equations because they are, as mentioned earlier,
-very difficult to understand. But it should be noted that the two equations above look a lot like eachother,
+The second equation shows us the change of this density. 
+Although to understand the math behind this simulation it isn't needed to fully understand these equations, it should be noted that the two equations above look a lot like each other,
 as this was helpful in developing the simulation. (\cite{josstam})
+
 \begin{figure}[H]
 \centering
 \begin{subfigure}{.5\textwidth}
@@ -212,19 +211,120 @@ as this was helpful in developing the simulation. (\cite{josstam})
 
 There are two different types of velocity vector fields we can use: collocated and staggered.
 In the collocated grid all the variables are stored in the center of the cell. 
-Whereas in the staggered grid the scalar variables are stored at the center but the velocity variable is stored at the cell face.
+Whereas in the staggered grid the scalar variables are stored at the center but the velocity variable is stored at the cell face. 
+Usually the use of a staggered grid is preferred, because its easier to see how much fluid flows from one cell to another. (\cite{tenminute})
+However because Mike Ash and Jos Stam used a collocated grid in their works we decided to use the same grid for simpliciy sake. \\
+
+\subsubsection{Density Solver} \label{density}
+
+First, lets look at the density solver. The density solver follows three steps: first adding forces, secondly diffusion and lastly moving the densities. 
+If we look at the density equation in figure 1, we see that the change in density in a single time steps is influenced by three terms. 
+The first term states that the density should follow the velocity field,
+the second term represents the density's rate of diffusion
+and the third term says that the density can increase due to sources. 
+The density solver will apply these terms in reverse order. 
+So, as stated before, first the forces are added, then the diffusion is applied and finally the densities are moved. \\
+
+\textbf{Adding Forces} \\
+
+The first step is adding forces from a source. In our case forces will be added if the user clicks on the screen.
+If that happens we will simply add a constant amount of density to the intial density. So:   \\
+
+\[
+\begin{array}{ll}
+  \rho_{t+dt} = \rho_t + S \cdot dt
+\end{array}
+\] \\
+
+\textbf{Diffusion} \\
+
+The second step is diffusion.
+Diffusion is the process where spread the fluid from high density cells to low density cells.
+The diffusion happens at a constant rate that we will call \textit{D}. 
+Now we can simply calculate the diffusion rate \textit{a} by multiplying it with the time step:
+
+\[
+\begin{array}{ll}
+  a = dt \cdot D
+\end{array}
+\] \\
+
+If we take a look at a single cell, we'll see that it exchanges densities with its four neighbors.
+The total difference of the densities between the cell and its neighbours can be calculated by the following formula,
+where $\rho_{x, y}$ is the current density of the cell at position (x, y):
+
+\[
+\begin{array}{ll}
+	\rho_{x+1, y} + \rho_{x-1, y} + \rho_{x, y+1} + \rho_{x, y-1} - 4 \cdot \rho_{x, y}
+\end{array}
+\]  \\
+
+By multiplying the difference in densities with the diffusion rate \textit{a} and adding it to the current density, we calculate new density of the cell. 
+This can be seen in the following formula, where P$_{x, y}$ is equal to the density of cell at position (x, y) after the time step: \\
+
+\[
+\begin{array}{ll}
+	P_{x, y} = \rho_{x, y} + a \cdot (\rho_{x+1, y} + \rho_{x-1, y} + \rho_{x, y+1} + \rho_{x, y-1} - 4 \cdot \rho_{x, y})
+\end{array}
+\]  \\
+
+But here we run into a problem. If the diffusion rate is big enough the density in a cell might end up becoming negative.
+Imagine, for example, a situation wehere the diffusion rate is equal to 1,  the density of a cell is 1 and the densities of its neighbors are all 0. This means that the density of the cell will become -3.
+This of course is not possible.
+The solution to this problem is to find the density of the cell when being diffused backwards in time. Which results in the following equation: \\
+
+\[
+\begin{array}{ll}
+	\rho_{x, y} = P_{x, y} + a \cdot (P_{x+1, y} + P_{x-1, y} + P_{x, y+1} + P_{x, y-1} - 4 \cdot P_{x, y})
+\end{array}	
+\] \\
+
+To solve this system of lineair equations for the unknowns P$_{x, y}$ the \hyperlink{https://en.wikipedia.org/wiki/Gauss–Seidel_method}{Gauss-Seidel method} is used. 
+(\cite{josstam}) \\
+
+\textbf{Advection }\\
+
+The final step of the density solver is moving the densities following the velocity field.
+Because you can't really move grid cells, we will use a technique where we represent a density as a set of particles.
+An obvious way to move the densities is to act like the center of a cell is a particle and move it through the velocity field.
+But because we have to convert the particles back to a grid, we will use a different method. 
+This method is called semi-lagrangian advection.
+We will first look at the particles that end up at the center of a cell and use the velocity of the cell to trace the particles one time step back in time.
+Then we will look at where the particles end up and calculate the weighted average of the densities of the four closest cells from a particle and set this as the new density of the current cell. 
+To do this we need to use two different grids: one that contains all the density values from the previous time step
+and on that contains the new density values. (\cite{josstam})
+
+ \subsubsection{Velocity Solver}
+Now we will look at the velocity solver. Just like with the density solver if we look at the equations in section \ref{math}
+we see that the change in velocity in a single time step is influenced by three factors. 
+These are: the addition of forces, viscous diffusion and self-advection. 
+Because the velocity equation looks so much like the density equation we can use the same steps that we're shown in section \ref{density} to solve it.
+The only difference is that the velocity solver has an extra step called projection. \\
+
+\textbf{Projection }\\
+
+This step ensures that mass is conserved. 
+The law of conservation of mass is an important property of real-life fluids.
+The projection step will be the last step that is executed because the previous steps might not always conserve mass.
+To make the fluid mass conserving we will use a mathematical concept called Hodge decomposition.
+Hodge composition states that every vector field is the sum of a mass conserving field and a gradient field.
+So all we have to do is compute a gradient field and subtract it from the velocity field. 
+The gradient field 
+Computing the gradient field involves the solution of a lineair system called a Poisson equation.
+To solve this system we will we again use the Gauss-Seidel method that was also mentioned in section \ref{density} in the diffusion step. (\cite{josstam})
 
 \subsubsection{The Implementation}
 Our code is structured as follows:
 \dirtree{%
 	.1 paper.
-	.2 simulation\DTcomment{Contains the physics simulation code}. 
-	.3 include\DTcomment{Our own engine headers}.
-	.3 lib\DTcomment{External libraries}.
-	.3 resources\DTcomment{Resources like images, fonts, shaders}.
-	.3 src\DTcomment{Actual engine source}.
+	.2 simulation/\DTcomment{Contains the physics simulation code}. 
+	.3 include/\DTcomment{Our own engine headers}.
+	.3 lib/\DTcomment{External libraries}.
+	.3 resources/\DTcomment{Resources like images, fonts, shaders}.
+	.3 src/\DTcomment{Actual engine source}.
+	.3 config.toml\DTcomment{Configuration file}.
+	.3 Makefile.
 	.2 neural\DTcomment{Contains ML engine}.
-	.2 Makefile.
 }
 
 The code is written in C++, and uses the \hyperlink{https://www.raylib.com/}{raylib}
@@ -281,7 +381,7 @@ if (solid[IX(x, y, z)]) {
 
 	// For density and pressure, use average of neighboring
 	// non-solid cells
-	if (b == 0) {
+	if (b == FieldType::DENSITY) {
 		float sum = 0;
 		int count = 0;
 

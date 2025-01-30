@@ -1,7 +1,7 @@
-# /target
-# /out
-/paper
 .DS_Store
+perf.data
+perf.data.old
+imgui.ini
 
 thesis/*
 !thesis/Thesis.tex

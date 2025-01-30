@@ -1,3 +1,0 @@
-[submodule "rlImGui"]
-	path = simulation/include/rlImGui
-	url = https://github.com/raylib-extras/rlImGui
