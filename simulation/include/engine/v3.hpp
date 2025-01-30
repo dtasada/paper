@@ -33,6 +33,9 @@ struct v3 {
     v3 operator+=(const float& other);
     v3 operator-=(const float& other);
 
+    bool operator==(const v3& other) const;
+    bool operator!=(const v3& other) const;
+
     std::string to_string(void) const;
 
     operator Vector3() const;
