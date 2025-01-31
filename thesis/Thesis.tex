@@ -92,6 +92,10 @@ breaklinks=true,
 	\begin{array}{ll}
 		\text{CFD} & \text{Computational Fluid Dynamics} \\
 		\text{ML} & \text{Machine Learning} \\
+		\text{NEAT} & \text{NeuroEvolution of Augmenting Topologies} \\
+		\text{BVH} & \text{Bounding Volume Hierarchy} \\
+		\text{FCL} & \text{Flexible Collision Library} \\
+		\text{AMR} & \text{Adaptive Mesh Refinement} \\
 	\end{array}
 \] \\
 
@@ -149,14 +153,62 @@ The thesis questions are the following:
 	\item{How do we dynamically generate 3D models?}
 	\item{How does an airplane's wing shape influence its performance?}
 \end{itemize}
+\pagebreak
+
+\section{Preliminary Research}
+In this paper we aim to create our own CFD model. 
+Before we start creating our own model a understanding of how CFD models work 
+and the different types of models and methods that can be used is needed.
+Most CFD models are based on the Navier-Stokes equations. Because the Navier-Stokes equations are very complex we will not be covering them in depth, 
+but we will explain what they are and how they are used in CFD models.
+This will be covered in section \ref{navierstokes}.
+In section \ref{eulerianlagrangian} we will be looking at two different types of methods that are used to simulate fluid dynamics.
+
+\subsection{Navier-Stokes equations} \label{navierstokes}
+The base of almost all CFD models are the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
+These are partial differential equations that describe single-phase fluid flows. 
+We will not go to much into detail about these equations, but its important to know that by solving these equations we will get a flow velocity.
+This flow velocity is a vector field that gives a vector to every point in the fluid at any time. 
+Using this velocity field the behavior of the fluid can be simulated.
+
+\subsection{Eulerian vs Lagrangian} \label{eulerianlagrangian}
+There are two main methods to simulate fluid dynamics: the Lagrangian method and the Eulerian method. \\
+
+\textbf{Lagrangian} \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{resources/lagrangian.png}
+	\caption{Lagrangian fluid simulation from (\cite{seblague})}
+\end{figure}
+
+The Langrangian method models the fluid as a particle collision system, where the air is represented by
+particles that follow the flow velocity and interact with each other to emulate a fluid. 
+This method is mostly usefull when trying to analyze situations where single fluid particles play an important role.\\
+
+
+\textbf{Eulerian} \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{resources/eulerian.png}
+	\caption{Eulerian fluid simulation from (\cite{tenminute})}
+\end{figure}
+
+The other method is the Eulerian method. This method models the fluid as a
+cellular automata. The fluid is represented by a grid of cells, each of which
+has its own properties and interacts with its neighbor cells, creating a Cartesian
+mesh-style field. This method is mostly used when trying to analyze the fluid as a whole.
+It can provide information about the fluid's flow patterns, turbulence, and pressure distribution. 
+
+\subsection{NEAT}
+NEAT (NeuroEvolution of Augmenting Topologies) is a machine learning algorithm
 
 % Execution
 \pagebreak
 \section{Preliminary: Lagrangian Fluid Simulation}
-One method of simulating fluid dynamics is the Lagrangian method. This method
-models the fluid as a particle collision system, where the air is represented by
-particles that interact with each other to emulate a fluid. Our implementation
-is based on \hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution}
+We first tried to implement a Lagrangian fluid simulation.
+Our implementation is based on \hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution}
 (\cite{hakenberg}). We used this paper as a guide for all the math involved.
 
 The math relies on the momentum, inertia, and velocity of the particles to
@@ -225,13 +277,11 @@ end it was put aside, and the Lagrangian implementation was never completed.
 
 \pagebreak
 \section{Execution: Eulerian Fluid Simulation}
-The other method is the Eulerian method. This method models the fluid as a
-cellular automata. The fluid is represented by a grid of cells, each of which
-has its own properties and interacts with its neighbor cells, creating a Cartesian
-mesh-style field.
-
+Our next attempt was to try and implement a Eulerian fluid simulation.
 Our fluid simulation involves a three-dimensional grid of cells, each of which
-have velocity and density fields. Each frame, the cells interact with each
+have velocity and density fields. The density fields are purely for the purpose of visualization. When we are talking about 'density',
+you can image it as the density of colored dye in the fluid. 
+Each frame, the cells interact with each
 other according to the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
 
 The specific math involved in the base equations for the fluid simulation is
@@ -239,6 +289,10 @@ quite complex, and we couldn't have derived it on our own, so we used
 Mike Ash's implementation \href{www.mikeash.com/pyblog/fluid-simulation-for-dummies.html}{\citefield{mikeash}{title}} (\cite{mikeash})
 as the bedrock of our program. Mike Ash's code is in turn based on Jos Stam's
 brilliant work on \href{www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf}{\citefield{josstam}{title}} (\cite{josstam}).
+This math will be explained in section \ref{math}. 
+How we implemented this math into the density solver of the fluid simulation is explained in section \ref{density}.
+The way it is implemented in the velocity solver is explained in section \ref{velocity}.
+We will be explaining the concepts in 2D, so it is easier to visualize and understand. 
 
 % Math
 \subsection{The Math} \label{math}
@@ -252,23 +306,23 @@ The Navier-Stokes equations show us how these velocity vectors evolve over time 
 	\end{array}
 \]
 The first equation returns the change in velocity in a vector notation. 
-Unlike in Lagrangian fluid simulation, in Eularian fluid simulation the fluid is not represented by individual particles. 
+Unlike in Lagrangian fluid simulation, in Eulerian fluid simulation the fluid is not represented by individual particles. 
 Thats why, instead, fluid density is used, which tells us the amount of particles present in a point in space. 
 The second equation shows us the change of this density. 
 Although to understand the math behind this simulation it isn't needed to fully understand these equations, it should be noted that the two equations above look a lot like each other,
 as this was helpful in developing the simulation. (\cite{josstam})
 
 \begin{figure}[H]
-    \centering
-    \begin{subfigure}[t]{0.45\textwidth}
-        \centering
+	\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
 		\includegraphics[width=5cm]{resources/collocated_grid_2.png}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.45\textwidth}
-        \centering
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
 		\includegraphics[width=5cm]{resources/staggered_grid_2.png}
-    \end{subfigure}
+	\end{subfigure}
 	\caption{Computational grids}
 \end{figure}
 
@@ -281,7 +335,7 @@ However because Mike Ash and Jos Stam used a collocated grid in their works we d
 \subsection{Density Solver} \label{density}
 
 First, lets look at the density solver. The density solver follows three steps: first adding forces, secondly diffusion and lastly moving the densities. 
-If we look at the density equation in figure 1, we see that the change in density in a single time steps is influenced by three terms. 
+If we look at the density equation in section \ref{math}, we see that the change in density in a single time steps is influenced by three terms. 
 The first term states that the density should follow the velocity field,
 the second term represents the density's rate of diffusion
 and the third term says that the density can increase due to sources. 
@@ -331,21 +385,42 @@ The solution to this problem is to find the density of the cell when being diffu
 	\rho_{x, y} = P_{x, y} + a \cdot (P_{x+1, y} + P_{x-1, y} + P_{x, y+1} + P_{x, y-1} - 4 \cdot P_{x, y})
 \end{array}	
 \]
-To solve this system of linear equations for the unknowns P$_{x, y}$ the \hyperlink{https://en.wikipedia.org/wiki/Gauss–Seidel_method}{Gauss-Seidel method} is used. 
-(\cite{josstam}
+To solve this system of linear equations for the unknowns P$_{x, y}$ the \href{https://en.wikipedia.org/wiki/Gauss–Seidel_method}{Gauss-Seidel method} is used. (\cite{josstam})
 
 \subsubsection{Advection}
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.3\textwidth}
+		\centering
+		\includegraphics[width=4cm]{resources/advection1.png}
+		\caption{Velocity vector field}
+	\end{subfigure}
+	\begin{subfigure}{0.3\textwidth}
+		\centering
+		\includegraphics[width=4cm]{resources/advection2.png}
+		\caption{A particle}
+	\end{subfigure}
+	\begin{subfigure}{0.3\textwidth}
+		\centering
+		\includegraphics[width=4cm]{resources/advection3.png}
+		\caption{Backtracing the particle}
+	\end{subfigure}
+	\caption {Advection method}
+	\label{fig:advection}
+\end{figure}
+
 The final step of the density solver is moving the densities following the velocity field.
 Because you can't really move grid cells, we will use a technique where we represent a density as a set of particles.
 An obvious way to move the densities is to act like the center of a cell is a particle and move it through the velocity field.
 But because we have to convert the particles back to a grid, we will use a different method. 
 This method is called semi-lagrangian advection.
-We will first look at the particles that end up at the center of a cell and use the velocity of the cell to trace the particles one time step back in time.
-Then we will look at where the particles end up and calculate the weighted average of the densities of the four closest cells from a particle and set this as the new density of the current cell. 
+We will first look at the particles that end up at the center of a cell, as shown in Figure \ref{fig:advection} (b). Then we use the velocity of the cell to trace the particles one time step back in time. This is shown in Figure \ref{fig:advection} (c).
+Then we will look at where the particles end up and calculate the weighted average of the densities of the four closest cells from a particle and set this as the new density of the current cell, also shown in Figure \ref{fig:advection} (c).
 To do this we need to use two different grids: one that contains all the density values from the previous time step
 and on that contains the new density values. (\cite{josstam})
-
-\subsection{Velocity Solver}
+ 
+\subsection{Velocity Solver} \label{velocity}
 Now we will look at the velocity solver. Just like with the density solver if we look at the equations in section \ref{math}
 we see that the change in velocity in a single time step is influenced by three factors. 
 These are: the addition of forces, viscous diffusion and self-advection. 
@@ -642,7 +717,15 @@ is something that would be very fun to explore in the future, but once again it'
 beyond the scope (and time limit) of our project.
 
 \subsection{Future Work}
-\ipsum[1]
+
+% Conclusion
+\subsection{Conclusion}
+We our paper we tried to answer the following questions: 
+\begin{itemize}
+	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
+	\item{How do we dynamically generate 3D models?}
+	\item{How does an airplane's wing shape influence its performance?}
+\end{itemize}
 
 % References
 \section{Bibliography}

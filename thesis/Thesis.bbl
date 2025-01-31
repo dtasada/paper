@@ -76,10 +76,10 @@
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \verb www.en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
       \verb{url}
-      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \verb www.en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
     \entry{brener}{video}{}
@@ -312,7 +312,6 @@
       \field{labeltitlesource}{title}
       \field{title}{Coding Adventure: Simulating Fluids}
       \field{year}{2023}
-      \true{nocite}
       \verb{urlraw}
       \verb www.youtu.be/rSKMYc1CQHE
       \endverb
@@ -591,10 +590,10 @@
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Gauss–Seidel_method
+      \verb www.en.wikipedia.org/wiki/Gauss–Seidel_method
       \endverb
       \verb{url}
-      \verb https://en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
+      \verb www.en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
       \endverb
     \endentry
     \entry{navierstokes}{article}{}
@@ -622,10 +621,10 @@
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
+      \verb www.en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
       \endverb
       \verb{url}
-      \verb https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
+      \verb www.en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
       \endverb
     \endentry
     \entry{pezzza}{video}{}
@@ -719,10 +718,10 @@
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \verb www.en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
       \verb{url}
-      \verb https://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+      \verb www.en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
     \entry{brener}{video}{}
@@ -955,7 +954,6 @@
       \field{labeltitlesource}{title}
       \field{title}{Coding Adventure: Simulating Fluids}
       \field{year}{2023}
-      \true{nocite}
       \verb{urlraw}
       \verb www.youtu.be/rSKMYc1CQHE
       \endverb
@@ -1234,10 +1232,10 @@
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Gauss–Seidel_method
+      \verb www.en.wikipedia.org/wiki/Gauss–Seidel_method
       \endverb
       \verb{url}
-      \verb https://en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
+      \verb www.en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
       \endverb
     \endentry
     \entry{navierstokes}{article}{}
@@ -1265,10 +1263,10 @@
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
+      \verb www.en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
       \endverb
       \verb{url}
-      \verb https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
+      \verb www.en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
       \endverb
     \endentry
     \entry{pezzza}{video}{}
