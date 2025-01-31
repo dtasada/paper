@@ -225,18 +225,17 @@ Although to understand the math behind this simulation it isn't needed to fully 
 as this was helpful in developing the simulation. (\cite{josstam})
 
 \begin{figure}[H]
-\centering
-\begin{subfigure}{.5\textwidth}
-	\centering
-	\includegraphics[width=5cm]{resources/collocated_grid_2.png}
-	\caption{Collocated grid}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-	\centering
-	\includegraphics[width=5cm]{resources/staggered_grid_2.png}
-	\caption{Staggered grid}
-\end{subfigure}
-\caption{Computational grids}
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+		\includegraphics[width=5cm]{resources/collocated_grid_2.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+		\includegraphics[width=5cm]{resources/staggered_grid_2.png}
+    \end{subfigure}
+	\caption{Computational grids}
 \end{figure}
 
 There are two different types of velocity vector fields we can use: collocated and staggered.
@@ -298,7 +297,7 @@ The solution to this problem is to find the density of the cell when being diffu
 	\rho_{x, y} = P_{x, y} + a \cdot (P_{x+1, y} + P_{x-1, y} + P_{x, y+1} + P_{x, y-1} - 4 \cdot P_{x, y})
 \end{array}	
 \]
-To solve this system of lineair equations for the unknowns P$_{x, y}$ the \hyperlink{https://en.wikipedia.org/wiki/Gauss–Seidel_method}{Gauss-Seidel method} is used. 
+To solve this system of linear equations for the unknowns P$_{x, y}$ the \hyperlink{https://en.wikipedia.org/wiki/Gauss–Seidel_method}{Gauss-Seidel method} is used. 
 (\cite{josstam}
 
 \subsubsection{Advection}
@@ -327,7 +326,7 @@ To make the fluid mass conserving we will use a mathematical concept called Hodg
 Hodge composition states that every vector field is the sum of a mass conserving field and a gradient field.
 So all we have to do is compute a gradient field and subtract it from the velocity field. 
 The gradient field 
-Computing the gradient field involves the solution of a lineair system called a Poisson equation.
+Computing the gradient field involves the solution of a linear system called a Poisson equation.
 To solve this system we will we again use the Gauss-Seidel method that was also mentioned in section \ref{density} in the diffusion step. (\cite{josstam})
 
 \subsection{The Implementation}
@@ -403,19 +402,25 @@ condition to the CFD. This is done for every cell in the grid, and the result
 is a 3D boolean array that represents the object. The source code is at \lstinline{Fluid::voxelize}.
 Each obstacle is passed to this function, and as a result we get a 3D boolean
 field saved at \lstinline{Fluid::state}. Below is a figure of the voxel map,
-with cells classified as solid highlighted in blue.
+with cells classified as solid highlighted in blue. Note that the edges of the
+torus are also marked as solid despite their cells obviously only being partial.
+This is because our implementation of the voxel mapping using FCL isn't working
+as intended.
 
 \begin{figure}[H]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=1.65in]{resources/voxelize1.png}%
+        \includegraphics[height=1.65in]{resources/voxelize1.png}
+		\caption{}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=1.65in]{resources/voxelize2.png}%
-    \end{subfigure}
+        \includegraphics[height=1.65in]{resources/voxelize2.png}
+		\caption{}
+		\label{fig:voxelmap}
+	\end{subfigure} 
     \caption{Voxel map}
 \end{figure}
 
@@ -444,7 +449,7 @@ into the three states is called the \href{https://www.sciencedirect.com/science/
 		\end{itemize}
 	\item{Solid cells}
 		\begin{itemize}
-			\item{Cells thar are fully inside an obstacle}
+			\item{Cells that are fully inside an obstacle}
 			\item{Applies no-slip condition: velocity is zero}
 		\end{itemize}
 	\item{Cut-cells}
@@ -454,17 +459,127 @@ into the three states is called the \href{https://www.sciencedirect.com/science/
 		\end{itemize}
 \end{enumerate}
 
-TODO: FINISH EXPLAINING CUT-CELL
+We'd like to preface this by saying that our implementation of Cut-Cell obstacle
+resolution is not completed or working, so some of the following is theoretical.
+The idea is that when a cell is classified as a Cut-Cell, we create a new field to
+track the amount of fluid that's inside the cell. For every cell, we calculate the
+fractional fluid volume:
 
-TODO: EXPLAIN OUR FAILURES
-TODO: EXPLAIN POSSIBLE FIXES AND WHAT SHOULD BE FINISHED/IMPROVED
+\[
+	\begin{array}{ll}
+		\text{Fractional fluid volume } \alpha = \frac{\text{volume of fluid in cell}}{\text{total cell volume}} \\
+		\text{Fractional face area } \beta_d = \frac{\text{open d-face area}}{\text{total d-face area}} \text{ where d is one of X, Y, or Z}
+	\end{array}
+\]
+
+The fractional fluid volume is the ratio of the volume of fluid in the cell to the
+total volume of the cell, where a solid cell has a value of 0 and an empty cell has
+a value of 1. The same goes for the fractional face area, which is the ratio of the
+open face area to the total area of a given cell.
+
+With this information we can modify the advection step of the CFD to account for
+a cut-cell. We do this by scaling the advection by the fractional face area. Next
+we also adjust the projection step. // TODO POISSON EQUATION //
+
+The last step is to make sure to apply the correct boundaries to the fluid,
+where any solid cells have a constant velocity of 0.
+
+The reason we failed to implement this is twofold:
+\begin{enumerate}
+	\item{
+			Incomplete voxelization process. Figure \ref{fig:voxelmap} is
+			captured with a modified version of the program that only voxelizes
+			to two states: solid and fluid, with no cut-cells. This is because we
+			weren't capable of implementing the FCL collision detection correctly.
+			We don't know what caused the issue, but unfortunately we didn't have
+			time to debug it thoroughly.
+	}
+	\item{
+			We realized while writing this paper that we'd forgotten to modify the
+			projection step to account for cut-cells, which explains a bug we experienced,
+			where the fluid would leak through the cut-cells.
+		}
+\end{enumerate}
+
+Improving on these two points might have yielded better results.
 
 % Results
-\section{Results}
-\ipsum[1]
+\section{Results: Challenges \& Failures}
+Due to the issues with the voxelization process and the object collisions, we
+weren't actually able to complete the model we wanted. We have a working fluid
+simulation, but most of the work we did on the obstacles was more theoretical
+than any tangible working prototype. Here's an outline of what went wrong:
+
+\subsection{Grid Collision}
+\begin{itemize}
+	\item{\textbf{Issue}: air bleeds through obstacles}
+	\item{\textbf{Causes}:}
+		\begin{itemize}
+			\item{Cut-cell method not fully implemented}
+			\item{Failure in voxelization process}
+		\end{itemize}
+	\item{
+			\textbf{Solution}: it took a lot of trial and error, but no solution
+			was found. We have some hypotheses, but we don't have any time to test,
+			so it's possible that some of the solutions defined in this paper don't
+			work in practice.
+		}
+	\item{\textbf{Result}: a dead end. Most of our project relied on this section working.}
+\end{itemize}
+
+\subsection{Performance}
+Despite being written in 2006, Mike Ash's isn't the fastest, even with today's
+hardware. The fluid simulation runs quite reasonably at a resolution, of say
+$32\times32\times32$, but bumping up the grid size yields worse and worse results.
+At that grid resolution of $32^3$, we see about 20 FPS on my laptop. This isn't
+abysmal by any means, but $32^3$ really isn't very high either. So we profiled
+the program to see what was the slowest.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{resources/profile.png}
+	\caption{Profile of the fluid simulation program}
+\end{figure}
+
+Some of the steps involved in the Eulerian fluid simulation require iterating
+over every cell in the grid, and performing some arithmetic operations on that cell.
+Both the advection and projection steps require this, and the advection step
+alone runs four times every step. That's about $32^3 * 4 = 131\,072$ iterations
+every step, just for the advection. This is understating the amount of arithmetic
+operations that are executed, but it already gives an idea of the scale of the
+problem.
+
+We haven't optimized the code that much, but the most important thing we did was
+parallelize the these large iterations. Anytime we have any meaningful iteration
+over the grid, we use \href{www.openmp.org}{OpenMP} to parallelize it. This was
+a very quick and simple way to get a performance boost, and it works quite well.
+Still, there's some room for improvement.
+
+We didn't actually go any further but we have some ideas for speed boosts. These
+are speed boosts and not real algorithmic optimizations because for that we'd have
+to really look into the Navier-Stokes equations and speed up Jos Stam's algorithms,
+but that's beyond the scope of what we'd want to do. Rather we're thinking that
+while we parallelized the long for loops, the code still isn't really asynchronous.
+OpenMP is a great tool for parallelization, which is what we're using it for,
+but we could go one step further and refactor our code to be truly asynchronous,
+and assign a thread to each task, for example.
+
+Another factor is that while the client-side rendering is hardware accelerated,
+the actual fluid simulation all runs on the CPU. This is quite the bottleneck,
+as the CPU architecture isn't really designed for this kind of large scale
+parallel work for high resolution grids. Brute-forcing this would require a lot
+of compute cores, which CPUs don't have (modern CPUs have between 4 and 16 cores
+in the consumer market). The most obvious solution is to transfer the load to
+a dedicated GPU, which we can utilize to perform all these arithmetic operations
+for us would be a massive improvement. Migrating the CFD code to a compute shader
+or an OpenCL kernel would be a great way to speed up the simulation. This is something
+that would be very fun to explore in the future, but once again it's beyond the
+scope (and time limit) of our project.
+
+
 
 % Conclusion
-\subsection{Conclusion}
+\section{Conclusion}
 \ipsum[1]
 
 % References

@@ -5,7 +5,7 @@
 
 Fluid::Fluid(int container_size, float scaling, float diffusion, float viscosity, float dt) {
     this->container_size = container_size;
-    this->scaling        = scaling; // raylib world size of a single cell
+    this->scaling        = scaling;  // raylib world size of a single cell
     this->dt             = dt;
     this->diffusion      = diffusion;
     this->visc           = viscosity;
@@ -61,7 +61,7 @@ void Fluid::add_velocity(v3 position, v3 amount) {
     vz[index] += amount.z;
 }
 
-void Fluid::advect(
+/* void Fluid::advect(
     FieldType     b,
     Field<float> &d,
     Field<float> &d0,
@@ -116,6 +116,78 @@ void Fluid::advect(
     }
 
     set_boundaries(b, d);
+} */
+
+void Fluid::advect(
+    FieldType     b,
+    Field<float> &d,
+    Field<float> &d0,
+    Field<float> &velocX,
+    Field<float> &velocY,
+    Field<float> &velocZ
+) {
+    float i0, i1, j0, j1, k0, k1;
+
+    float dtx = dt * (N - 2);
+    float dty = dt * (N - 2);
+    float dtz = dt * (N - 2);
+
+    float s0, s1, t0, t1, u0, u1;
+    float tmp1, tmp2, tmp3, x, y, z;
+
+    float Nfloat = N;
+    float ifloat, jfloat, kfloat;
+    int   i, j, k;
+
+    for (k = 1, kfloat = 1; k < N - 1; k++, kfloat++) {
+        for (j = 1, jfloat = 1; j < N - 1; j++, jfloat++) {
+            for (i = 1, ifloat = 1; i < N - 1; i++, ifloat++) {
+                tmp1 = dtx * velocX[IX(i, j, k)];
+                tmp2 = dty * velocY[IX(i, j, k)];
+                tmp3 = dtz * velocZ[IX(i, j, k)];
+                x    = ifloat - tmp1;
+                y    = jfloat - tmp2;
+                z    = kfloat - tmp3;
+
+                if (x < 0.5f) x = 0.5f;
+                if (x > Nfloat + 0.5f) x = Nfloat + 0.5f;
+                i0 = floorf(x);
+                i1 = i0 + 1.0f;
+                if (y < 0.5f) y = 0.5f;
+                if (y > Nfloat + 0.5f) y = Nfloat + 0.5f;
+                j0 = floorf(y);
+                j1 = j0 + 1.0f;
+                if (z < 0.5f) z = 0.5f;
+                if (z > Nfloat + 0.5f) z = Nfloat + 0.5f;
+                k0 = floorf(z);
+                k1 = k0 + 1.0f;
+
+                s1 = x - i0;
+                s0 = 1.0f - s1;
+                t1 = y - j0;
+                t0 = 1.0f - t1;
+                u1 = z - k0;
+                u0 = 1.0f - u1;
+
+                int i0i = i0;
+                int i1i = i1;
+                int j0i = j0;
+                int j1i = j1;
+                int k0i = k0;
+                int k1i = k1;
+
+                d[IX(i, j, k)] =
+
+                    s0
+                        * (t0 * (u0 * d0[IX(i0i, j0i, k0i)] + u1 * d0[IX(i0i, j0i, k1i)])
+                           + (t1 * (u0 * d0[IX(i0i, j1i, k0i)] + u1 * d0[IX(i0i, j1i, k1i)])))
+                    + s1
+                          * (t0 * (u0 * d0[IX(i1i, j0i, k0i)] + u1 * d0[IX(i1i, j0i, k1i)])
+                             + (t1 * (u0 * d0[IX(i1i, j1i, k0i)] + u1 * d0[IX(i1i, j1i, k1i)])));
+            }
+        }
+    }
+    set_boundaries(b, d);
 }
 
 void Fluid::diffuse(FieldType b, Field<float> &x, Field<float> &x0, float diff) {
@@ -140,6 +212,7 @@ void Fluid::lin_solve(FieldType b, Field<float> &f, Field<float> &f0, float a, f
                 }
             }
         }
+
         set_boundaries(b, f);
     }
 }
@@ -156,8 +229,8 @@ void Fluid::project(
         for (int y = 1; y < N - 1; y++) {
             for (int x = 1; x < N - 1; x++) {
                 if (state[IX(x, y, z)] == CellType::SOLID) {
-                    div[IX(x, y, z)] = 0; // No divergence in solid cells
-                    p[IX(x, y, z)]   = 0; // Pressure is also zero
+                    div[IX(x, y, z)] = 0;  // No divergence in solid cells
+                    p[IX(x, y, z)]   = 0;  // Pressure is also zero
                 } else if (state[IX(x, y, z)] == CellType::CUT_CELL) {
                     float fraction   = volume[IX(x, y, z)];
                     div[IX(x, y, z)] = -0.5f * fraction
@@ -166,7 +239,7 @@ void Fluid::project(
                                         + velocZ[IX(x, y, z + 1)] - velocZ[IX(x, y, z - 1)])
                                      / N;
                     p[IX(x, y, z)] = 0;
-                } else { // FLUID cells
+                } else {  // FLUID cells
                     div[IX(x, y, z)] = -0.5f
                                      * (velocX[IX(x + 1, y, z)] - velocX[IX(x - 1, y, z)]
                                         + velocY[IX(x, y + 1, z)] - velocY[IX(x, y - 1, z)]
@@ -201,7 +274,7 @@ void Fluid::project(
                         -= 0.5f * fraction * (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
                     velocZ[IX(x, y, z)]
                         -= 0.5f * fraction * (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
-                } else { // FLUID cells
+                } else {  // FLUID cells
                     velocX[IX(x, y, z)] -= 0.5f * (p[IX(x + 1, y, z)] - p[IX(x - 1, y, z)]) * N;
                     velocY[IX(x, y, z)] -= 0.5f * (p[IX(x, y + 1, z)] - p[IX(x, y - 1, z)]) * N;
                     velocZ[IX(x, y, z)] -= 0.5f * (p[IX(x, y, z + 1)] - p[IX(x, y, z - 1)]) * N;
@@ -226,7 +299,7 @@ void        Fluid::set_boundaries(FieldType b, Field<float> &f) {
 
             // Handle bottom (z=0) and top (z=N-1) boundaries
             if (state[index0] == CellType::SOLID) {
-                f[index0] = 0.0f; // No velocity through solid
+                f[index0] = 0.0f;  // No velocity through solid
             } else if (b == FieldType::VZ) {
                 f[index0] = -f[IX(x, y, 1)];
             } else {

@@ -270,36 +270,6 @@
       \verb www.youtu.be/rSKMYc1CQHE
       \endverb
     \endentry
-    \entry{fcl}{software}{}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=088cc4cfbbcbf959b0205345e3541de2}{%
-           family={Library},
-           familyi={L\bibinitperiod},
-           given={Flexible\bibnamedelima Collision},
-           giveni={F\bibinitperiod\bibinitdelim C\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{fullhash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{bibnamehash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{authorbibnamehash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{authornamehash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{authorfullhash}{088cc4cfbbcbf959b0205345e3541de2}
-      \field{sortinit}{L}
-      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
-      \field{labeldatesource}{nodate}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Flexible Collision Library}
-      \true{nocite}
-      \verb{urlraw}
-      \verb https://github.com/flexible-collision-library/fcl
-      \endverb
-      \verb{url}
-      \verb https://github.com/flexible-collision-library/fcl
-      \endverb
-    \endentry
     \entry{tenminute}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=81a3feeb579a36f8ed14c22d7264cf2c}{%
@@ -800,36 +770,6 @@
       \endverb
       \verb{url}
       \verb www.youtu.be/rSKMYc1CQHE
-      \endverb
-    \endentry
-    \entry{fcl}{software}{}
-      \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=088cc4cfbbcbf959b0205345e3541de2}{%
-           family={Library},
-           familyi={L\bibinitperiod},
-           given={Flexible\bibnamedelima Collision},
-           giveni={F\bibinitperiod\bibinitdelim C\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{fullhash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{bibnamehash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{authorbibnamehash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{authornamehash}{088cc4cfbbcbf959b0205345e3541de2}
-      \strng{authorfullhash}{088cc4cfbbcbf959b0205345e3541de2}
-      \field{sortinit}{L}
-      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
-      \field{labeldatesource}{nodate}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Flexible Collision Library}
-      \true{nocite}
-      \verb{urlraw}
-      \verb https://github.com/flexible-collision-library/fcl
-      \endverb
-      \verb{url}
-      \verb https://github.com/flexible-collision-library/fcl
       \endverb
     \endentry
     \entry{tenminute}{video}{}
