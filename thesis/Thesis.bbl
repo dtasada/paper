@@ -286,6 +286,7 @@
       \verb www.youtu.be/rSKMYc1CQHE
       \endverb
     \endentry
+<<<<<<< HEAD
     \entry{fcl}{software}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=088cc4cfbbcbf959b0205345e3541de2}{%
@@ -319,6 +320,9 @@
       \endverb
     \endentry
     \entry{tenminute}{video}{}{}
+=======
+    \entry{tenminute}{video}{}
+>>>>>>> 0dc08d8d8760efcaf577b68ee1a5580267b9f966
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=81a3feeb579a36f8ed14c22d7264cf2c}{%
            family={Müller},
@@ -852,6 +856,7 @@
       \verb www.youtu.be/rSKMYc1CQHE
       \endverb
     \endentry
+<<<<<<< HEAD
     \entry{fcl}{software}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=088cc4cfbbcbf959b0205345e3541de2}{%
@@ -885,6 +890,9 @@
       \endverb
     \endentry
     \entry{tenminute}{video}{}{}
+=======
+    \entry{tenminute}{video}{}
+>>>>>>> 0dc08d8d8760efcaf577b68ee1a5580267b9f966
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=81a3feeb579a36f8ed14c22d7264cf2c}{%
            family={Müller},
