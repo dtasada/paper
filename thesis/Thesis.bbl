@@ -238,6 +238,56 @@
       \verb www.researchgate.net/publication/222518000
       \endverb
     \endentry
+    \entry{airfoil3}{article}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=a03e9eefe309e53a48c30ad57c770626}{%
+           family={Koning},
+           familyi={K\bibinitperiod},
+           given={Witold\bibnamedelima J.F.},
+           giveni={W\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=efefd9080bda5e878c60fa36d225f11e}{%
+           family={Romander},
+           familyi={R\bibinitperiod},
+           given={Ethan\bibnamedelima A.},
+           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7d06192f62a629470e7b9a2556c9f6d1}{%
+           family={Cummings},
+           familyi={C\bibinitperiod},
+           given={Haley\bibnamedelima V.},
+           giveni={H\bibinitperiod\bibinitdelim V\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=404b0ad93000addc7905c1fde90ab6b9}{%
+           family={Perez},
+           familyi={P\bibinitperiod},
+           given={B.\bibnamedelimi Natalia\bibnamedelima Perez},
+           giveni={B\bibinitperiod\bibinitdelim N\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{7158fbdbef86d5428bba67a2385fe3be}
+      \strng{fullhash}{9715df2260bb6225709cf4d92be39470}
+      \strng{bibnamehash}{9715df2260bb6225709cf4d92be39470}
+      \strng{authorbibnamehash}{9715df2260bb6225709cf4d92be39470}
+      \strng{authornamehash}{7158fbdbef86d5428bba67a2385fe3be}
+      \strng{authorfullhash}{9715df2260bb6225709cf4d92be39470}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{On Improved Understanding of Airfoil Performance Evaluation Methods at Low Reynolds Numbers}
+      \field{year}{2023}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.rotorcraft.arc.nasa.gov/Publications/files/1.c037023.pdf
+      \endverb
+      \verb{url}
+      \verb www.rotorcraft.arc.nasa.gov/Publications/files/1.c037023.pdf
+      \endverb
+    \endentry
     \entry{seblague}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=082f0a20a5ae96d82e2f5df24e0fac8e}{%
@@ -268,6 +318,35 @@
       \endverb
       \verb{url}
       \verb www.youtu.be/rSKMYc1CQHE
+      \endverb
+    \endentry
+    \entry{airfoil1}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e884c507c5198a4578a84498f7a323e2}{%
+           family={LinkedIn},
+           familyi={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{fullhash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{bibnamehash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{authorbibnamehash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{authornamehash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{authorfullhash}{e884c507c5198a4578a84498f7a323e2}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{How do you evaluate the performance of different airfoil shapes and configurations}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.linkedin.com/advice/1/how-do-you-evaluate-performance-different-airfoil
+      \endverb
+      \verb{url}
+      \verb www.linkedin.com/advice/1/how-do-you-evaluate-performance-different-airfoil
       \endverb
     \endentry
     \entry{tenminute}{video}{}
@@ -364,6 +443,68 @@
       \verb www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf
       \endverb
     \endentry
+    \entry{airfoil2}{article}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=304b572d03834ead064ba6686a9717d2}{%
+           family={Teimourian},
+           familyi={T\bibinitperiod},
+           given={Amir},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=cd785eb4fbfb95bae974e84b9dc2acf1}{%
+           family={Rohacs},
+           familyi={R\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=463f94ed2406cfe1c1e58f61af3f0423}{%
+           family={Dimililer},
+           familyi={D\bibinitperiod},
+           given={Kamil},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fe62fd53d5c9eb642497d4e7f197eae4}{%
+           family={Teimourian},
+           familyi={T\bibinitperiod},
+           given={Hanifa},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=69e1a165831cf8211596c6c697610ff8}{%
+           family={Yildiz},
+           familyi={Y\bibinitperiod},
+           given={Melih},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=412f7a90682bd43a4f3ff6008fab9133}{%
+           family={Kale},
+           familyi={K\bibinitperiod},
+           given={Utku},
+           giveni={U\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{4af9d08a65cbb6cf3a03854c6fa76b82}
+      \strng{fullhash}{3a28051095c187e0918495f47dccaae8}
+      \strng{bibnamehash}{3a28051095c187e0918495f47dccaae8}
+      \strng{authorbibnamehash}{3a28051095c187e0918495f47dccaae8}
+      \strng{authornamehash}{4af9d08a65cbb6cf3a03854c6fa76b82}
+      \strng{authorfullhash}{3a28051095c187e0918495f47dccaae8}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Airfoil aerodynamic performance prediction using machine learning and surrogate modeling}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.sciencedirect.com/science/article/pii/S2405844024054082
+      \endverb
+      \verb{url}
+      \verb www.sciencedirect.com/science/article/pii/S2405844024054082
+      \endverb
+    \endentry
     \entry{cutcell}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=4b550ebb91db45cd9c66db925eed7761}{%
@@ -450,10 +591,10 @@
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Gauss–Seidel_method#References
+      \verb https://en.wikipedia.org/wiki/Gauss–Seidel_method
       \endverb
       \verb{url}
-      \verb https://en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method#References
+      \verb https://en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
       \endverb
     \endentry
     \entry{navierstokes}{article}{}
@@ -740,6 +881,56 @@
       \verb www.researchgate.net/publication/222518000
       \endverb
     \endentry
+    \entry{airfoil3}{article}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=a03e9eefe309e53a48c30ad57c770626}{%
+           family={Koning},
+           familyi={K\bibinitperiod},
+           given={Witold\bibnamedelima J.F.},
+           giveni={W\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=efefd9080bda5e878c60fa36d225f11e}{%
+           family={Romander},
+           familyi={R\bibinitperiod},
+           given={Ethan\bibnamedelima A.},
+           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7d06192f62a629470e7b9a2556c9f6d1}{%
+           family={Cummings},
+           familyi={C\bibinitperiod},
+           given={Haley\bibnamedelima V.},
+           giveni={H\bibinitperiod\bibinitdelim V\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=404b0ad93000addc7905c1fde90ab6b9}{%
+           family={Perez},
+           familyi={P\bibinitperiod},
+           given={B.\bibnamedelimi Natalia\bibnamedelima Perez},
+           giveni={B\bibinitperiod\bibinitdelim N\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{7158fbdbef86d5428bba67a2385fe3be}
+      \strng{fullhash}{9715df2260bb6225709cf4d92be39470}
+      \strng{bibnamehash}{9715df2260bb6225709cf4d92be39470}
+      \strng{authorbibnamehash}{9715df2260bb6225709cf4d92be39470}
+      \strng{authornamehash}{7158fbdbef86d5428bba67a2385fe3be}
+      \strng{authorfullhash}{9715df2260bb6225709cf4d92be39470}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{On Improved Understanding of Airfoil Performance Evaluation Methods at Low Reynolds Numbers}
+      \field{year}{2023}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.rotorcraft.arc.nasa.gov/Publications/files/1.c037023.pdf
+      \endverb
+      \verb{url}
+      \verb www.rotorcraft.arc.nasa.gov/Publications/files/1.c037023.pdf
+      \endverb
+    \endentry
     \entry{seblague}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=082f0a20a5ae96d82e2f5df24e0fac8e}{%
@@ -770,6 +961,35 @@
       \endverb
       \verb{url}
       \verb www.youtu.be/rSKMYc1CQHE
+      \endverb
+    \endentry
+    \entry{airfoil1}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e884c507c5198a4578a84498f7a323e2}{%
+           family={LinkedIn},
+           familyi={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{fullhash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{bibnamehash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{authorbibnamehash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{authornamehash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{authorfullhash}{e884c507c5198a4578a84498f7a323e2}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{How do you evaluate the performance of different airfoil shapes and configurations}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.linkedin.com/advice/1/how-do-you-evaluate-performance-different-airfoil
+      \endverb
+      \verb{url}
+      \verb www.linkedin.com/advice/1/how-do-you-evaluate-performance-different-airfoil
       \endverb
     \endentry
     \entry{tenminute}{video}{}
@@ -866,6 +1086,68 @@
       \verb www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf
       \endverb
     \endentry
+    \entry{airfoil2}{article}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=304b572d03834ead064ba6686a9717d2}{%
+           family={Teimourian},
+           familyi={T\bibinitperiod},
+           given={Amir},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=cd785eb4fbfb95bae974e84b9dc2acf1}{%
+           family={Rohacs},
+           familyi={R\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=463f94ed2406cfe1c1e58f61af3f0423}{%
+           family={Dimililer},
+           familyi={D\bibinitperiod},
+           given={Kamil},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fe62fd53d5c9eb642497d4e7f197eae4}{%
+           family={Teimourian},
+           familyi={T\bibinitperiod},
+           given={Hanifa},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=69e1a165831cf8211596c6c697610ff8}{%
+           family={Yildiz},
+           familyi={Y\bibinitperiod},
+           given={Melih},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=412f7a90682bd43a4f3ff6008fab9133}{%
+           family={Kale},
+           familyi={K\bibinitperiod},
+           given={Utku},
+           giveni={U\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{4af9d08a65cbb6cf3a03854c6fa76b82}
+      \strng{fullhash}{3a28051095c187e0918495f47dccaae8}
+      \strng{bibnamehash}{3a28051095c187e0918495f47dccaae8}
+      \strng{authorbibnamehash}{3a28051095c187e0918495f47dccaae8}
+      \strng{authornamehash}{4af9d08a65cbb6cf3a03854c6fa76b82}
+      \strng{authorfullhash}{3a28051095c187e0918495f47dccaae8}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Airfoil aerodynamic performance prediction using machine learning and surrogate modeling}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.sciencedirect.com/science/article/pii/S2405844024054082
+      \endverb
+      \verb{url}
+      \verb www.sciencedirect.com/science/article/pii/S2405844024054082
+      \endverb
+    \endentry
     \entry{cutcell}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=4b550ebb91db45cd9c66db925eed7761}{%
@@ -952,10 +1234,10 @@
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb https://en.wikipedia.org/wiki/Gauss–Seidel_method#References
+      \verb https://en.wikipedia.org/wiki/Gauss–Seidel_method
       \endverb
       \verb{url}
-      \verb https://en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method#References
+      \verb https://en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
       \endverb
     \endentry
     \entry{navierstokes}{article}{}

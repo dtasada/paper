@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt]{article}
+\documentclass[a4paper,12pt,titlepage]{article}
 
 % Packages
 \usepackage{animate}
@@ -67,12 +67,10 @@ breaklinks=true,
 }
 \date{\today}
 
-\begin{document}
-
 % Title and abstract
+\begin{document}
 \maketitle
 
-\pagebreak
 \begin{abstract}
 	In this paper, we investigate the relationship between an airplane's shape
 	and its performance. Our results show that \dots
@@ -80,7 +78,43 @@ breaklinks=true,
 
 % Table of Contents
 \pagebreak
+\section{Preface}
+\ipsum[1]
+
+\pagebreak
+\section{Contents}
 \tableofcontents
+\pagebreak
+
+\section{Nomenclature}
+\textit{Acronyms:}
+\[
+	\begin{array}{ll}
+		\text{CFD} & \text{Computational Fluid Dynamics} \\
+		\text{ML} & \text{Machine Learning} \\
+	\end{array}
+\] \\
+
+\textit{Variables:}
+\[
+	\begin{array}{ll}
+		L & \text{Angular momentum of a given particle} \\
+		I & \text{Inertia tensor of a given particle} \\
+		\omega & \text{Angular velocity of a given particle} \\
+		n & \text{Collision normal of a given particle} \\
+		R_i & \text{Orientation of a given particle} \\
+		\lambda & \text{Constant used in Lagrangian collision resolution} \\
+
+		\\
+
+		u & \text{Velocity vector field} \\
+		\rho & \text{Density field} \\
+		\nu & \text{Viscosity} \\
+		\kappa & \text{Density diffusivity} \\
+		f & \text{External forces} \\
+		S & \text{Density source}
+	\end{array}
+\]
 \pagebreak
 
 % Introduction
@@ -503,8 +537,39 @@ The reason we failed to implement this is twofold:
 
 Improving on these two points might have yielded better results.
 
+\section{Machine Learning Theory}
+The second part of our project was to use machine learning to optimize the shape
+of the airplane's body. The idea was to use a genetic algorithm to evolve the
+shape of the airplane's body to maximize performance. Once again since we didn't
+have a working fluid simulation we never got around to actually writing this part.
+
+That being said here's the outline of how ML (Machine Learning) works: we grab
+a basic airplane model, and we generate a population of airplane models. We
+simulate the airflow around each airplane model, and we use the results to calculate
+a fitness score for each airplane model. We then use a genetic algorithm to evolve
+the airplane models to maximize the fitness score. We repeat this process until
+we have a model that maximizes the fitness score.
+
+The plan was to write a Python script that utilizes the NEAT algorithm to generate
+the populations. NEAT is a genetic algorithm that evolves neural networks, which
+has a Python library that the user can implement in their scripts.
+There's two big parts to this: the first is the fitness function, which is the
+function that takes the results of the fluid simulation and calculates a score
+for the airplane model. The second part is the genetic algorithm, which is the
+algorithm that tweaks the vertex data of each airplane model to try to improve
+the fitness score.
+
+\subsection{Fitness Calculation}
+\subsection{Genetic Algorithm}
+
+% Conclusion
+\pagebreak
+\section{Conclusion}
+\ipsum[1]
+
 % Results
-\section{Results: Challenges \& Failures}
+\pagebreak
+\section{Discussion: Challenges, Failures \& Future Work}
 Due to the issues with the voxelization process and the object collisions, we
 weren't actually able to complete the model we wanted. We have a working fluid
 simulation, but most of the work we did on the obstacles was more theoretical
@@ -571,18 +636,16 @@ parallel work for high resolution grids. Brute-forcing this would require a lot
 of compute cores, which CPUs don't have (modern CPUs have between 4 and 16 cores
 in the consumer market). The most obvious solution is to transfer the load to
 a dedicated GPU, which we can utilize to perform all these arithmetic operations
-for us would be a massive improvement. Migrating the CFD code to a compute shader
-or an OpenCL kernel would be a great way to speed up the simulation. This is something
-that would be very fun to explore in the future, but once again it's beyond the
-scope (and time limit) of our project.
+for us and would yield a massive improvement. Migrating the CFD code to a compute
+shader or an OpenCL kernel would be a great way to speed up the simulation. This
+is something that would be very fun to explore in the future, but once again it's
+beyond the scope (and time limit) of our project.
 
-
-
-% Conclusion
-\section{Conclusion}
+\subsection{Future Work}
 \ipsum[1]
 
 % References
+\section{Bibliography}
 \nocite{*}
 \printbibliography
 
