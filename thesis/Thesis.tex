@@ -152,10 +152,11 @@ very expensive from a computational perspective, so code optimization is importa
 
 The thesis questions are the following:
 \begin{itemize}
-	\item{How do the different aspects of fluid dynamics work and how do we
-		implement it in a computer program?}
-	\item{How do we dynamically generate 3D models?}
-	\item{How does an airplane's wing shape influence its performance?}
+	\item{How does the math behind CFD work?}
+	\item{How is a CFD implemented?}
+	\item{How do obstacles work in a CFD?}
+	\item{How is the performance of an airplane calculated?}
+	\item{How can machine learning be used to optimize an airplane's shape?}
 \end{itemize}
 \pagebreak
 
@@ -312,6 +313,7 @@ In the end it was put aside, and the Lagrangian implementation was never complet
 	interact with each other according to the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
 	\end{minipage}\hfill
 	\begin{minipage}[t]{0.3\textwidth}
+		\vspace{4pt}
 		\centering\raisebox{\dimexpr \topskip-\height}{%
 		\includegraphics[width=\textwidth]{resources/dye.jpg}}
 		\captionof{figure}{Dye diffusing in water}
@@ -325,7 +327,9 @@ brilliant work on \href{www.dgp.toronto.edu/public_user/stam/reality/Research/pd
 This math will be explained in section \ref{math}. 
 How we implemented this math into the density solver of the fluid simulation is explained in section \ref{density}.
 The way it is implemented in the velocity solver is explained in section \ref{velocity}.
-We will explain the concepts in 2D, so it is easier to visualize and understand. 
+We will explain the concepts in 2D, so it is easier to visualize and understand.
+Lastly, section \ref{implementation} explains how to implement the fluid simulation,
+which includes the code's structure and how we implemented the collision detection.
 
 % Math
 \subsection{The Math} \label{math}
@@ -480,7 +484,7 @@ looks so much like the density equation we can use the same steps that were show
 in section \ref{density} to solve it. The only difference is that the velocity
 solver has an extra step called projection.
 
-\subsubsection{Projection}
+\subsubsection{Projection} \label{projectionstep}
 This step ensures that mass is conserved. 
 The law of conservation of mass is an important property of real-life fluids.
 The projection step will be the last step that is executed because the previous
@@ -492,7 +496,7 @@ field. The gradient field...TODO: finish this.
 Computing the gradient field involves the solution of a linear system called a Poisson equation.
 To solve this system we will we again use the Gauss-Seidel method that was also mentioned in section \ref{density} in the diffusion step (\cite{josstam}).
 
-\subsection{The Implementation}
+\subsection{The Implementation} \label{implementation}
 \subsubsection{Introduction to the code}
 Our project is structured as follows:
 \dirtree{%
@@ -604,7 +608,7 @@ which would adapt the mesh's resolution based on what's in a given region. This 
 generate a high resolution grid around an obstacle's bounds, and a low resolution
 grid in any empty space. This is an interesting concept, but we would have to
 rewrite some of the fluid math code to make the irregular grid work, and the Cut-Cell
-method is more straightforward, so we stuck with that. % TODO: finish this??
+method is more straightforward, so we stuck with that.
 
 \subsubsection{Implementing obstacle collision}
 According to the Cut-Cell method, each cell of the grid now has one of three states:
@@ -659,7 +663,7 @@ open face area to the total area of a given cell.
 
 With this information we can modify the advection step of the CFD to account for
 a cut-cell. We do this by scaling the advection by the fractional face area. Next
-we also adjust the projection step. // TODO POISSON EQUATION //
+we also adjust the \hyperref[projectionstep]{projection step}. TODO POISSON EQUATION
 
 The last step is to make sure to apply the correct boundaries to the fluid,
 where any solid cells have a constant velocity of 0.
@@ -702,11 +706,11 @@ the user can implement in their scripts.
 
 There's two big parts to this: the first is the fitness function, which is the
 function that takes the results of the fluid simulation and calculates a score
-for the airplane model. The second part is the genetic algorithm, which is the
-algorithm that tweaks the vertex data of each airplane model to try to improve
-the fitness score.
+for the airplane model. This is discussed in section \ref{fitness}.
+section \ref{genalg} discusses the genetic algorithm, which is the portion that tweaks
+the vertex data of each airplane model to try to improve the fitness score.
 
-\subsection{Fitness Calculation}
+\subsection{Fitness Calculation} \label{fitness}
 The fitness function is the function on the CFD-side that measures how good a
 given polygon is at flying. The metric for this is the lift-to-drag ratio, which
 is a measure of how much lift the airplane generates compared to how much drag
@@ -744,8 +748,22 @@ Now that we have a formula for the lift and drag, we can calculate the lift-to-d
 ratio by dividing the lift by the drag. This is the fitness score that we will
 use to evaluate the airplane models.
 
-\subsection{Genetic Algorithm}
-\ipsum[1]
+\subsection{Genetic Algorithm} \label{genalg}
+This is the final part of the project, where the working fluid simulation and a
+correct fitness function both converge. Since we never got around to implementing
+the whole Machine Learning part of the project, we can't really give any specifics
+on how our genetic algorithm should work. Knowing how to calculate the fitness
+score is a good start, but the actual population generation and mutation requires
+some trial and error with the different parameters of the genetic algorithm.
+What we can talk about is how we would mutate the airplane models. This is the
+part where the genetic algorithm tweaks the airplane models to try to improve
+the fitness score.
+
+The idea is to take the vertex data of the airplane model and apply some random
+mutations to it. This could be anything from changing the position of a vertex
+to adding a new vertex. The idea is to make small changes to the airplane model
+and see if the fitness score improves. If it does, we keep the change, if it
+doesn't we discard it. This is the basic idea behind the genetic algorithm.
 
 % Conclusion
 \pagebreak
