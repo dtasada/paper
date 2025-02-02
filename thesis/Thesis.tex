@@ -140,24 +140,47 @@ of a model's aerodynamic performance without building a physical model, or
 have to set up a wind tunnel. The practical alternative is much more expensive
 and time-consuming.
 
-The final aim is to determine how the shape of an airplane's body affects its
-performance. Part of the project is to dynamically generate 3D models of
-airplanes, and simulate the airflow around them. The intention is to use
-machine learning to optimize the shape of the airplane's body to maximize
-performance.
-
 CFD is challenging in the sense that it requires a good understanding of fluid
 dynamics, as well as a good understanding of the math involved. CFD is also
 very expensive from a computational perspective, so code optimization is important.
 
-The thesis questions are the following:
-\begin{itemize}
-	\item{How does a basic a CFD model work?}
-	\item{How is a CFD model implemented?}
-	\item{How do obstacles work in a CFD?}
-	\item{How is the performance of an airplane calculated?}
-	\item{How can machine learning be used to optimize an airplane's shape?}
-\end{itemize}
+The final aim is to determine how the shape of an airplane's body affects its
+performance. The intention is to use machine learning to optimize the shape of the airplane's body to maximize
+performance. Therefore the question we will try to answer in this paper is: \\
+
+What is the most optimal shape for an airplane to maximize its aerodynamic performance? \\
+
+The question will be divided into the following sub-questions: \\
+
+\textbf{SQ1:} How does a basic a CFD model work? \\
+
+Because we will be making our own CFD model, it is important that we understand how a CFD model works. 
+Answering this question will give us a good idea of how we can create our own CFD model. \\
+
+\textbf{SQ2:} How is a CFD model implemented? \\
+
+Not only is understanding how a CFD model works important, but also how it is implemented. 
+Part of the research done to answer this question will be by analyzing other existing CFD models.
+After answering this question we will have created a basic CFD model. \\
+
+\textbf{SQ3:} How do obstacles work in a CFD?\\
+
+To answer our main question we will need to implement the way the airplane interacts with the fluid. 
+That is why answering \textbf{SQ3} is an important part of our research. 
+It will give us the possibilty to analyze how the airplane's shape affects it performance. \\
+
+\textbf{SQ4:} How is the performance of an airplane calculated? \\
+
+We want to be able to compare different airplane shapes to see which one has the best aerodynamic performance 
+To be able to know how well an airplane is performing we need to how performance is defined
+The answer to this question will give us that definition and also the information we need to compare the different airplane shapes.\\
+
+\textbf{SQ5:} How can machine learning be used to optimize an airplane's shape? \\
+
+A part of the research will require us to use machine learning. 
+This is so that the we can optimize the shape of the airplane way faster and more efficiently than we could do by hand.
+That is why the answer \textbf{SQ5} will in the end help us to find the answer to our main question. 
+
 \pagebreak
 
 \section{Preliminary Research}
@@ -861,7 +884,7 @@ the program to see what was the slowest.
 Some of the steps involved in the Eulerian fluid simulation require iterating
 over every cell in the grid, and performing some arithmetic operations on that cell.
 Both the advection and projection steps require this, and the advection step
-alone runs four times every step. That's about $32^3 * 4 = 131\,072$ iterations
+alone runs four times every step. That's about $32^3 \times 4 = 131\,072$ iterations
 every step, just for the advection. This is understating the amount of arithmetic
 operations that are executed, but it already gives an idea of the scale of the
 problem.
