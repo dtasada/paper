@@ -81,7 +81,7 @@ breaklinks=true,
 \ipsum[1]
 
 \pagebreak
-\section{Contents}
+
 \tableofcontents
 \pagebreak
 
@@ -110,8 +110,8 @@ breaklinks=true,
 
 		\\
 
-		u & \text{Velocity vector field} \\
-		\rho & \text{Density field} \\
+		u & \text{Velocity} \\
+		\rho & \text{Density} \\
 		\nu & \text{Viscosity} \\
 		\kappa & \text{Density diffusivity} \\
 		f & \text{External forces} \\
@@ -161,7 +161,7 @@ The thesis questions are the following:
 
 \section{Preliminary Research}
 In this paper we aim to create our own CFD model. 
-Before we start creating our own model a understanding of how CFD models work 
+Before we start creating our own model, an understanding of how CFD works 
 and the different types of models and methods that can be used is needed.
 Most CFD models are based on the Navier-Stokes equations. Because the Navier-Stokes equations are very complex we will not be covering them in depth, 
 but we will explain what they are and how they are used in CFD models.
@@ -170,10 +170,11 @@ In section \ref{eulerianlagrangian} we will be looking at two different types of
 
 \subsection{Navier-Stokes equations} \label{navierstokes}
 The base of almost all CFD models are the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
-These are partial differential equations that describe single-phase fluid flows. 
-We will not go to much into detail about these equations, but its important to know that by solving these equations we will get a flow velocity.
-This flow velocity is a vector field that gives a vector to every point in the fluid at any time. 
-Using this velocity field the behavior of the fluid can be simulated.
+These are partial differential equations that describe fluid flows. 
+We will not go into too much detail about these equations, but the gist of it that these equations return the flow velocity of the fluid.
+This flow velocity is a vector field that assigns a vector to every point in the fluid at a given time. 
+Using this velocity field, the behavior of the fluid can be simulated.
+(\cite{navierstokes})
 
 \subsection{Eulerian vs Lagrangian} \label{eulerianlagrangian}
 There are two main methods to simulate fluid dynamics: the Lagrangian method and the Eulerian method.
@@ -188,9 +189,10 @@ There are two main methods to simulate fluid dynamics: the Lagrangian method and
 
 The Langrangian method models the fluid as a particle collision system, where the air is represented by
 particles that follow the flow velocity and interact with each other to emulate a fluid. 
-This method is mostly usefull when trying to analyze situations where single fluid particles play an important role.
+This method is mostly useful when trying to analyze situations where single fluid particles play an important role.
 
-\paragraph{Eulerian}\mbox{}
+\pagebreak
+\textbf{Eulerian} \\
 
 \begin{figure}[H]
 	\centering
@@ -200,12 +202,26 @@ This method is mostly usefull when trying to analyze situations where single flu
 
 The other method is the Eulerian method. This method models the fluid as a
 cellular automata. The fluid is represented by a grid of cells, each of which
-has its own properties and interacts with its neighbor cells, creating a Cartesian
-mesh-style field. This method is mostly used when trying to analyze the fluid as a whole.
+has its own properties and interacts with its neighbor cells, creating a continuous
+field. This method is mostly used when trying to analyze the fluid as a whole.
 It can provide information about the fluid's flow patterns, turbulence, and pressure distribution. 
 
-\subsection{NEAT}
-NEAT (NeuroEvolution of Augmenting Topologies) is a machine learning algorithm
+\subsection{Genetic Algorithm}
+In machine learning, genetic algorithms are models that mimic the process of natural selection.
+In a genetic algorithm a population of solutions to an optimization problem is evolved over time towards better solutions.
+The evolution usually starts from a population of randomly generated solutions.
+It is an iterative process, where the population in each iteration is called a generation.
+A fitness function is used every generation to evaluate the fitness of each solution in the population.
+Fitness is a measure of how well a solution fits the problem.
+With that in mind an iteration will typically look like this:
+\begin{enumerate}
+	\item{The fitness of every solution in the population is evaluated.}
+	\item{A percentage of the more fit solution are selected from the current population.}
+	\item{Each selected solution is randomly modified.}
+	\item {These fit solutions and the new mutated solutions are added to the new generation.}
+	\item{The new generation of candidate solutions is then used in the next iteration of the algorithm.}
+\end{enumerate}
+(\cite{genalg})
 
 % Execution
 \pagebreak
@@ -263,29 +279,42 @@ This was implemented using Go and raylib, and the code is available at
 When dealing with a lot of particles, the simulation stops performing as well,
 because the number of calculations and iterations of the formulas listed above
 has a time complexity of $O(n^2)$, where $n$ is the number of particles. This is
-because every particle handles collisions with every other particlee every
+because every particle handles collisions with every other particle every
 single frame. This can be elegantly mitigated by implementing a three-dimensional
 grid system, where every particle is assigned to a cell in the grid. This way,
 particles only need to check for collisions with other particles in the same cell
-or neighboring cells. If the particles are evenly distributed within the container,
-each particle only needs to handle collisions with particles in its own cell, and
-its 26 neighboring cells. This reduces the time complexity to $O(n)$.
+or in any of its 26 neighboring cells, assuming that the particles are evenly
+distributed within the container, each particle only needs to handle collisions
+with particles in its own cell, and its 26 neighboring cells. This reduces the
+time complexity to $O(n)$.
 
 The simulation was unstable at higher densities, where particles would phase
 into each other instead of cleanly bouncing. The bug is likely quite simple to
-fix, but we got distracted by another method. Despite the optimizations we
+fix, but we got distracted by the Eulerian method. Despite the optimizations we
 made, Lagrangian simulation is still quite computationally expensive, and Go
-probably wasn't doing it any favors (Go isn't very memory efficient). In the
-end it was put aside, and the Lagrangian implementation was never completed.
+wasn't doing it any favors, because it's not a very memory efficient language.
+In the end it was put aside, and the Lagrangian implementation was never completed.
 
 \pagebreak
 \section{Execution: Eulerian Fluid Simulation}
-Our next attempt was to try and implement a Eulerian fluid simulation.
-Our fluid simulation involves a three-dimensional grid of cells, each of which
-have velocity and density fields. The density fields are purely for the purpose of visualization. When we are talking about 'density',
-you can image it as the density of colored dye in the fluid. 
-Each frame, the cells interact with each
-other according to the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
+
+
+\noindent
+\begin{minipage}[t]{0.65\textwidth}
+	Our next attempt was to try and implement a Eulerian fluid simulation.
+	Our fluid simulation involves a three-dimensional grid of cells, each of which
+	have velocity and density fields. The density fields are purely for the purpose
+	of visualization. In the CFD frontend, we render translucent colored cubes in
+	each cell according to its density field. These translucent cubes represent
+	dye getting dropped into the container. When we are talking about `density',
+	you can image it as the density of dye in the fluid. Each frame, the cells
+	interact with each other according to the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
+	\end{minipage}\hfill
+	\begin{minipage}[t]{0.3\textwidth}
+		\centering\raisebox{\dimexpr \topskip-\height}{%
+		\includegraphics[width=\textwidth]{resources/dye.jpg}}
+		\captionof{figure}{Dye diffusing in water}
+	\end{minipage}
 
 The specific math involved in the base equations for the fluid simulation is
 quite complex, and we couldn't have derived it on our own, so we used
@@ -295,25 +324,26 @@ brilliant work on \href{www.dgp.toronto.edu/public_user/stam/reality/Research/pd
 This math will be explained in section \ref{math}. 
 How we implemented this math into the density solver of the fluid simulation is explained in section \ref{density}.
 The way it is implemented in the velocity solver is explained in section \ref{velocity}.
-We will be explaining the concepts in 2D, so it is easier to visualize and understand. 
+We will explain the concepts in 2D, so it is easier to visualize and understand. 
 
 % Math
 \subsection{The Math} \label{math}
 In Eulerian fluid dynamics we represent fluids with a velocity vector field. This means we assign a velocity vector to every point in space.
-The Navier-Stokes equations show us how these velocity vectors evolve over time with an infinitely small timestep.
+The Navier-Stokes equations show us how these velocity vectors evolve over time with an infinitesimal timestep.
 \[
 	\begin{array}{ll}
-		\pdv{u}{t} = -(u \cdot \nabla)u + v\nabla^2 + f \\
+		\text{velocity equation: } & \pdv{u}{t} = -(u \cdot \nabla)u + \nu\nabla^2 + f \\
 		\\
-		\pdv{\rho}{t} = -(u \cdot \nabla)\rho + k\nabla^2\rho + S
+		\text{density equation: } & \pdv{\rho}{t} = -(u \cdot \nabla)\rho + k\nabla^2\rho + S
 	\end{array}
 \]
 The first equation returns the change in velocity in a vector notation. 
 Unlike in Lagrangian fluid simulation, in Eulerian fluid simulation the fluid is not represented by individual particles. 
-Thats why, instead, fluid density is used, which tells us the amount of particles present in a point in space. 
-The second equation shows us the change of this density. 
-Although to understand the math behind this simulation it isn't needed to fully understand these equations, it should be noted that the two equations above look a lot like each other,
-as this was helpful in developing the simulation. (\cite{josstam})
+That's why fluid density is used instead, which tells us the amount of particles present in a point in space. 
+The second equation shows us the change in density. 
+Despite that it isn't needed to fully understand these equations to understand
+the math behind the simulation, it should be noted that the two equations above look
+a lot like each other, as this was helpful in developing the simulation. (\cite{josstam})
 
 \begin{figure}[H]
 	\centering
@@ -330,18 +360,19 @@ as this was helpful in developing the simulation. (\cite{josstam})
 \end{figure}
 
 There are two different types of velocity vector fields we can use: collocated and staggered.
-In the collocated grid all the variables are stored in the center of the cell. 
-Whereas in the staggered grid the scalar variables are stored at the center but the velocity variable is stored at the cell face. 
-Usually the use of a staggered grid is preferred, because its easier to see how much fluid flows from one cell to another. (\cite{tenminute})
-However because Mike Ash and Jos Stam used a collocated grid in their works we decided to use the same grid for simpliciy sake.
+In the collocated grid all the variables are stored in the center of the cell,
+whereas in the staggered grid the scalar variables are stored at the center but the velocity variable is stored at the cell face. 
+Usually the use of a staggered grid is preferred, because it's easier to see how much fluid flows from one cell to another (\cite{tenminute}).
+However, because Mike Ash and Jos Stam used a collocated grid in their works we decided to use the same grid for the sake of simplicity.
 
 \subsection{Density Solver} \label{density}
 
-First, lets look at the density solver. The density solver follows three steps: first adding forces, secondly diffusion and lastly moving the densities. 
-If we look at the density equation in section \ref{math}, we see that the change in density in a single time steps is influenced by three terms. 
+First, let's look at the density solver. The density solver follows three steps:
+adding forces, then applying diffusion and lastly moving the densities. 
+If we look at the density equation in section \ref{math}, we see that the change in density in a single time step is influenced by three terms. 
 The first term states that the density should follow the velocity field,
 the second term represents the density's rate of diffusion
-and the third term says that the density can increase due to sources. 
+and the third term says that the density can increase due to external sources. 
 The density solver will apply these terms in reverse order. 
 So, as stated before, first the forces are added, then the diffusion is applied and finally the densities are moved.
 
@@ -356,7 +387,7 @@ If that happens we will simply add a constant amount of density to the intial de
 
 \subsubsection{Diffusion}
 The second step is diffusion.
-Diffusion is the process where spread the fluid from high density cells to low density cells.
+Diffusion is the process where the fluid spreads from high density cells to low density cells.
 The diffusion happens at a constant rate that we will call \textit{D}. 
 Now we can simply calculate the diffusion rate \textit{a} by multiplying it with the time step:
 \[
@@ -364,8 +395,8 @@ Now we can simply calculate the diffusion rate \textit{a} by multiplying it with
   a = dt \cdot D
 \end{array}
 \]
-If we take a look at a single cell, we'll see that it exchanges densities with its four neighbors.
-The total difference of the densities between the cell and its neighbours can be calculated by the following formula,
+If we take a look at a single cell, we'll see that it exchanges densities with its four neighbors (in 2D, the same applies for a 3D cell's six neighbors).
+The total difference of the densities between the cell and its neighbors can be calculated by the following formula,
 where $\rho_{x, y}$ is the current density of the cell at position $(x, y)$:
 \[
 \begin{array}{ll}
@@ -373,14 +404,14 @@ where $\rho_{x, y}$ is the current density of the cell at position $(x, y)$:
 \end{array}
 \]
 By multiplying the difference in densities with the diffusion rate \textit{a} and adding it to the current density, we calculate new density of the cell. 
-This can be seen in the following formula, where P$_{x, y}$ is equal to the density of cell at position (x, y) after the time step:
+This can be seen in the following formula, where P$_{x, y}$ is equal to the density of cell at position $(x, y)$ after the time step:
 \[
 \begin{array}{ll}
 	P_{x, y} = \rho_{x, y} + a \cdot (\rho_{x+1, y} + \rho_{x-1, y} + \rho_{x, y+1} + \rho_{x, y-1} - 4 \cdot \rho_{x, y})
 \end{array}
 \]
-But here we run into a problem. If the diffusion rate is big enough the density in a cell might end up becoming negative.
-Imagine, for example, a situation wehere the diffusion rate is equal to 1,  the density of a cell is 1 and the densities of its neighbors are all 0. This means that the density of the cell will become -3.
+But here we run into a problem. If the diffusion rate is big enough, the density in a cell might end up becoming negative.
+Imagine, for example, a situation were the diffusion rate is equal to 1,  the density of a cell is 1 and the densities of its neighbors are all 0. This means that the density of the cell will become -3.
 This of course is not possible.
 The solution to this problem is to find the density of the cell when being diffused backwards in time. Which results in the following equation:
 \[
@@ -403,43 +434,53 @@ To solve this system of linear equations for the unknowns P$_{x, y}$ the \href{h
 		\centering
 		\includegraphics[width=4cm]{resources/advection2.png}
 		\caption{A particle}
+		\label{fig:aparticle}
 	\end{subfigure}
 	\begin{subfigure}{0.3\textwidth}
 		\centering
 		\includegraphics[width=4cm]{resources/advection3.png}
 		\caption{Backtracing the particle}
+		\label{fig:backtrace}
 	\end{subfigure}
 	\caption {Advection method}
 	\label{fig:advection}
 \end{figure}
 
-The final step of the density solver is moving the densities following the velocity field.
-Because you can't really move grid cells, we will use a technique where we represent a density as a set of particles.
-An obvious way to move the densities is to act like the center of a cell is a particle and move it through the velocity field.
-But because we have to convert the particles back to a grid, we will use a different method. 
-This method is called semi-lagrangian advection.
-We will first look at the particles that end up at the center of a cell, as shown in Figure \ref{fig:advection} (b). Then we use the velocity of the cell to trace the particles one time step back in time. This is shown in Figure \ref{fig:advection} (c).
-Then we will look at where the particles end up and calculate the weighted average of the densities of the four closest cells from a particle and set this as the new density of the current cell, also shown in Figure \ref{fig:advection} (c).
-To do this we need to use two different grids: one that contains all the density values from the previous time step
-and on that contains the new density values. (\cite{josstam})
+The final step of the density solver is moving the densities following the velocity
+field. Because you can't really move grid cells, we will use a technique where we
+represent a density as a set of particles. This technique is called semi-lagrangian
+advection. An obvious way to move the densities is to act like the center of a
+cell is a particle and move it through the velocity field. But because we have
+to convert the particles back to a grid, we will use a different method. We will
+first look at the particles that end up at the center of a cell, as shown in
+figure \ref{fig:aparticle}. Then we use the velocity of the cell to trace the particles
+one time step back in time. This is shown in figure \ref{fig:backtrace}. Then we will
+look at where the particles end up and calculate the weighted average of the
+densities of the four closest cells from a particle and set this as the new density
+of the current cell, also shown in figure \ref{fig:backtrace}. To do this we need to use
+two different grids: one that contains all the density values from the previous
+time step and on that contains the new density values. (\cite{josstam})
  
 \subsection{Velocity Solver} \label{velocity}
-Now we will look at the velocity solver. Just like with the density solver if we look at the equations in section \ref{math}
-we see that the change in velocity in a single time step is influenced by three factors. 
-These are: the addition of forces, viscous diffusion and self-advection. 
-Because the velocity equation looks so much like the density equation we can use the same steps that we're shown in section \ref{density} to solve it.
-The only difference is that the velocity solver has an extra step called projection.
+Now we will look at the velocity solver. Just like with the density solver if we
+look at the equations in section \ref{math} we see that the change in velocity
+in a single time step is influenced by three factors. These are: the addition of
+forces, viscous diffusion and self-advection. Because the velocity equation
+looks so much like the density equation we can use the same steps that were shown
+in section \ref{density} to solve it. The only difference is that the velocity
+solver has an extra step called projection.
 
 \subsubsection{Projection}
 This step ensures that mass is conserved. 
 The law of conservation of mass is an important property of real-life fluids.
-The projection step will be the last step that is executed because the previous steps might not always conserve mass.
-To make the fluid mass conserving we will use a mathematical concept called Hodge decomposition.
-Hodge composition states that every vector field is the sum of a mass conserving field and a gradient field.
-So all we have to do is compute a gradient field and subtract it from the velocity field. 
-The gradient field 
+The projection step will be the last step that is executed because the previous
+steps might not always conserve mass. To make the fluid mass conserving we will
+use a mathematical concept called Hodge decomposition. Hodge composition states
+that every vector field is the sum of a mass conserving field and a gradient field.
+So all we have to do is compute a gradient field and subtract it from the velocity
+field. The gradient field...TODO: finish this.
 Computing the gradient field involves the solution of a linear system called a Poisson equation.
-To solve this system we will we again use the Gauss-Seidel method that was also mentioned in section \ref{density} in the diffusion step. (\cite{josstam})
+To solve this system we will we again use the Gauss-Seidel method that was also mentioned in section \ref{density} in the diffusion step (\cite{josstam}).
 
 \subsection{The Implementation}
 \subsubsection{Introduction to the code}
@@ -471,12 +512,16 @@ The interface is as follows:
 	\centering
 	\includegraphics[width=\textwidth]{resources/Fluid.png}
 	\caption{Fluid class diagram}
+	\label{fig:interface}
 \end{figure}
 
 This class contains the vector fields for the container as well as all the
 functions related to the physics simulation, including the advection, diffusion
 and projection procedures. These functions are the core of the CFD and
-this is the part that we borrowed from Mike Ash.
+this is the part that we borrowed from Mike Ash. After implementing the
+interface of figure \ref{fig:interface} along with some graphical
+rendering code, we were able to get a basic fluid simulation working. The
+result is shown in figure \ref{fig:core}.
 
 \begin{figure}[H]
     \centering
@@ -490,13 +535,14 @@ this is the part that we borrowed from Mike Ash.
         \includegraphics[height=1.65in]{resources/core2.png}
     \end{subfigure}
 	\caption{Basic fluid simulation}
+	\label{fig:core}
 \end{figure}
 
 \subsubsection{Voxelizing Geometry}
 The next step is to implement geometry collision. The graphics library we're using,
-Raylib, has a function to load geometry from object files. Loading in a torus is
-easy enough, but the real challenge lies in communicating to the CFD that there's
-a torus in a given position and it behaving correspondingly.
+Raylib, has a function to load geometry from object files. Loading in an arbitrary shape
+like a torus is easy enough, but the real challenge lies in communicating to the
+CFD that there's a torus in a given position and it behaving correspondingly.
 
 First, the 3D object that Raylib loads has to be converted to a BVH (Bounding Volume
 Hierarchy) object. This is a tree structure that contains the object's geometry in
@@ -506,18 +552,19 @@ uses to check for collisions. We are using FCL to easily process flexible
 collisions between 3D objects.
 
 The next step is to write a voxelization function. Voxelization takes a 3D
-object's mesh data and checks the previously established 3D vector fields to see which
-if the object is in a given cell. FCL performs collision detection between two 3D objects.
-In this case those two objects are our obstacle (like a torus or a plane), and
-whichever cell is being iterated over. If the object is in a cell, we can pass a
-condition to the CFD. This is done for every cell in the grid, and the result
-is a 3D boolean array that represents the object. The source code is at \lstinline{Fluid::voxelize}.
-Each obstacle is passed to this function, and as a result we get a 3D boolean
-field saved at \lstinline{Fluid::state}. Below is a figure of the voxel map,
-with cells classified as solid highlighted in blue. Note that the edges of the
-torus are also marked as solid despite their cells obviously only being partial.
-This is because our implementation of the voxel mapping using FCL isn't working
-as intended.
+object's mesh data and iterates over the cells of the 3D
+vector fields to see if the object occupies a cell or a part of a cell. FCL performs
+collision detection between two 3D objects. In this case those two objects are
+our obstacle (like a torus or a plane), and whichever cell is being iterated over.
+If the cell that's being iterated over contains part of an object, we can pass
+a corresponding condition to the CFD. This is done for every cell in the grid,
+and the result is a 3D boolean array that represents the object. The source code
+is at \lstinline{Fluid::voxelize}. Each obstacle is passed to this function, and
+as a result we get a 3D boolean field saved at \lstinline{Fluid::state}.
+\ref{fig:voxelmap} is a figure of the voxel map, with cells classified as solid highlighted in
+blue. Note that the edges of the torus are also marked as solid despite their cells
+obviously only being partial. This is because our implementation of the voxel mapping
+using FCL isn't working as intended.
 
 \begin{figure}[H]
     \centering
@@ -536,40 +583,50 @@ as intended.
     \caption{Voxel map}
 \end{figure}
 
-This is called the Cut-Cell method. The reason we even need this is because
-the more obvious option is to set up the grid to be high resolution so the voxels
-are small enough to accurately approximate an arbitrarily complex object.
-The reason this isn't viable is purely due to performance. This might be reasonable
+This is called the \href{https://www.sciencedirect.com/science/article/pii/S0307904X00000056}{Cut-Cell method}. The reason we even need this is because
+the more obvious option is to set up the grid to be high resolution so each cell
+is small enough to accurately approximate an arbitrarily complex object. The
+reason this isn't viable is purely due to performance. This might be reasonable
 with a supercomputer, but for our purposes we'd just like to optimize.
 
 Another method would be to implement an AMR (Adaptive Mesh Refinement) system,
 which would adapt the mesh's resolution based on what's in a given region. This would
 generate a high resolution grid around an obstacle's bounds, and a low resolution
 grid in any empty space. This is an interesting concept, but we would have to
-rewrite some of the fluid math code to make the irregular grid work, and it seems
-like a lot of work, so we stuck with the Cut-Cell method. % TODO: finish this??
+rewrite some of the fluid math code to make the irregular grid work, and the Cut-Cell
+method is more straightforward, so we stuck with that. % TODO: finish this??
 
 \subsubsection{Implementing obstacle collision}
-Each cell of the grid is now one of three states: \lstinline{FLUID},
-\lstinline{SOLID}, or \lstinline{CUT_CELL}. This method of classifying cells
-into the three states is called the \href{https://www.sciencedirect.com/science/article/pii/S0307904X00000056}{Cut-Cell method}.
-\begin{enumerate}
-	\item{Fluid cells}
-		\begin{itemize}
-			\item{Cells that are fully inside a fluid region}
-			\item{Normal Navier-Stokes equations apply}
-		\end{itemize}
-	\item{Solid cells}
-		\begin{itemize}
-			\item{Cells that are fully inside an obstacle}
-			\item{Applies no-slip condition: velocity is zero}
-		\end{itemize}
-	\item{Cut-cells}
-		\begin{itemize}
-			\item{Cells partially inside an object}
-			\item{Modify fluid calculations}
-		\end{itemize}
-\end{enumerate}
+According to the Cut-Cell method, each cell of the grid now has one of three states:
+\lstinline{FLUID}, \lstinline{SOLID}, or \lstinline{CUT_CELL}.
+
+\begin{minipage}[t]{0.65\textwidth}
+	\begin{enumerate}
+		\item{Fluid cells}
+			\begin{itemize}
+				\item{Cells that are fully inside a fluid region}
+				\item{Normal Navier-Stokes equations apply}
+			\end{itemize}
+		\item{Solid cells}
+			\begin{itemize}
+				\item{Cells that are fully inside an obstacle}
+				\item{Applies no-slip condition: velocity is zero}
+			\end{itemize}
+		\item{Cut-cells}
+			\begin{itemize}
+				\item{Cells partially inside an object}
+				\item{Modify fluid calculations}
+			\end{itemize}
+	\end{enumerate}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.3\textwidth}
+	\vspace{10pt}
+	\centering\raisebox{\dimexpr \topskip-\height}{%
+	\includegraphics[width=\textwidth]{resources/voxeldiagram.png}}
+	\captionof{figure}{Diagram of cell states}
+	\label{fig:voxeldiagram}
+\end{minipage}
+\vspace{10pt}
 
 We'd like to preface this by saying that our implementation of Cut-Cell obstacle
 resolution is not completed or working, so some of the following is theoretical.
@@ -580,6 +637,7 @@ fractional fluid volume:
 \[
 	\begin{array}{ll}
 		\text{Fractional fluid volume } \alpha = \frac{\text{volume of fluid in cell}}{\text{total cell volume}} \\
+		\\
 		\text{Fractional face area } \beta_d = \frac{\text{open d-face area}}{\text{total d-face area}} \text{ where d is one of $x$, $y$, or $z$}
 	\end{array}
 \]
@@ -607,9 +665,9 @@ The reason we failed to implement this is twofold:
 			time to debug it thoroughly.
 	}
 	\item{
-			We realized while writing this paper that we'd forgotten to modify the
-			projection step to account for cut-cells, which explains a bug we experienced,
-			where the fluid would leak through the cut-cells.
+			We'd forgotten to modify the projection step to account for cut-cells,
+			which explains a bug we experienced, where the fluid would leak through
+			the cut-cells.
 		}
 \end{enumerate}
 
@@ -629,8 +687,8 @@ the airplane models to maximize the fitness score. We repeat this process until
 we have a model that approaches a maximum fitness score.
 
 The plan was to write a Python script that utilizes the NEAT algorithm to generate
-the populations. NEAT is a genetic algorithm that evolves neural networks, which
-has a Python library that the user can implement in their scripts.
+the populations. NEAT is a genetic algorithm, which has a Python library that
+the user can implement in their scripts.
 
 There's two big parts to this: the first is the fitness function, which is the
 function that takes the results of the fluid simulation and calculates a score
@@ -648,11 +706,11 @@ lift-to-drag ratio to be as high as possible. To achieve that we need to try
 to maximize lift and minimize drag.
 
 The lift force $L$ primarily exists because of the pressure difference between
-the top and the bottom of a wing. Here are the integrals for the lift and drag
-forces on a wing:
+the top and the bottom of a wing. The integrals for the lift and drag forces are
+listed below (\cite{liftdrag}).
 \[
 	\begin{aligned}
-		& \textit{where:} \\
+		& \text{where:} \\
 		& \text{shear stress } \tau \\
 		& \text{pressure } P \\
 		& \text{surface of the wing } A \\
@@ -662,11 +720,11 @@ forces on a wing:
 \]
 
 
-We can discreetly approximate this integral by summing the pressure difference
+We can discreetly approximate these integrals by summing the pressure difference
 over the surface of the wing:
 \[
 	\begin{array}{l}
-		\textit{where $i$ is a triangle of the wing:} \\
+		\text{where $i$ is a triangle of the wing:} \\
 		F_D = \sum\limits_i (P_i \cos \theta_i + \tau_{w_i} \sin \theta_i) \cdot A_i \\
 		F_L = \sum\limits_i (-P_i \sin \theta_i + \tau_{w_i} \cos \theta_i) \cdot A_i
 	\end{array}
@@ -682,13 +740,24 @@ use to evaluate the airplane models.
 % Conclusion
 \pagebreak
 \section{Conclusion}
-We our paper we tried to answer the following questions: 
+In our paper we tried to answer the following questions: 
+
 \begin{itemize}
 	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
 	\item{How do we dynamically generate 3D models?}
 	\item{How does an airplane's wing shape influence its performance?}
 \end{itemize}
 TODO: FINISH THIS
+
+To answer the first question we looked the different methods that can be used to simulate fluid dynamics and the math behind them.
+Most CFD models are based on the Navier-Stokes equations. These equations describe the flow of fluid. 
+The two main methods for implementing these equations are: the Lagrangian method and the Eulerian method. 
+We then first tried implementing a Lagrangian fluid simulation, but we ran into some issues and decided to switch to an Eulerian fluid simulation.
+
+To answer the second question we looked at how we dynamically can generate 3D models.
+
+To find the answer to the third question we wanted to use a genetic algorithm to evolve the shape of an airplane's wing 
+and analyze the performance of the different shapes in the fluid simulation.
 
 % Results
 \pagebreak
@@ -767,7 +836,7 @@ of our project.
 
 \subsection{Future Work}
 
-% References
+% Reference
 \pagebreak
 \section{Bibliography}
 \nocite{*}

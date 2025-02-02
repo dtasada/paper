@@ -377,6 +377,35 @@
       \verb www.youtu.be/iKAVRgIrUOU
       \endverb
     \endentry
+    \entry{lagvseul}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=a133c6897f19dca180d31e4f8cb62148}{%
+           family={ResolvedAnalytics},
+           familyi={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{fullhash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{bibnamehash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{authorbibnamehash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{authornamehash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{authorfullhash}{a133c6897f19dca180d31e4f8cb62148}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Navigating Fluid Motion: Lagrangian vs. Eulerian Frames of Fluid Motion}
+      \field{year}{n.d.}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://www.resolvedanalytics.com/cfd-physics-models/lagrangian-vs-eulerian-phase-models
+      \endverb
+      \verb{url}
+      \verb https://www.resolvedanalytics.com/cfd-physics-models/lagrangian-vs-eulerian-phase-models
+      \endverb
+    \endentry
     \entry{codingchallenge}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=462edbbbf0e67b9184c8162731cda879}{%
@@ -531,7 +560,7 @@
       \verb www.physics.weber.edu/schroeder/javacourse/LatticeBoltzmann.pdf
       \endverb
     \endentry
-    \entry{gaussseidel}{article}{}
+    \entry{cfd}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -552,17 +581,17 @@
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Gauss–Seidel method}
+      \field{title}{Computational fluid dynamics}
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb www.en.wikipedia.org/wiki/Gauss–Seidel_method
+      \verb https://en.wikipedia.org/wiki/Computational_fluid_dynamics
       \endverb
       \verb{url}
-      \verb www.en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
+      \verb https://en.wikipedia.org/wiki/Computational_fluid_dynamics
       \endverb
     \endentry
-    \entry{navierstokes}{article}{}
+    \entry{gaussseidel}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -583,9 +612,69 @@
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Navier-Stokes equations}
+      \field{title}{Gauss–Seidel method}
       \field{year}{2024}
       \true{nocite}
+      \verb{urlraw}
+      \verb www.en.wikipedia.org/wiki/Gauss–Seidel_method
+      \endverb
+      \verb{url}
+      \verb www.en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
+      \endverb
+    \endentry
+    \entry{genalg}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
+           family={Wikipedia},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{extraname}{3}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradate}{3}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Genetic algorithm}
+      \field{year}{2024}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Genetic_algorithm
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Genetic_algorithm
+      \endverb
+    \endentry
+    \entry{navierstokes}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
+           family={Wikipedia},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{extraname}{4}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradate}{4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Navier-Stokes equations}
+      \field{year}{2024}
       \verb{urlraw}
       \verb www.en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
       \endverb
@@ -985,6 +1074,35 @@
       \verb www.youtu.be/iKAVRgIrUOU
       \endverb
     \endentry
+    \entry{lagvseul}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=a133c6897f19dca180d31e4f8cb62148}{%
+           family={ResolvedAnalytics},
+           familyi={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{fullhash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{bibnamehash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{authorbibnamehash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{authornamehash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{authorfullhash}{a133c6897f19dca180d31e4f8cb62148}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Navigating Fluid Motion: Lagrangian vs. Eulerian Frames of Fluid Motion}
+      \field{year}{n.d.}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://www.resolvedanalytics.com/cfd-physics-models/lagrangian-vs-eulerian-phase-models
+      \endverb
+      \verb{url}
+      \verb https://www.resolvedanalytics.com/cfd-physics-models/lagrangian-vs-eulerian-phase-models
+      \endverb
+    \endentry
     \entry{codingchallenge}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=462edbbbf0e67b9184c8162731cda879}{%
@@ -1139,7 +1257,7 @@
       \verb www.physics.weber.edu/schroeder/javacourse/LatticeBoltzmann.pdf
       \endverb
     \endentry
-    \entry{gaussseidel}{article}{}
+    \entry{cfd}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -1160,17 +1278,17 @@
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Gauss–Seidel method}
+      \field{title}{Computational fluid dynamics}
       \field{year}{2024}
       \true{nocite}
       \verb{urlraw}
-      \verb www.en.wikipedia.org/wiki/Gauss–Seidel_method
+      \verb https://en.wikipedia.org/wiki/Computational_fluid_dynamics
       \endverb
       \verb{url}
-      \verb www.en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
+      \verb https://en.wikipedia.org/wiki/Computational_fluid_dynamics
       \endverb
     \endentry
-    \entry{navierstokes}{article}{}
+    \entry{gaussseidel}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -1191,9 +1309,69 @@
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Navier-Stokes equations}
+      \field{title}{Gauss–Seidel method}
       \field{year}{2024}
       \true{nocite}
+      \verb{urlraw}
+      \verb www.en.wikipedia.org/wiki/Gauss–Seidel_method
+      \endverb
+      \verb{url}
+      \verb www.en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
+      \endverb
+    \endentry
+    \entry{genalg}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
+           family={Wikipedia},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{extraname}{3}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradate}{3}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Genetic algorithm}
+      \field{year}{2024}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Genetic_algorithm
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Genetic_algorithm
+      \endverb
+    \endentry
+    \entry{navierstokes}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
+           family={Wikipedia},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \field{extraname}{4}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradate}{4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Navier-Stokes equations}
+      \field{year}{2024}
       \verb{urlraw}
       \verb www.en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
       \endverb
