@@ -152,8 +152,8 @@ very expensive from a computational perspective, so code optimization is importa
 
 The thesis questions are the following:
 \begin{itemize}
-	\item{How does the math behind CFD work?}
-	\item{How is a CFD implemented?}
+	\item{How does a basic a CFD model work?}
+	\item{How is a CFD model implemented?}
 	\item{How do obstacles work in a CFD?}
 	\item{How is the performance of an airplane calculated?}
 	\item{How can machine learning be used to optimize an airplane's shape?}
@@ -492,9 +492,16 @@ steps might not always conserve mass. To make the fluid mass conserving we will
 use a mathematical concept called Hodge decomposition. Hodge composition states
 that every vector field is the sum of a mass conserving field and a gradient field.
 So all we have to do is compute a gradient field and subtract it from the velocity
-field. The gradient field...TODO: finish this.
-Computing the gradient field involves the solution of a linear system called a Poisson equation.
+field. The gradient field indicates the direction of steepest descent of a height function, as seen in figure \ref{fig:gradient_field}.
+Computing this height field involves the solution of a linear system called a Poisson equation.
 To solve this system we will we again use the Gauss-Seidel method that was also mentioned in section \ref{density} in the diffusion step (\cite{josstam}).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{resources/gradient_field.png}
+	\caption{Gradient field from (\cite{christophefinot})}
+	\label{fig:gradient_field}
+\end{figure}
 
 \subsection{The Implementation} \label{implementation}
 \subsubsection{Introduction to the code}
@@ -768,15 +775,18 @@ doesn't we discard it. This is the basic idea behind the genetic algorithm.
 % Conclusion
 \pagebreak
 \section{Conclusion}
-In our paper we tried to answer the following questions: 
+In our paper we tried to answer the question: 
+This lead to the following subquestions: 
 
 \begin{itemize}
-	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
-	\item{How do we dynamically generate 3D models?}
-	\item{How does an airplane's wing shape influence its performance?}
+	\item{How does a basic CFD simulation work?}
+	\item{How is a CFD model implemented?}
+	\item{How do obstacles work in a CFD?}
+	\item{How is the performance of an airplane calculated?}
+	\item{How can machine learning be used to optimize an airplane's shape?}
 \end{itemize}
 
-To answer the first question we looked the different methods that can be used to simulate fluid dynamics and the math behind them.
+To answer the first and second question we looked the different methods that can be used to simulate fluid dynamics and the math behind them.
 Most CFD models are based on the Navier-Stokes equations. These equations describe the flow of fluid. 
 The two main methods for implementing these equations are: the Lagrangian method and the Eulerian method. 
 We first tried implementing a Lagrangian fluid simulation, in this model fluid is represented by particles.
@@ -784,12 +794,19 @@ While trying to create this model we ran into some issues and decided to switch 
 In a Eulerian fluid simulation the fluid is represented by a grid of cells, where each cell has a velocity and density value.
 The density solver in our simulation used three steps: adding forces, applying diffusion and moving the densities.
 The velocity solver used the same steps as the density solver but with an extra step called projection.
-After having a created a basic fluid simulation, we looked at how we could implement fluid behavior when dealing with obstacles. 
-For this, we used the Cut-Cell method. 
+We decided to use C++ and the Raylib library to implement the fluid simulation. 
 
-We weren't able to answer the second question. 
+To answer the third question we looked at different ways to implement fluid behavior when dealing with obstacles.
 
-To find the answer to the third question we wanted to use a genetic algorithm to evolve the shape of an airplane's wing 
+...EXPLAIN METHODS
+
+In the end we decided to use the Cut-Cell method. 
+
+To answer the fourth question We
+
+...EXPLAIN HOW PERFORMANCE IS CALCULATED
+
+To find the answer to the fifth question we wanted to use a genetic algorithm to evolve the shape of an airplane's wing 
 and analyze the performance of the different shapes in the fluid simulation. 
 
 % Results
