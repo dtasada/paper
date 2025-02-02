@@ -390,7 +390,7 @@ If that happens we will simply add a constant amount of density to the intial de
 \end{array}
 \]
 
-\subsubsection{Diffusion}
+\subsubsection{Diffusion} \label{diffusion}
 The second step is diffusion.
 Diffusion is the process where the fluid spreads from high density cells to low density cells.
 The diffusion happens at a constant rate that we will call \textit{D}. 
@@ -428,9 +428,9 @@ To solve this system of linear equations for the unknowns P$_{x, y}$ the \href{h
 This is an iterative method to solve a system of linear equations. In short, we apply the following formula an N amount of times for every cell in the grid:
 
 \[
-\begin{array}{ll}
-	P_{x, y} = \frac{\rho_{x, y} + a \cdot (P_{x+1, y} + P_{x-1, y} + P_{x, y+1} + P_{x, y-1})}{1+4a}
-\end{array}	
+	\begin{array}{ll}
+		P_{x, y} = \frac{\rho_{x, y} + a \cdot (P_{x+1, y} + P_{x-1, y} + P_{x, y+1} + P_{x, y-1})}{1+4a}
+	\end{array}
 \]
 
 N is a constant that determines how many times the formula is applied. The higher N is, the more accurate the result will be. (\cite{josstam})
@@ -670,7 +670,18 @@ open face area to the total area of a given cell.
 
 With this information we can modify the advection step of the CFD to account for
 a cut-cell. We do this by scaling the advection by the fractional face area. Next
-we also adjust the \hyperref[projectionstep]{projection step}. TODO POISSON EQUATION
+we also adjust the \hyperref[projectionstep]{projection step}. The projection step
+is where we ensure that mass is conserved. We do this by scaling the pressure
+field by the fractional fluid volume and fractional face area. The formula for pressure
+given in section \ref{diffusion} is modified to:
+\[
+	\centering
+	P_{x, y, z} = \frac{
+		\frac{1}{\Delta t} \nabla \cdot u + \beta_x^+ P_{x+1, y, z} + \beta_x^- P_{x-1, y, z} + \beta_y^+ P_{x, y+1, z} + \beta_y^- P_{x, y-1, z} + \beta_z^+ P_{x, y, z+1} + \beta_z^- P_{x, y, z-1}
+	}{
+		\alpha (\beta_x^+ + \beta_x^- + \beta_y^- + \beta_z^+ + \beta_z^-)
+	}
+\]
 
 The last step is to make sure to apply the correct boundaries to the fluid,
 where any solid cells have a constant velocity of 0.
@@ -692,8 +703,9 @@ The reason we failed to implement this is twofold:
 		}
 \end{enumerate}
 
-Improving on these two points might have yielded better results.
+Improving on these two points would have yielded better results.
 
+\pagebreak
 \section{Machine Learning Theory}
 The second part of our project was to use machine learning to optimize the shape
 of the airplane's body. The idea was to use a genetic algorithm to evolve the
@@ -776,17 +788,19 @@ doesn't we discard it. This is the basic idea behind the genetic algorithm.
 \pagebreak
 \section{Conclusion}
 In our paper we tried to answer the question: 
-This lead to the following subquestions: 
+This lead to the following subquestions:  \\
 
-\begin{itemize}
-	\item{How does a basic CFD simulation work?}
-	\item{How is a CFD model implemented?}
-	\item{How do obstacles work in a CFD?}
-	\item{How is the performance of an airplane calculated?}
-	\item{How can machine learning be used to optimize an airplane's shape?}
-\end{itemize}
+\textbf{SQ1:} How does a basic CFD simulation work?
 
-To answer the first and second question we looked the different methods that can be used to simulate fluid dynamics and the math behind them.
+\textbf{SQ2:} How is a CFD model implemented?
+
+\textbf{SQ3:} How do obstacles work in a CFD?
+
+\textbf{SQ4:} How is the performance of an airplane calculated?
+
+\textbf{SQ5:} How can machine learning be used to optimize an airplane's shape? \\
+
+To answer the questions 1 and 2 we looked the different methods that can be used to simulate fluid dynamics and the math behind them.
 Most CFD models are based on the Navier-Stokes equations. These equations describe the flow of fluid. 
 The two main methods for implementing these equations are: the Lagrangian method and the Eulerian method. 
 We first tried implementing a Lagrangian fluid simulation, in this model fluid is represented by particles.
@@ -796,17 +810,13 @@ The density solver in our simulation used three steps: adding forces, applying d
 The velocity solver used the same steps as the density solver but with an extra step called projection.
 We decided to use C++ and the Raylib library to implement the fluid simulation. 
 
-To answer the third question we looked at different ways to implement fluid behavior when dealing with obstacles.
+To answer question 3 we created a cell state map that classified each cell as fluid or solid, but failed to recognize cut-cells.
+We set up a pressure formula to account for cut-cells.
 
-...EXPLAIN METHODS
+To answer the question 4 researched the lift-drag ratio, which is a measure of how efficient an airplane is at flying.
+We set up an approximation for the lift and drag forces.
 
-In the end we decided to use the Cut-Cell method. 
-
-To answer the fourth question We
-
-...EXPLAIN HOW PERFORMANCE IS CALCULATED
-
-To find the answer to the fifth question we wanted to use a genetic algorithm to evolve the shape of an airplane's wing 
+To find the answer to the last question we wanted to use a genetic algorithm to evolve the shape of an airplane's wing 
 and analyze the performance of the different shapes in the fluid simulation. 
 
 % Results
@@ -896,6 +906,30 @@ we'd like to follow to get the project to a working state.
 \end{enumerate}
 Once that's all completed, we'd truly have answered all the questions we set out
 to answer in this paper.
+
+\pagebreak
+\section{Eigen-werk verklaring}
+Ondergetekende …………………………………………………… verklaart:
+
+\begin{itemize}
+	\item{dat dit PWS eigen werk is}
+	\item{dat alles wat overgenomen is uit enige bron voorzien is van een correcte bronvermelding}
+\end{itemize}
+
+Heemstede, [datum]…………………………………………………………2025 \\
+
+Handtekening: \\ \\
+
+Ondergetekende …………………………………………………… verklaart:
+
+\begin{itemize}
+	\item{dat dit PWS eigen werk is}
+	\item{dat alles wat overgenomen is uit enige bron voorzien is van een correcte bronvermelding}
+\end{itemize}
+
+Heemstede, [datum]…………………………………………………………2025 \\
+
+Handtekening: \\ \\
 
 % Reference
 \pagebreak
