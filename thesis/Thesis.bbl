@@ -106,7 +106,6 @@
       \field{labeltitlesource}{title}
       \field{title}{Flow over a Cylinder}
       \field{year}{2021}
-      \true{nocite}
       \verb{urlraw}
       \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
       \endverb
@@ -391,13 +390,11 @@
       \strng{authorfullhash}{a133c6897f19dca180d31e4f8cb62148}
       \field{sortinit}{R}
       \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
+      \field{labeldatesource}{nodate}
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Navigating Fluid Motion: Lagrangian vs. Eulerian Frames of Fluid Motion}
-      \field{year}{n.d.}
       \true{nocite}
       \verb{urlraw}
       \verb https://www.resolvedanalytics.com/cfd-physics-models/lagrangian-vs-eulerian-phase-models
@@ -803,7 +800,6 @@
       \field{labeltitlesource}{title}
       \field{title}{Flow over a Cylinder}
       \field{year}{2021}
-      \true{nocite}
       \verb{urlraw}
       \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
       \endverb
@@ -1088,13 +1084,11 @@
       \strng{authorfullhash}{a133c6897f19dca180d31e4f8cb62148}
       \field{sortinit}{R}
       \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
+      \field{labeldatesource}{nodate}
       \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Navigating Fluid Motion: Lagrangian vs. Eulerian Frames of Fluid Motion}
-      \field{year}{n.d.}
       \true{nocite}
       \verb{urlraw}
       \verb https://www.resolvedanalytics.com/cfd-physics-models/lagrangian-vs-eulerian-phase-models
