@@ -82,7 +82,7 @@ breaklinks=true,
 \ipsum[1]
 
 \pagebreak
-\section{Contents}
+
 \tableofcontents
 \pagebreak
 
@@ -111,8 +111,8 @@ breaklinks=true,
 
 		\\
 
-		u & \text{Velocity vector field} \\
-		\rho & \text{Density field} \\
+		u & \text{Velocity} \\
+		\rho & \text{Density} \\
 		\nu & \text{Viscosity} \\
 		\kappa & \text{Density diffusivity} \\
 		f & \text{External forces} \\
@@ -170,6 +170,7 @@ These are partial differential equations that describe single-phase fluid flows.
 We will not go to much into detail about these equations, but its important to know that by solving these equations we will get a flow velocity.
 This flow velocity is a vector field that gives a vector to every point in the fluid at any time. 
 Using this velocity field the behavior of the fluid can be simulated.
+(\cite{navierstokes})
 
 \subsection{Eulerian vs Lagrangian} \label{eulerianlagrangian}
 There are two main methods to simulate fluid dynamics: the Lagrangian method and the Eulerian method. \\
@@ -184,9 +185,9 @@ There are two main methods to simulate fluid dynamics: the Lagrangian method and
 
 The Langrangian method models the fluid as a particle collision system, where the air is represented by
 particles that follow the flow velocity and interact with each other to emulate a fluid. 
-This method is mostly usefull when trying to analyze situations where single fluid particles play an important role.\\
+This method is mostly usefull when trying to analyze situations where single fluid particles play an important role. (\cite{lagvseul}) \\
 
-
+\pagebreak
 \textbf{Eulerian} \\
 
 \begin{figure}[H]
@@ -200,9 +201,24 @@ cellular automata. The fluid is represented by a grid of cells, each of which
 has its own properties and interacts with its neighbor cells, creating a Cartesian
 mesh-style field. This method is mostly used when trying to analyze the fluid as a whole.
 It can provide information about the fluid's flow patterns, turbulence, and pressure distribution. 
+(\cite{lagvseul})
 
-\subsection{NEAT}
-NEAT (NeuroEvolution of Augmenting Topologies) is a machine learning algorithm
+\subsection{Genetic Algorithm}
+In machine learning genetic algorithms are models that mimic the process of natural selection.
+In a genetic algorithm a population of solutions to an optimization problem is evolved over time towards better solutions.
+The evolution usually starts from a population of randomly generated solutions.
+It is an iterative process, with the population in each iteration called a generation.
+A fitness functions is used every generation to evaluate the fitness of each solution in the population.
+Fitness is a measure of how well a solution fits the problem.
+With that in mind a iteration will typically look something like this:
+\begin{enumerate}
+	\item{The fitness of every solution in the population is evaluated.}
+	\item{A percentage of the more fit solution are selected from the current population.}
+	\item{Each selected solution is randomly modified.}
+	\item {The selected solutions and modified selected solutions are added to the new generation.}
+	\item{The new generation of candidate solutions is then used in the next iteration of the algorithm.}
+\end{enumerate}
+(\cite{genalg})
 
 % Execution
 \pagebreak
@@ -640,7 +656,23 @@ the fitness score.
 % Conclusion
 \pagebreak
 \section{Conclusion}
-\ipsum[1]
+In our paper we tried to answer the following questions: 
+
+\begin{itemize}
+	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
+	\item{How do we dynamically generate 3D models?}
+	\item{How does an airplane's wing shape influence its performance?}
+\end{itemize}
+
+To answer the first question we looked the different methods that can be used to simulate fluid dynamics and the math behind them.
+Most CFD models are based on the Navier-Stokes equations. These equations describe the flow of fluid. 
+The two main methods for implementing these equations are: the Lagrangian method and the Eulerian method. 
+We then first tried implementing a Lagrangian fluid simulation, but we ran into some issues and decided to switch to an Eulerian fluid simulation.
+
+To answer the second question we looked at how we dynamically can generate 3D models.
+
+To find the answer to the third question we wanted to use a genetic algorithm to evolve the shape of an airplane's wing 
+and analyze the performance of the different shapes in the fluid simulation.
 
 % Results
 \pagebreak
@@ -718,14 +750,6 @@ beyond the scope (and time limit) of our project.
 
 \subsection{Future Work}
 
-% Conclusion
-\subsection{Conclusion}
-We our paper we tried to answer the following questions: 
-\begin{itemize}
-	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
-	\item{How do we dynamically generate 3D models?}
-	\item{How does an airplane's wing shape influence its performance?}
-\end{itemize}
 
 % References
 \section{Bibliography}
