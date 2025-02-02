@@ -1,5 +1,5 @@
 % $ biblatex auxiliary file $
-% $ biblatex bbl format version 3.2 $
+% $ biblatex bbl format version 3.3 $
 % Do not modify the above lines!
 %
 % This is an auxiliary file used by the 'biblatex' package.
@@ -18,8 +18,8 @@
 
 
 \refsection{0}
-  \datalist[entry]{apa/apasortcite//global/global}
-    \entry{mikeash}{article}{}
+  \datalist[entry]{apa/apasortcite//global/global/global}
+    \entry{mikeash}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=092ae28cdea4adba9c60004fee15edde}{%
            family={Ash},
@@ -30,10 +30,12 @@
       }
       \strng{namehash}{092ae28cdea4adba9c60004fee15edde}
       \strng{fullhash}{092ae28cdea4adba9c60004fee15edde}
+      \strng{fullhashraw}{092ae28cdea4adba9c60004fee15edde}
       \strng{bibnamehash}{092ae28cdea4adba9c60004fee15edde}
       \strng{authorbibnamehash}{092ae28cdea4adba9c60004fee15edde}
       \strng{authornamehash}{092ae28cdea4adba9c60004fee15edde}
       \strng{authorfullhash}{092ae28cdea4adba9c60004fee15edde}
+      \strng{authorfullhashraw}{092ae28cdea4adba9c60004fee15edde}
       \field{sortinit}{A}
       \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
       \field{extradatescope}{labelyear}
@@ -50,7 +52,7 @@
       \verb www.mikeash.com/pyblog/fluid-simulation-for-dummies.html
       \endverb
     \endentry
-    \entry{amr}{article}{}
+    \entry{amr}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=e2ceeea38f8620383cfbd3e99c5c0cd8}{%
            family={contributors},
@@ -61,10 +63,12 @@
       }
       \strng{namehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{fullhash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{fullhashraw}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{bibnamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{authorbibnamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{authornamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{authorfullhash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{authorfullhashraw}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \field{sortinit}{c}
       \field{sortinithash}{4d103a86280481745c9c897c925753c0}
       \field{extradatescope}{labelyear}
@@ -82,7 +86,7 @@
       \verb www.en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
-    \entry{liftdrag}{article}{}
+    \entry{liftdrag}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=503529c0f468aa239c08b4c02db0e67e}{%
            family={Darak},
@@ -93,10 +97,12 @@
       }
       \strng{namehash}{503529c0f468aa239c08b4c02db0e67e}
       \strng{fullhash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{fullhashraw}{503529c0f468aa239c08b4c02db0e67e}
       \strng{bibnamehash}{503529c0f468aa239c08b4c02db0e67e}
       \strng{authorbibnamehash}{503529c0f468aa239c08b4c02db0e67e}
       \strng{authornamehash}{503529c0f468aa239c08b4c02db0e67e}
       \strng{authorfullhash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{authorfullhashraw}{503529c0f468aa239c08b4c02db0e67e}
       \field{sortinit}{D}
       \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
       \field{extradatescope}{labelyear}
@@ -106,7 +112,6 @@
       \field{labeltitlesource}{title}
       \field{title}{Flow over a Cylinder}
       \field{year}{2021}
-      \true{nocite}
       \verb{urlraw}
       \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
       \endverb
@@ -114,7 +119,7 @@
       \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
       \endverb
     \endentry
-    \entry{brener}{video}{}
+    \entry{brener}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=dd29b5c6a77d570e4520509adfc0518d}{%
            family={d'Lélis},
@@ -125,10 +130,12 @@
       }
       \strng{namehash}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{fullhash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{fullhashraw}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{bibnamehash}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{authorbibnamehash}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{authornamehash}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{authorfullhash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{authorfullhashraw}{dd29b5c6a77d570e4520509adfc0518d}
       \field{sortinit}{d}
       \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
       \field{extradatescope}{labelyear}
@@ -146,7 +153,7 @@
       \verb www.youtu.be/kvBRFxRIJuY
       \endverb
     \endentry
-    \entry{braincells}{video}{}
+    \entry{braincells}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=1b59471e6d6ef93fbff5d0137200633a}{%
            family={Gonkee},
@@ -154,10 +161,12 @@
       }
       \strng{namehash}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{fullhash}{1b59471e6d6ef93fbff5d0137200633a}
+      \strng{fullhashraw}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{bibnamehash}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{authorbibnamehash}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{authornamehash}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{authorfullhash}{1b59471e6d6ef93fbff5d0137200633a}
+      \strng{authorfullhashraw}{1b59471e6d6ef93fbff5d0137200633a}
       \field{sortinit}{G}
       \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
       \field{extradatescope}{labelyear}
@@ -175,7 +184,7 @@
       \verb www.youtu.be/uG2mPez44eY
       \endverb
     \endentry
-    \entry{gradience}{video}{}
+    \entry{gradience}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=339ce75d4073f412a93429c808ca4c7d}{%
            family={Gradience},
@@ -183,10 +192,12 @@
       }
       \strng{namehash}{339ce75d4073f412a93429c808ca4c7d}
       \strng{fullhash}{339ce75d4073f412a93429c808ca4c7d}
+      \strng{fullhashraw}{339ce75d4073f412a93429c808ca4c7d}
       \strng{bibnamehash}{339ce75d4073f412a93429c808ca4c7d}
       \strng{authorbibnamehash}{339ce75d4073f412a93429c808ca4c7d}
       \strng{authornamehash}{339ce75d4073f412a93429c808ca4c7d}
       \strng{authorfullhash}{339ce75d4073f412a93429c808ca4c7d}
+      \strng{authorfullhashraw}{339ce75d4073f412a93429c808ca4c7d}
       \field{sortinit}{G}
       \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
       \field{extradatescope}{labelyear}
@@ -204,7 +215,7 @@
       \verb www.youtu.be/NorXFOobehY
       \endverb
     \endentry
-    \entry{hakenberg}{article}{}
+    \entry{hakenberg}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=87cf1da0a09a03905a7ae820e9f5adea}{%
            family={Hakenberg},
@@ -212,10 +223,12 @@
       }
       \strng{namehash}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{fullhash}{87cf1da0a09a03905a7ae820e9f5adea}
+      \strng{fullhashraw}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{bibnamehash}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{authorbibnamehash}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{authornamehash}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{authorfullhash}{87cf1da0a09a03905a7ae820e9f5adea}
+      \strng{authorfullhashraw}{87cf1da0a09a03905a7ae820e9f5adea}
       \field{sortinit}{H}
       \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
       \field{extradatescope}{labelyear}
@@ -232,7 +245,7 @@
       \verb www.hakenberg.de/diffgeo/collision/rigid_body_collision_resolution.pdf
       \endverb
     \endentry
-    \entry{cutcell2}{article}{}
+    \entry{cutcell2}{article}{}{}
       \name{author}{2}{}{%
         {{un=0,uniquepart=base,hash=2aa6d9615885bdded7a7e2a72b17155a}{%
            family={Ingram},
@@ -249,10 +262,12 @@
       }
       \strng{namehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{fullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{fullhashraw}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{bibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{authorfullhashraw}{9fc571192bb1e23111bb7ad0d30d3e16}
       \field{sortinit}{I}
       \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
       \field{extradatescope}{labelyear}
@@ -270,7 +285,7 @@
       \verb www.researchgate.net/publication/222518000
       \endverb
     \endentry
-    \entry{seblague}{video}{}
+    \entry{seblague}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=082f0a20a5ae96d82e2f5df24e0fac8e}{%
            family={Lague},
@@ -281,10 +296,12 @@
       }
       \strng{namehash}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{fullhash}{082f0a20a5ae96d82e2f5df24e0fac8e}
+      \strng{fullhashraw}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{bibnamehash}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{authorbibnamehash}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{authornamehash}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{authorfullhash}{082f0a20a5ae96d82e2f5df24e0fac8e}
+      \strng{authorfullhashraw}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
@@ -301,7 +318,7 @@
       \verb www.youtu.be/rSKMYc1CQHE
       \endverb
     \endentry
-    \entry{airfoil2}{article}{}
+    \entry{airfoil2}{article}{}{}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
@@ -317,7 +334,7 @@
       \verb www.en.wikipedia.org/wiki/Lift-to-drag_ratio
       \endverb
     \endentry
-    \entry{airfoil1}{article}{}
+    \entry{airfoil1}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=e884c507c5198a4578a84498f7a323e2}{%
            family={LinkedIn},
@@ -325,10 +342,12 @@
       }
       \strng{namehash}{e884c507c5198a4578a84498f7a323e2}
       \strng{fullhash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{fullhashraw}{e884c507c5198a4578a84498f7a323e2}
       \strng{bibnamehash}{e884c507c5198a4578a84498f7a323e2}
       \strng{authorbibnamehash}{e884c507c5198a4578a84498f7a323e2}
       \strng{authornamehash}{e884c507c5198a4578a84498f7a323e2}
       \strng{authorfullhash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{authorfullhashraw}{e884c507c5198a4578a84498f7a323e2}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
@@ -346,7 +365,7 @@
       \verb www.linkedin.com/advice/1/how-do-you-evaluate-performance-different-airfoil
       \endverb
     \endentry
-    \entry{tenminute}{video}{}
+    \entry{tenminute}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=81a3feeb579a36f8ed14c22d7264cf2c}{%
            family={Müller},
@@ -357,10 +376,12 @@
       }
       \strng{namehash}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{fullhash}{81a3feeb579a36f8ed14c22d7264cf2c}
+      \strng{fullhashraw}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{bibnamehash}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{authorbibnamehash}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{authornamehash}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{authorfullhash}{81a3feeb579a36f8ed14c22d7264cf2c}
+      \strng{authorfullhashraw}{81a3feeb579a36f8ed14c22d7264cf2c}
       \field{sortinit}{M}
       \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
       \field{extradatescope}{labelyear}
@@ -377,7 +398,7 @@
       \verb www.youtu.be/iKAVRgIrUOU
       \endverb
     \endentry
-    \entry{lagvseul}{article}{}
+    \entry{lagvseul}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=a133c6897f19dca180d31e4f8cb62148}{%
            family={ResolvedAnalytics},
@@ -385,10 +406,12 @@
       }
       \strng{namehash}{a133c6897f19dca180d31e4f8cb62148}
       \strng{fullhash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{fullhashraw}{a133c6897f19dca180d31e4f8cb62148}
       \strng{bibnamehash}{a133c6897f19dca180d31e4f8cb62148}
       \strng{authorbibnamehash}{a133c6897f19dca180d31e4f8cb62148}
       \strng{authornamehash}{a133c6897f19dca180d31e4f8cb62148}
       \strng{authorfullhash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{authorfullhashraw}{a133c6897f19dca180d31e4f8cb62148}
       \field{sortinit}{R}
       \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
       \field{extradatescope}{labelyear}
@@ -406,7 +429,7 @@
       \verb https://www.resolvedanalytics.com/cfd-physics-models/lagrangian-vs-eulerian-phase-models
       \endverb
     \endentry
-    \entry{codingchallenge}{video}{}
+    \entry{codingchallenge}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=462edbbbf0e67b9184c8162731cda879}{%
            family={Shiffman},
@@ -417,10 +440,12 @@
       }
       \strng{namehash}{462edbbbf0e67b9184c8162731cda879}
       \strng{fullhash}{462edbbbf0e67b9184c8162731cda879}
+      \strng{fullhashraw}{462edbbbf0e67b9184c8162731cda879}
       \strng{bibnamehash}{462edbbbf0e67b9184c8162731cda879}
       \strng{authorbibnamehash}{462edbbbf0e67b9184c8162731cda879}
       \strng{authornamehash}{462edbbbf0e67b9184c8162731cda879}
       \strng{authorfullhash}{462edbbbf0e67b9184c8162731cda879}
+      \strng{authorfullhashraw}{462edbbbf0e67b9184c8162731cda879}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
@@ -438,7 +463,7 @@
       \verb www.youtu.be/alhpH6ECFvQ
       \endverb
     \endentry
-    \entry{josstam}{article}{}
+    \entry{josstam}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=989eb4efa3f78c25c89fbf848445d952}{%
            family={Stam},
@@ -449,10 +474,12 @@
       }
       \strng{namehash}{989eb4efa3f78c25c89fbf848445d952}
       \strng{fullhash}{989eb4efa3f78c25c89fbf848445d952}
+      \strng{fullhashraw}{989eb4efa3f78c25c89fbf848445d952}
       \strng{bibnamehash}{989eb4efa3f78c25c89fbf848445d952}
       \strng{authorbibnamehash}{989eb4efa3f78c25c89fbf848445d952}
       \strng{authornamehash}{989eb4efa3f78c25c89fbf848445d952}
       \strng{authorfullhash}{989eb4efa3f78c25c89fbf848445d952}
+      \strng{authorfullhashraw}{989eb4efa3f78c25c89fbf848445d952}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
@@ -469,7 +496,7 @@
       \verb www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf
       \endverb
     \endentry
-    \entry{cutcell}{article}{}
+    \entry{cutcell}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=4b550ebb91db45cd9c66db925eed7761}{%
            family={Tucker},
@@ -480,10 +507,12 @@
       }
       \strng{namehash}{4b550ebb91db45cd9c66db925eed7761}
       \strng{fullhash}{4b550ebb91db45cd9c66db925eed7761}
+      \strng{fullhashraw}{4b550ebb91db45cd9c66db925eed7761}
       \strng{bibnamehash}{4b550ebb91db45cd9c66db925eed7761}
       \strng{authorbibnamehash}{4b550ebb91db45cd9c66db925eed7761}
       \strng{authornamehash}{4b550ebb91db45cd9c66db925eed7761}
       \strng{authorfullhash}{4b550ebb91db45cd9c66db925eed7761}
+      \strng{authorfullhashraw}{4b550ebb91db45cd9c66db925eed7761}
       \field{sortinit}{T}
       \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
       \field{extradatescope}{labelyear}
@@ -501,7 +530,7 @@
       \verb www.sciencedirect.com/science/article/pii/S0307904X00000056
       \endverb
     \endentry
-    \entry{airfoil3}{article}{}
+    \entry{airfoil3}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=760c0789a1b39db9b700ec7c4701aaa8}{%
            family={University},
@@ -512,10 +541,12 @@
       }
       \strng{namehash}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{fullhash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{fullhashraw}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{bibnamehash}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{authorbibnamehash}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{authornamehash}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{authorfullhash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{authorfullhashraw}{760c0789a1b39db9b700ec7c4701aaa8}
       \field{sortinit}{U}
       \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
       \field{extradatescope}{labelyear}
@@ -531,7 +562,7 @@
       \verb www.eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/airfoil-characteristics/
       \endverb
     \endentry
-    \entry{weberedu}{article}{}
+    \entry{weberedu}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=88183b946cc5f0e8c96b2e66e1c74a7e}{%
            family={Unknown},
@@ -539,10 +570,12 @@
       }
       \strng{namehash}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{fullhash}{88183b946cc5f0e8c96b2e66e1c74a7e}
+      \strng{fullhashraw}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{bibnamehash}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{authorbibnamehash}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{authornamehash}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{authorfullhash}{88183b946cc5f0e8c96b2e66e1c74a7e}
+      \strng{authorfullhashraw}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \field{sortinit}{U}
       \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
       \field{extradatescope}{labelyear}
@@ -560,7 +593,7 @@
       \verb www.physics.weber.edu/schroeder/javacourse/LatticeBoltzmann.pdf
       \endverb
     \endentry
-    \entry{cfd}{article}{}
+    \entry{cfd}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -568,10 +601,12 @@
       }
       \strng{namehash}{9c677286866aad38f8e9b660f5411814}
       \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhashraw}{9c677286866aad38f8e9b660f5411814}
       \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{extraname}{1}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
@@ -591,7 +626,7 @@
       \verb https://en.wikipedia.org/wiki/Computational_fluid_dynamics
       \endverb
     \endentry
-    \entry{gaussseidel}{article}{}
+    \entry{gaussseidel}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -599,10 +634,12 @@
       }
       \strng{namehash}{9c677286866aad38f8e9b660f5411814}
       \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhashraw}{9c677286866aad38f8e9b660f5411814}
       \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{extraname}{2}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
@@ -622,7 +659,7 @@
       \verb www.en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
       \endverb
     \endentry
-    \entry{genalg}{article}{}
+    \entry{genalg}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -630,10 +667,12 @@
       }
       \strng{namehash}{9c677286866aad38f8e9b660f5411814}
       \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhashraw}{9c677286866aad38f8e9b660f5411814}
       \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{extraname}{3}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
@@ -652,7 +691,7 @@
       \verb https://en.wikipedia.org/wiki/Genetic_algorithm
       \endverb
     \endentry
-    \entry{navierstokes}{article}{}
+    \entry{navierstokes}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -660,10 +699,12 @@
       }
       \strng{namehash}{9c677286866aad38f8e9b660f5411814}
       \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhashraw}{9c677286866aad38f8e9b660f5411814}
       \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{extraname}{4}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
@@ -682,7 +723,7 @@
       \verb www.en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
       \endverb
     \endentry
-    \entry{pezzza}{video}{}
+    \entry{pezzza}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=effe86d3d37af1a192a9e7d8936fde75}{%
            family={Work},
@@ -693,10 +734,12 @@
       }
       \strng{namehash}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{fullhash}{effe86d3d37af1a192a9e7d8936fde75}
+      \strng{fullhashraw}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{bibnamehash}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{authorbibnamehash}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{authornamehash}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{authorfullhash}{effe86d3d37af1a192a9e7d8936fde75}
+      \strng{authorfullhashraw}{effe86d3d37af1a192a9e7d8936fde75}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
       \field{extradatescope}{labelyear}
@@ -715,8 +758,8 @@
       \endverb
     \endentry
   \enddatalist
-  \datalist[entry]{apa/global//global/global}
-    \entry{mikeash}{article}{}
+  \datalist[entry]{apa/global//global/global/global}
+    \entry{mikeash}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=092ae28cdea4adba9c60004fee15edde}{%
            family={Ash},
@@ -727,10 +770,12 @@
       }
       \strng{namehash}{092ae28cdea4adba9c60004fee15edde}
       \strng{fullhash}{092ae28cdea4adba9c60004fee15edde}
+      \strng{fullhashraw}{092ae28cdea4adba9c60004fee15edde}
       \strng{bibnamehash}{092ae28cdea4adba9c60004fee15edde}
       \strng{authorbibnamehash}{092ae28cdea4adba9c60004fee15edde}
       \strng{authornamehash}{092ae28cdea4adba9c60004fee15edde}
       \strng{authorfullhash}{092ae28cdea4adba9c60004fee15edde}
+      \strng{authorfullhashraw}{092ae28cdea4adba9c60004fee15edde}
       \field{sortinit}{A}
       \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
       \field{extradatescope}{labelyear}
@@ -747,7 +792,7 @@
       \verb www.mikeash.com/pyblog/fluid-simulation-for-dummies.html
       \endverb
     \endentry
-    \entry{amr}{article}{}
+    \entry{amr}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=e2ceeea38f8620383cfbd3e99c5c0cd8}{%
            family={contributors},
@@ -758,10 +803,12 @@
       }
       \strng{namehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{fullhash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{fullhashraw}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{bibnamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{authorbibnamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{authornamehash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \strng{authorfullhash}{e2ceeea38f8620383cfbd3e99c5c0cd8}
+      \strng{authorfullhashraw}{e2ceeea38f8620383cfbd3e99c5c0cd8}
       \field{sortinit}{c}
       \field{sortinithash}{4d103a86280481745c9c897c925753c0}
       \field{extradatescope}{labelyear}
@@ -779,7 +826,7 @@
       \verb www.en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
-    \entry{liftdrag}{article}{}
+    \entry{liftdrag}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=503529c0f468aa239c08b4c02db0e67e}{%
            family={Darak},
@@ -790,10 +837,12 @@
       }
       \strng{namehash}{503529c0f468aa239c08b4c02db0e67e}
       \strng{fullhash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{fullhashraw}{503529c0f468aa239c08b4c02db0e67e}
       \strng{bibnamehash}{503529c0f468aa239c08b4c02db0e67e}
       \strng{authorbibnamehash}{503529c0f468aa239c08b4c02db0e67e}
       \strng{authornamehash}{503529c0f468aa239c08b4c02db0e67e}
       \strng{authorfullhash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{authorfullhashraw}{503529c0f468aa239c08b4c02db0e67e}
       \field{sortinit}{D}
       \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
       \field{extradatescope}{labelyear}
@@ -803,7 +852,6 @@
       \field{labeltitlesource}{title}
       \field{title}{Flow over a Cylinder}
       \field{year}{2021}
-      \true{nocite}
       \verb{urlraw}
       \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
       \endverb
@@ -811,7 +859,7 @@
       \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
       \endverb
     \endentry
-    \entry{brener}{video}{}
+    \entry{brener}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=dd29b5c6a77d570e4520509adfc0518d}{%
            family={d'Lélis},
@@ -822,10 +870,12 @@
       }
       \strng{namehash}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{fullhash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{fullhashraw}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{bibnamehash}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{authorbibnamehash}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{authornamehash}{dd29b5c6a77d570e4520509adfc0518d}
       \strng{authorfullhash}{dd29b5c6a77d570e4520509adfc0518d}
+      \strng{authorfullhashraw}{dd29b5c6a77d570e4520509adfc0518d}
       \field{sortinit}{d}
       \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
       \field{extradatescope}{labelyear}
@@ -843,7 +893,7 @@
       \verb www.youtu.be/kvBRFxRIJuY
       \endverb
     \endentry
-    \entry{braincells}{video}{}
+    \entry{braincells}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=1b59471e6d6ef93fbff5d0137200633a}{%
            family={Gonkee},
@@ -851,10 +901,12 @@
       }
       \strng{namehash}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{fullhash}{1b59471e6d6ef93fbff5d0137200633a}
+      \strng{fullhashraw}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{bibnamehash}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{authorbibnamehash}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{authornamehash}{1b59471e6d6ef93fbff5d0137200633a}
       \strng{authorfullhash}{1b59471e6d6ef93fbff5d0137200633a}
+      \strng{authorfullhashraw}{1b59471e6d6ef93fbff5d0137200633a}
       \field{sortinit}{G}
       \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
       \field{extradatescope}{labelyear}
@@ -872,7 +924,7 @@
       \verb www.youtu.be/uG2mPez44eY
       \endverb
     \endentry
-    \entry{gradience}{video}{}
+    \entry{gradience}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=339ce75d4073f412a93429c808ca4c7d}{%
            family={Gradience},
@@ -880,10 +932,12 @@
       }
       \strng{namehash}{339ce75d4073f412a93429c808ca4c7d}
       \strng{fullhash}{339ce75d4073f412a93429c808ca4c7d}
+      \strng{fullhashraw}{339ce75d4073f412a93429c808ca4c7d}
       \strng{bibnamehash}{339ce75d4073f412a93429c808ca4c7d}
       \strng{authorbibnamehash}{339ce75d4073f412a93429c808ca4c7d}
       \strng{authornamehash}{339ce75d4073f412a93429c808ca4c7d}
       \strng{authorfullhash}{339ce75d4073f412a93429c808ca4c7d}
+      \strng{authorfullhashraw}{339ce75d4073f412a93429c808ca4c7d}
       \field{sortinit}{G}
       \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
       \field{extradatescope}{labelyear}
@@ -901,7 +955,7 @@
       \verb www.youtu.be/NorXFOobehY
       \endverb
     \endentry
-    \entry{hakenberg}{article}{}
+    \entry{hakenberg}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=87cf1da0a09a03905a7ae820e9f5adea}{%
            family={Hakenberg},
@@ -909,10 +963,12 @@
       }
       \strng{namehash}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{fullhash}{87cf1da0a09a03905a7ae820e9f5adea}
+      \strng{fullhashraw}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{bibnamehash}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{authorbibnamehash}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{authornamehash}{87cf1da0a09a03905a7ae820e9f5adea}
       \strng{authorfullhash}{87cf1da0a09a03905a7ae820e9f5adea}
+      \strng{authorfullhashraw}{87cf1da0a09a03905a7ae820e9f5adea}
       \field{sortinit}{H}
       \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
       \field{extradatescope}{labelyear}
@@ -929,7 +985,7 @@
       \verb www.hakenberg.de/diffgeo/collision/rigid_body_collision_resolution.pdf
       \endverb
     \endentry
-    \entry{cutcell2}{article}{}
+    \entry{cutcell2}{article}{}{}
       \name{author}{2}{}{%
         {{un=0,uniquepart=base,hash=2aa6d9615885bdded7a7e2a72b17155a}{%
            family={Ingram},
@@ -946,10 +1002,12 @@
       }
       \strng{namehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{fullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{fullhashraw}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{bibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authorbibnamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authornamehash}{9fc571192bb1e23111bb7ad0d30d3e16}
       \strng{authorfullhash}{9fc571192bb1e23111bb7ad0d30d3e16}
+      \strng{authorfullhashraw}{9fc571192bb1e23111bb7ad0d30d3e16}
       \field{sortinit}{I}
       \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
       \field{extradatescope}{labelyear}
@@ -967,7 +1025,7 @@
       \verb www.researchgate.net/publication/222518000
       \endverb
     \endentry
-    \entry{seblague}{video}{}
+    \entry{seblague}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=082f0a20a5ae96d82e2f5df24e0fac8e}{%
            family={Lague},
@@ -978,10 +1036,12 @@
       }
       \strng{namehash}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{fullhash}{082f0a20a5ae96d82e2f5df24e0fac8e}
+      \strng{fullhashraw}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{bibnamehash}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{authorbibnamehash}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{authornamehash}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \strng{authorfullhash}{082f0a20a5ae96d82e2f5df24e0fac8e}
+      \strng{authorfullhashraw}{082f0a20a5ae96d82e2f5df24e0fac8e}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
@@ -998,7 +1058,7 @@
       \verb www.youtu.be/rSKMYc1CQHE
       \endverb
     \endentry
-    \entry{airfoil2}{article}{}
+    \entry{airfoil2}{article}{}{}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
@@ -1014,7 +1074,7 @@
       \verb www.en.wikipedia.org/wiki/Lift-to-drag_ratio
       \endverb
     \endentry
-    \entry{airfoil1}{article}{}
+    \entry{airfoil1}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=e884c507c5198a4578a84498f7a323e2}{%
            family={LinkedIn},
@@ -1022,10 +1082,12 @@
       }
       \strng{namehash}{e884c507c5198a4578a84498f7a323e2}
       \strng{fullhash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{fullhashraw}{e884c507c5198a4578a84498f7a323e2}
       \strng{bibnamehash}{e884c507c5198a4578a84498f7a323e2}
       \strng{authorbibnamehash}{e884c507c5198a4578a84498f7a323e2}
       \strng{authornamehash}{e884c507c5198a4578a84498f7a323e2}
       \strng{authorfullhash}{e884c507c5198a4578a84498f7a323e2}
+      \strng{authorfullhashraw}{e884c507c5198a4578a84498f7a323e2}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
@@ -1043,7 +1105,7 @@
       \verb www.linkedin.com/advice/1/how-do-you-evaluate-performance-different-airfoil
       \endverb
     \endentry
-    \entry{tenminute}{video}{}
+    \entry{tenminute}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=81a3feeb579a36f8ed14c22d7264cf2c}{%
            family={Müller},
@@ -1054,10 +1116,12 @@
       }
       \strng{namehash}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{fullhash}{81a3feeb579a36f8ed14c22d7264cf2c}
+      \strng{fullhashraw}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{bibnamehash}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{authorbibnamehash}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{authornamehash}{81a3feeb579a36f8ed14c22d7264cf2c}
       \strng{authorfullhash}{81a3feeb579a36f8ed14c22d7264cf2c}
+      \strng{authorfullhashraw}{81a3feeb579a36f8ed14c22d7264cf2c}
       \field{sortinit}{M}
       \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
       \field{extradatescope}{labelyear}
@@ -1074,7 +1138,7 @@
       \verb www.youtu.be/iKAVRgIrUOU
       \endverb
     \endentry
-    \entry{lagvseul}{article}{}
+    \entry{lagvseul}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=a133c6897f19dca180d31e4f8cb62148}{%
            family={ResolvedAnalytics},
@@ -1082,10 +1146,12 @@
       }
       \strng{namehash}{a133c6897f19dca180d31e4f8cb62148}
       \strng{fullhash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{fullhashraw}{a133c6897f19dca180d31e4f8cb62148}
       \strng{bibnamehash}{a133c6897f19dca180d31e4f8cb62148}
       \strng{authorbibnamehash}{a133c6897f19dca180d31e4f8cb62148}
       \strng{authornamehash}{a133c6897f19dca180d31e4f8cb62148}
       \strng{authorfullhash}{a133c6897f19dca180d31e4f8cb62148}
+      \strng{authorfullhashraw}{a133c6897f19dca180d31e4f8cb62148}
       \field{sortinit}{R}
       \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
       \field{extradatescope}{labelyear}
@@ -1103,7 +1169,7 @@
       \verb https://www.resolvedanalytics.com/cfd-physics-models/lagrangian-vs-eulerian-phase-models
       \endverb
     \endentry
-    \entry{codingchallenge}{video}{}
+    \entry{codingchallenge}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=462edbbbf0e67b9184c8162731cda879}{%
            family={Shiffman},
@@ -1114,10 +1180,12 @@
       }
       \strng{namehash}{462edbbbf0e67b9184c8162731cda879}
       \strng{fullhash}{462edbbbf0e67b9184c8162731cda879}
+      \strng{fullhashraw}{462edbbbf0e67b9184c8162731cda879}
       \strng{bibnamehash}{462edbbbf0e67b9184c8162731cda879}
       \strng{authorbibnamehash}{462edbbbf0e67b9184c8162731cda879}
       \strng{authornamehash}{462edbbbf0e67b9184c8162731cda879}
       \strng{authorfullhash}{462edbbbf0e67b9184c8162731cda879}
+      \strng{authorfullhashraw}{462edbbbf0e67b9184c8162731cda879}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
@@ -1135,7 +1203,7 @@
       \verb www.youtu.be/alhpH6ECFvQ
       \endverb
     \endentry
-    \entry{josstam}{article}{}
+    \entry{josstam}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=989eb4efa3f78c25c89fbf848445d952}{%
            family={Stam},
@@ -1146,10 +1214,12 @@
       }
       \strng{namehash}{989eb4efa3f78c25c89fbf848445d952}
       \strng{fullhash}{989eb4efa3f78c25c89fbf848445d952}
+      \strng{fullhashraw}{989eb4efa3f78c25c89fbf848445d952}
       \strng{bibnamehash}{989eb4efa3f78c25c89fbf848445d952}
       \strng{authorbibnamehash}{989eb4efa3f78c25c89fbf848445d952}
       \strng{authornamehash}{989eb4efa3f78c25c89fbf848445d952}
       \strng{authorfullhash}{989eb4efa3f78c25c89fbf848445d952}
+      \strng{authorfullhashraw}{989eb4efa3f78c25c89fbf848445d952}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{extradatescope}{labelyear}
@@ -1166,7 +1236,7 @@
       \verb www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf
       \endverb
     \endentry
-    \entry{cutcell}{article}{}
+    \entry{cutcell}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=4b550ebb91db45cd9c66db925eed7761}{%
            family={Tucker},
@@ -1177,10 +1247,12 @@
       }
       \strng{namehash}{4b550ebb91db45cd9c66db925eed7761}
       \strng{fullhash}{4b550ebb91db45cd9c66db925eed7761}
+      \strng{fullhashraw}{4b550ebb91db45cd9c66db925eed7761}
       \strng{bibnamehash}{4b550ebb91db45cd9c66db925eed7761}
       \strng{authorbibnamehash}{4b550ebb91db45cd9c66db925eed7761}
       \strng{authornamehash}{4b550ebb91db45cd9c66db925eed7761}
       \strng{authorfullhash}{4b550ebb91db45cd9c66db925eed7761}
+      \strng{authorfullhashraw}{4b550ebb91db45cd9c66db925eed7761}
       \field{sortinit}{T}
       \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
       \field{extradatescope}{labelyear}
@@ -1198,7 +1270,7 @@
       \verb www.sciencedirect.com/science/article/pii/S0307904X00000056
       \endverb
     \endentry
-    \entry{airfoil3}{article}{}
+    \entry{airfoil3}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=760c0789a1b39db9b700ec7c4701aaa8}{%
            family={University},
@@ -1209,10 +1281,12 @@
       }
       \strng{namehash}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{fullhash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{fullhashraw}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{bibnamehash}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{authorbibnamehash}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{authornamehash}{760c0789a1b39db9b700ec7c4701aaa8}
       \strng{authorfullhash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{authorfullhashraw}{760c0789a1b39db9b700ec7c4701aaa8}
       \field{sortinit}{U}
       \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
       \field{extradatescope}{labelyear}
@@ -1228,7 +1302,7 @@
       \verb www.eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/airfoil-characteristics/
       \endverb
     \endentry
-    \entry{weberedu}{article}{}
+    \entry{weberedu}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=88183b946cc5f0e8c96b2e66e1c74a7e}{%
            family={Unknown},
@@ -1236,10 +1310,12 @@
       }
       \strng{namehash}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{fullhash}{88183b946cc5f0e8c96b2e66e1c74a7e}
+      \strng{fullhashraw}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{bibnamehash}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{authorbibnamehash}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{authornamehash}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \strng{authorfullhash}{88183b946cc5f0e8c96b2e66e1c74a7e}
+      \strng{authorfullhashraw}{88183b946cc5f0e8c96b2e66e1c74a7e}
       \field{sortinit}{U}
       \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
       \field{extradatescope}{labelyear}
@@ -1257,7 +1333,7 @@
       \verb www.physics.weber.edu/schroeder/javacourse/LatticeBoltzmann.pdf
       \endverb
     \endentry
-    \entry{cfd}{article}{}
+    \entry{cfd}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -1265,10 +1341,12 @@
       }
       \strng{namehash}{9c677286866aad38f8e9b660f5411814}
       \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhashraw}{9c677286866aad38f8e9b660f5411814}
       \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{extraname}{1}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
@@ -1288,7 +1366,7 @@
       \verb https://en.wikipedia.org/wiki/Computational_fluid_dynamics
       \endverb
     \endentry
-    \entry{gaussseidel}{article}{}
+    \entry{gaussseidel}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -1296,10 +1374,12 @@
       }
       \strng{namehash}{9c677286866aad38f8e9b660f5411814}
       \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhashraw}{9c677286866aad38f8e9b660f5411814}
       \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{extraname}{2}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
@@ -1319,7 +1399,7 @@
       \verb www.en.wikipedia.org/wiki/Gauss%E2%80%93Seidel_method
       \endverb
     \endentry
-    \entry{genalg}{article}{}
+    \entry{genalg}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -1327,10 +1407,12 @@
       }
       \strng{namehash}{9c677286866aad38f8e9b660f5411814}
       \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhashraw}{9c677286866aad38f8e9b660f5411814}
       \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{extraname}{3}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
@@ -1349,7 +1431,7 @@
       \verb https://en.wikipedia.org/wiki/Genetic_algorithm
       \endverb
     \endentry
-    \entry{navierstokes}{article}{}
+    \entry{navierstokes}{article}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=9c677286866aad38f8e9b660f5411814}{%
            family={Wikipedia},
@@ -1357,10 +1439,12 @@
       }
       \strng{namehash}{9c677286866aad38f8e9b660f5411814}
       \strng{fullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{fullhashraw}{9c677286866aad38f8e9b660f5411814}
       \strng{bibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorbibnamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authornamehash}{9c677286866aad38f8e9b660f5411814}
       \strng{authorfullhash}{9c677286866aad38f8e9b660f5411814}
+      \strng{authorfullhashraw}{9c677286866aad38f8e9b660f5411814}
       \field{extraname}{4}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
@@ -1379,7 +1463,7 @@
       \verb www.en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations
       \endverb
     \endentry
-    \entry{pezzza}{video}{}
+    \entry{pezzza}{video}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=effe86d3d37af1a192a9e7d8936fde75}{%
            family={Work},
@@ -1390,10 +1474,12 @@
       }
       \strng{namehash}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{fullhash}{effe86d3d37af1a192a9e7d8936fde75}
+      \strng{fullhashraw}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{bibnamehash}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{authorbibnamehash}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{authornamehash}{effe86d3d37af1a192a9e7d8936fde75}
       \strng{authorfullhash}{effe86d3d37af1a192a9e7d8936fde75}
+      \strng{authorfullhashraw}{effe86d3d37af1a192a9e7d8936fde75}
       \field{sortinit}{W}
       \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
       \field{extradatescope}{labelyear}
