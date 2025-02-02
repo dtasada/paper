@@ -82,6 +82,38 @@
       \verb www.en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
+    \entry{liftdrag}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=503529c0f468aa239c08b4c02db0e67e}{%
+           family={Darak},
+           familyi={D\bibinitperiod},
+           given={Laxmikanth},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{fullhash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{bibnamehash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{authorbibnamehash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{authornamehash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{authorfullhash}{503529c0f468aa239c08b4c02db0e67e}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Flow over a Cylinder}
+      \field{year}{2021}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
+      \endverb
+      \verb{url}
+      \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
+      \endverb
+    \endentry
     \entry{brener}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=dd29b5c6a77d570e4520509adfc0518d}{%
@@ -238,56 +270,6 @@
       \verb www.researchgate.net/publication/222518000
       \endverb
     \endentry
-    \entry{airfoil3}{article}{}
-      \name{author}{4}{}{%
-        {{un=0,uniquepart=base,hash=a03e9eefe309e53a48c30ad57c770626}{%
-           family={Koning},
-           familyi={K\bibinitperiod},
-           given={Witold\bibnamedelima J.F.},
-           giveni={W\bibinitperiod\bibinitdelim J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=efefd9080bda5e878c60fa36d225f11e}{%
-           family={Romander},
-           familyi={R\bibinitperiod},
-           given={Ethan\bibnamedelima A.},
-           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=7d06192f62a629470e7b9a2556c9f6d1}{%
-           family={Cummings},
-           familyi={C\bibinitperiod},
-           given={Haley\bibnamedelima V.},
-           giveni={H\bibinitperiod\bibinitdelim V\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=404b0ad93000addc7905c1fde90ab6b9}{%
-           family={Perez},
-           familyi={P\bibinitperiod},
-           given={B.\bibnamedelimi Natalia\bibnamedelima Perez},
-           giveni={B\bibinitperiod\bibinitdelim N\bibinitperiod\bibinitdelim P\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{7158fbdbef86d5428bba67a2385fe3be}
-      \strng{fullhash}{9715df2260bb6225709cf4d92be39470}
-      \strng{bibnamehash}{9715df2260bb6225709cf4d92be39470}
-      \strng{authorbibnamehash}{9715df2260bb6225709cf4d92be39470}
-      \strng{authornamehash}{7158fbdbef86d5428bba67a2385fe3be}
-      \strng{authorfullhash}{9715df2260bb6225709cf4d92be39470}
-      \field{sortinit}{K}
-      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{On Improved Understanding of Airfoil Performance Evaluation Methods at Low Reynolds Numbers}
-      \field{year}{2023}
-      \true{nocite}
-      \verb{urlraw}
-      \verb www.rotorcraft.arc.nasa.gov/Publications/files/1.c037023.pdf
-      \endverb
-      \verb{url}
-      \verb www.rotorcraft.arc.nasa.gov/Publications/files/1.c037023.pdf
-      \endverb
-    \endentry
     \entry{seblague}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=082f0a20a5ae96d82e2f5df24e0fac8e}{%
@@ -317,6 +299,22 @@
       \endverb
       \verb{url}
       \verb www.youtu.be/rSKMYc1CQHE
+      \endverb
+    \endentry
+    \entry{airfoil2}{article}{}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labeltitlesource}{title}
+      \field{title}{Lift-to-drag ratio}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.en.wikipedia.org/wiki/Lift-to-drag_ratio
+      \endverb
+      \verb{url}
+      \verb www.en.wikipedia.org/wiki/Lift-to-drag_ratio
       \endverb
     \endentry
     \entry{airfoil1}{article}{}
@@ -442,68 +440,6 @@
       \verb www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf
       \endverb
     \endentry
-    \entry{airfoil2}{article}{}
-      \name{author}{6}{}{%
-        {{un=0,uniquepart=base,hash=304b572d03834ead064ba6686a9717d2}{%
-           family={Teimourian},
-           familyi={T\bibinitperiod},
-           given={Amir},
-           giveni={A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=cd785eb4fbfb95bae974e84b9dc2acf1}{%
-           family={Rohacs},
-           familyi={R\bibinitperiod},
-           given={Daniel},
-           giveni={D\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=463f94ed2406cfe1c1e58f61af3f0423}{%
-           family={Dimililer},
-           familyi={D\bibinitperiod},
-           given={Kamil},
-           giveni={K\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=fe62fd53d5c9eb642497d4e7f197eae4}{%
-           family={Teimourian},
-           familyi={T\bibinitperiod},
-           given={Hanifa},
-           giveni={H\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=69e1a165831cf8211596c6c697610ff8}{%
-           family={Yildiz},
-           familyi={Y\bibinitperiod},
-           given={Melih},
-           giveni={M\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=412f7a90682bd43a4f3ff6008fab9133}{%
-           family={Kale},
-           familyi={K\bibinitperiod},
-           given={Utku},
-           giveni={U\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{4af9d08a65cbb6cf3a03854c6fa76b82}
-      \strng{fullhash}{3a28051095c187e0918495f47dccaae8}
-      \strng{bibnamehash}{3a28051095c187e0918495f47dccaae8}
-      \strng{authorbibnamehash}{3a28051095c187e0918495f47dccaae8}
-      \strng{authornamehash}{4af9d08a65cbb6cf3a03854c6fa76b82}
-      \strng{authorfullhash}{3a28051095c187e0918495f47dccaae8}
-      \field{sortinit}{T}
-      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Airfoil aerodynamic performance prediction using machine learning and surrogate modeling}
-      \field{year}{2024}
-      \true{nocite}
-      \verb{urlraw}
-      \verb www.sciencedirect.com/science/article/pii/S2405844024054082
-      \endverb
-      \verb{url}
-      \verb www.sciencedirect.com/science/article/pii/S2405844024054082
-      \endverb
-    \endentry
     \entry{cutcell}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=4b550ebb91db45cd9c66db925eed7761}{%
@@ -534,6 +470,36 @@
       \endverb
       \verb{url}
       \verb www.sciencedirect.com/science/article/pii/S0307904X00000056
+      \endverb
+    \endentry
+    \entry{airfoil3}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=760c0789a1b39db9b700ec7c4701aaa8}{%
+           family={University},
+           familyi={U\bibinitperiod},
+           given={Embry-Riddle\bibnamedelima Aeronautical},
+           giveni={E\bibinithyphendelim R\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{fullhash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{bibnamehash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{authorbibnamehash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{authornamehash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{authorfullhash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \field{sortinit}{U}
+      \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/airfoil-characteristics/
+      \endverb
+      \verb{url}
+      \verb www.eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/airfoil-characteristics/
       \endverb
     \endentry
     \entry{weberedu}{article}{}
@@ -724,6 +690,38 @@
       \verb www.en.wikipedia.org/wiki/Adaptive_mesh_refinement
       \endverb
     \endentry
+    \entry{liftdrag}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=503529c0f468aa239c08b4c02db0e67e}{%
+           family={Darak},
+           familyi={D\bibinitperiod},
+           given={Laxmikanth},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{fullhash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{bibnamehash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{authorbibnamehash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{authornamehash}{503529c0f468aa239c08b4c02db0e67e}
+      \strng{authorfullhash}{503529c0f468aa239c08b4c02db0e67e}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Flow over a Cylinder}
+      \field{year}{2021}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
+      \endverb
+      \verb{url}
+      \verb www.skill-lync.com/student-projects/week-2-flow-over-a-cylinder-86
+      \endverb
+    \endentry
     \entry{brener}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=dd29b5c6a77d570e4520509adfc0518d}{%
@@ -880,56 +878,6 @@
       \verb www.researchgate.net/publication/222518000
       \endverb
     \endentry
-    \entry{airfoil3}{article}{}
-      \name{author}{4}{}{%
-        {{un=0,uniquepart=base,hash=a03e9eefe309e53a48c30ad57c770626}{%
-           family={Koning},
-           familyi={K\bibinitperiod},
-           given={Witold\bibnamedelima J.F.},
-           giveni={W\bibinitperiod\bibinitdelim J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=efefd9080bda5e878c60fa36d225f11e}{%
-           family={Romander},
-           familyi={R\bibinitperiod},
-           given={Ethan\bibnamedelima A.},
-           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=7d06192f62a629470e7b9a2556c9f6d1}{%
-           family={Cummings},
-           familyi={C\bibinitperiod},
-           given={Haley\bibnamedelima V.},
-           giveni={H\bibinitperiod\bibinitdelim V\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=404b0ad93000addc7905c1fde90ab6b9}{%
-           family={Perez},
-           familyi={P\bibinitperiod},
-           given={B.\bibnamedelimi Natalia\bibnamedelima Perez},
-           giveni={B\bibinitperiod\bibinitdelim N\bibinitperiod\bibinitdelim P\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{7158fbdbef86d5428bba67a2385fe3be}
-      \strng{fullhash}{9715df2260bb6225709cf4d92be39470}
-      \strng{bibnamehash}{9715df2260bb6225709cf4d92be39470}
-      \strng{authorbibnamehash}{9715df2260bb6225709cf4d92be39470}
-      \strng{authornamehash}{7158fbdbef86d5428bba67a2385fe3be}
-      \strng{authorfullhash}{9715df2260bb6225709cf4d92be39470}
-      \field{sortinit}{K}
-      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{On Improved Understanding of Airfoil Performance Evaluation Methods at Low Reynolds Numbers}
-      \field{year}{2023}
-      \true{nocite}
-      \verb{urlraw}
-      \verb www.rotorcraft.arc.nasa.gov/Publications/files/1.c037023.pdf
-      \endverb
-      \verb{url}
-      \verb www.rotorcraft.arc.nasa.gov/Publications/files/1.c037023.pdf
-      \endverb
-    \endentry
     \entry{seblague}{video}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=082f0a20a5ae96d82e2f5df24e0fac8e}{%
@@ -959,6 +907,22 @@
       \endverb
       \verb{url}
       \verb www.youtu.be/rSKMYc1CQHE
+      \endverb
+    \endentry
+    \entry{airfoil2}{article}{}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labeltitlesource}{title}
+      \field{title}{Lift-to-drag ratio}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.en.wikipedia.org/wiki/Lift-to-drag_ratio
+      \endverb
+      \verb{url}
+      \verb www.en.wikipedia.org/wiki/Lift-to-drag_ratio
       \endverb
     \endentry
     \entry{airfoil1}{article}{}
@@ -1084,68 +1048,6 @@
       \verb www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/GDC03.pdf
       \endverb
     \endentry
-    \entry{airfoil2}{article}{}
-      \name{author}{6}{}{%
-        {{un=0,uniquepart=base,hash=304b572d03834ead064ba6686a9717d2}{%
-           family={Teimourian},
-           familyi={T\bibinitperiod},
-           given={Amir},
-           giveni={A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=cd785eb4fbfb95bae974e84b9dc2acf1}{%
-           family={Rohacs},
-           familyi={R\bibinitperiod},
-           given={Daniel},
-           giveni={D\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=463f94ed2406cfe1c1e58f61af3f0423}{%
-           family={Dimililer},
-           familyi={D\bibinitperiod},
-           given={Kamil},
-           giveni={K\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=fe62fd53d5c9eb642497d4e7f197eae4}{%
-           family={Teimourian},
-           familyi={T\bibinitperiod},
-           given={Hanifa},
-           giveni={H\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=69e1a165831cf8211596c6c697610ff8}{%
-           family={Yildiz},
-           familyi={Y\bibinitperiod},
-           given={Melih},
-           giveni={M\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=412f7a90682bd43a4f3ff6008fab9133}{%
-           family={Kale},
-           familyi={K\bibinitperiod},
-           given={Utku},
-           giveni={U\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{4af9d08a65cbb6cf3a03854c6fa76b82}
-      \strng{fullhash}{3a28051095c187e0918495f47dccaae8}
-      \strng{bibnamehash}{3a28051095c187e0918495f47dccaae8}
-      \strng{authorbibnamehash}{3a28051095c187e0918495f47dccaae8}
-      \strng{authornamehash}{4af9d08a65cbb6cf3a03854c6fa76b82}
-      \strng{authorfullhash}{3a28051095c187e0918495f47dccaae8}
-      \field{sortinit}{T}
-      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Airfoil aerodynamic performance prediction using machine learning and surrogate modeling}
-      \field{year}{2024}
-      \true{nocite}
-      \verb{urlraw}
-      \verb www.sciencedirect.com/science/article/pii/S2405844024054082
-      \endverb
-      \verb{url}
-      \verb www.sciencedirect.com/science/article/pii/S2405844024054082
-      \endverb
-    \endentry
     \entry{cutcell}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=4b550ebb91db45cd9c66db925eed7761}{%
@@ -1176,6 +1078,36 @@
       \endverb
       \verb{url}
       \verb www.sciencedirect.com/science/article/pii/S0307904X00000056
+      \endverb
+    \endentry
+    \entry{airfoil3}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=760c0789a1b39db9b700ec7c4701aaa8}{%
+           family={University},
+           familyi={U\bibinitperiod},
+           given={Embry-Riddle\bibnamedelima Aeronautical},
+           giveni={E\bibinithyphendelim R\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{fullhash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{bibnamehash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{authorbibnamehash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{authornamehash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \strng{authorfullhash}{760c0789a1b39db9b700ec7c4701aaa8}
+      \field{sortinit}{U}
+      \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb www.eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/airfoil-characteristics/
+      \endverb
+      \verb{url}
+      \verb www.eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/airfoil-characteristics/
       \endverb
     \endentry
     \entry{weberedu}{article}{}

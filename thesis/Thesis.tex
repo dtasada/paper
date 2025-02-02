@@ -70,7 +70,6 @@ breaklinks=true,
 % Title and abstract
 \begin{document}
 \maketitle
-
 \begin{abstract}
 	In this paper, we investigate the relationship between an airplane's shape
 	and its performance. Our results show that \dots
@@ -97,7 +96,7 @@ breaklinks=true,
 		\text{FCL} & \text{Flexible Collision Library} \\
 		\text{AMR} & \text{Adaptive Mesh Refinement} \\
 	\end{array}
-\] \\
+\]
 
 \textit{Variables:}
 \[
@@ -117,6 +116,11 @@ breaklinks=true,
 		\kappa & \text{Density diffusivity} \\
 		f & \text{External forces} \\
 		S & \text{Density source}
+
+		\\
+		
+		\tau & \text{Shear stress} \\
+		P & \text{Pressure} \\
 	\end{array}
 \]
 \pagebreak
@@ -172,9 +176,9 @@ This flow velocity is a vector field that gives a vector to every point in the f
 Using this velocity field the behavior of the fluid can be simulated.
 
 \subsection{Eulerian vs Lagrangian} \label{eulerianlagrangian}
-There are two main methods to simulate fluid dynamics: the Lagrangian method and the Eulerian method. \\
+There are two main methods to simulate fluid dynamics: the Lagrangian method and the Eulerian method.
 
-\textbf{Lagrangian} \\
+\paragraph{Lagrangian}\mbox{}
 
 \begin{figure}[H]
 	\centering
@@ -184,10 +188,9 @@ There are two main methods to simulate fluid dynamics: the Lagrangian method and
 
 The Langrangian method models the fluid as a particle collision system, where the air is represented by
 particles that follow the flow velocity and interact with each other to emulate a fluid. 
-This method is mostly usefull when trying to analyze situations where single fluid particles play an important role.\\
+This method is mostly usefull when trying to analyze situations where single fluid particles play an important role.
 
-
-\textbf{Eulerian} \\
+\paragraph{Eulerian}\mbox{}
 
 \begin{figure}[H]
 	\centering
@@ -206,7 +209,7 @@ NEAT (NeuroEvolution of Augmenting Topologies) is a machine learning algorithm
 
 % Execution
 \pagebreak
-\section{Preliminary: Lagrangian Fluid Simulation}
+\section{First Prototype: Lagrangian Fluid Simulation}
 We first tried to implement a Lagrangian fluid simulation.
 Our implementation is based on \hyperlink{http://www.hakenberg.de/diffgeo/collision_resolution.htm}{Rigid Body Collision Resolution}
 (\cite{hakenberg}). We used this paper as a guide for all the math involved.
@@ -255,7 +258,7 @@ The following formulas represent the relation between particles:
 \]
 
 This was implemented using Go and raylib, and the code is available at
-\href{www.github.com/dtasada/paper}{github.com/dtasada/paper} at the \lstinline{lagrangian-go} branch.
+\href{www.github.com/dtasada/paper}{github.com/dtasada/paper} at the \lstinline[breaklines]{lagrangian-go} branch.
 
 When dealing with a lot of particles, the simulation stops performing as well,
 because the number of calculations and iterations of the formulas listed above
@@ -540,11 +543,11 @@ The reason this isn't viable is purely due to performance. This might be reasona
 with a supercomputer, but for our purposes we'd just like to optimize.
 
 Another method would be to implement an AMR (Adaptive Mesh Refinement) system,
-which would adapt the mesh's resolution based on what's in a given region. So this would
+which would adapt the mesh's resolution based on what's in a given region. This would
 generate a high resolution grid around an obstacle's bounds, and a low resolution
 grid in any empty space. This is an interesting concept, but we would have to
 rewrite some of the fluid math code to make the irregular grid work, and it seems
-like a lot of work, so we stuck with the Cut-Cell method. TODO: finish this
+like a lot of work, so we stuck with the Cut-Cell method. % TODO: finish this??
 
 \subsubsection{Implementing obstacle collision}
 Each cell of the grid is now one of three states: \lstinline{FLUID},
@@ -577,7 +580,7 @@ fractional fluid volume:
 \[
 	\begin{array}{ll}
 		\text{Fractional fluid volume } \alpha = \frac{\text{volume of fluid in cell}}{\text{total cell volume}} \\
-		\text{Fractional face area } \beta_d = \frac{\text{open d-face area}}{\text{total d-face area}} \text{ where d is one of X, Y, or Z}
+		\text{Fractional face area } \beta_d = \frac{\text{open d-face area}}{\text{total d-face area}} \text{ where d is one of $x$, $y$, or $z$}
 	\end{array}
 \]
 
@@ -623,11 +626,12 @@ a basic airplane model, and we generate a population of airplane models. We
 simulate the airflow around each airplane model, and we use the results to calculate
 a fitness score for each airplane model. We then use a genetic algorithm to evolve
 the airplane models to maximize the fitness score. We repeat this process until
-we have a model that maximizes the fitness score.
+we have a model that approaches a maximum fitness score.
 
 The plan was to write a Python script that utilizes the NEAT algorithm to generate
 the populations. NEAT is a genetic algorithm that evolves neural networks, which
 has a Python library that the user can implement in their scripts.
+
 There's two big parts to this: the first is the fitness function, which is the
 function that takes the results of the fluid simulation and calculates a score
 for the airplane model. The second part is the genetic algorithm, which is the
@@ -635,12 +639,56 @@ algorithm that tweaks the vertex data of each airplane model to try to improve
 the fitness score.
 
 \subsection{Fitness Calculation}
+The fitness function is the function on the CFD-side that measures how good a
+given polygon is at flying. The metric for this is the lift-to-drag ratio, which
+is a measure of how much lift the airplane generates compared to how much drag
+it generates. The lift-to-drag ratio is a good measure of how efficient an airplane
+is at flying and it's a good way to quantify aerodynamic performance. We want the
+lift-to-drag ratio to be as high as possible. To achieve that we need to try
+to maximize lift and minimize drag.
+
+The lift force $L$ primarily exists because of the pressure difference between
+the top and the bottom of a wing. Here are the integrals for the lift and drag
+forces on a wing:
+\[
+	\begin{aligned}
+		& \textit{where:} \\
+		& \text{shear stress } \tau \\
+		& \text{pressure } P \\
+		& \text{surface of the wing } A \\
+		& F_L = -\int_A (P \sin \theta + \tau_w \cos \theta) dA \\
+		& F_D = \int_A (-P \cos \theta + \tau_w \sin \theta) dA
+	\end{aligned}
+\]
+
+
+We can discreetly approximate this integral by summing the pressure difference
+over the surface of the wing:
+\[
+	\begin{array}{l}
+		\textit{where $i$ is a triangle of the wing:} \\
+		F_D = \sum\limits_i (P_i \cos \theta_i + \tau_{w_i} \sin \theta_i) \cdot A_i \\
+		F_L = \sum\limits_i (-P_i \sin \theta_i + \tau_{w_i} \cos \theta_i) \cdot A_i
+	\end{array}
+\]
+
+Now that we have a formula for the lift and drag, we can calculate the lift-to-drag
+ratio by dividing the lift by the drag. This is the fitness score that we will
+use to evaluate the airplane models.
+
 \subsection{Genetic Algorithm}
+\ipsum[1]
 
 % Conclusion
 \pagebreak
 \section{Conclusion}
-\ipsum[1]
+We our paper we tried to answer the following questions: 
+\begin{itemize}
+	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
+	\item{How do we dynamically generate 3D models?}
+	\item{How does an airplane's wing shape influence its performance?}
+\end{itemize}
+TODO: FINISH THIS
 
 % Results
 \pagebreak
@@ -712,22 +760,15 @@ of compute cores, which CPUs don't have (modern CPUs have between 4 and 16 cores
 in the consumer market). The most obvious solution is to transfer the load to
 a dedicated GPU, which we can utilize to perform all these arithmetic operations
 for us and would yield a massive improvement. Migrating the CFD code to a compute
-shader or an OpenCL kernel would be a great way to speed up the simulation. This
-is something that would be very fun to explore in the future, but once again it's
-beyond the scope (and time limit) of our project.
+shader or an \href{https://en.wikipedia.org/wiki/OpenCL}{OpenCL kernel} would
+be a great way to speed up the simulation. This is something that would be very
+fun to explore in the future, but once again it's beyond the scope (and time limit)
+of our project.
 
 \subsection{Future Work}
 
-% Conclusion
-\subsection{Conclusion}
-We our paper we tried to answer the following questions: 
-\begin{itemize}
-	\item{How do the different aspects of fluid dynamics work and how do we implement it in a computer program?}
-	\item{How do we dynamically generate 3D models?}
-	\item{How does an airplane's wing shape influence its performance?}
-\end{itemize}
-
 % References
+\pagebreak
 \section{Bibliography}
 \nocite{*}
 \printbibliography
