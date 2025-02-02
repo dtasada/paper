@@ -169,7 +169,7 @@ but we will explain what they are and how they are used in CFD models.
 This will be covered in section \ref{navierstokes}.
 In section \ref{eulerianlagrangian} we will be looking at two different types of methods that are used to simulate fluid dynamics.
 For the machine learning part, we will be using a genetic algorithm to optimize the shape of the airplane. 
-What genetic algorithms are and how they work will be covered in section \ref{genalg}.
+What genetic algorithms are and how they work will be covered in section \ref{genalgsec}.
 
 \subsection{Navier-Stokes equations} \label{navierstokes}
 The base of almost all CFD models are the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
@@ -209,7 +209,7 @@ has its own properties and interacts with its neighbor cells, creating a continu
 field. This method is mostly used when trying to analyze the fluid as a whole.
 It can provide information about the fluid's flow patterns, turbulence, and pressure distribution. 
 
-\subsection{Genetic Algorithm} \label{genalg}
+\subsection{Genetic Algorithm} \label{genalgsec}
 In machine learning, genetic algorithms are models that mimic the process of natural selection.
 In a genetic algorithm a population of solutions to an optimization problem is evolved over time towards better solutions.
 The evolution usually starts from a population of randomly generated solutions.
@@ -604,14 +604,14 @@ using FCL isn't working as intended.
     \caption{Voxel map}
 \end{figure}
 
-This is called the \href{https://www.sciencedirect.com/science/article/pii/S0307904X00000056}{Cut-Cell method}. The reason we even need this is because
+This is called the \href{https://www.sciencedirect.com/science/article/pii/S0307904X00000056}{Cut-Cell method} (\cite{cutcell}). The reason we even need this is because
 the more obvious option is to set up the grid to be high resolution so each cell
 is small enough to accurately approximate an arbitrarily complex object. The
 reason this isn't viable is purely due to performance. This might be reasonable
 with a supercomputer, but for our purposes we'd just like to optimize.
 
 Another method would be to implement an AMR (Adaptive Mesh Refinement) system,
-which would adapt the mesh's resolution based on what's in a given region. This would
+which would adapt the mesh's resolution based on what's in a given region (\cite{amr}). This would
 generate a high resolution grid around an obstacle's bounds, and a low resolution
 grid in any empty space. This is an interesting concept, but we would have to
 rewrite some of the fluid math code to make the irregular grid work, and the Cut-Cell
@@ -619,7 +619,7 @@ method is more straightforward, so we stuck with that.
 
 \subsubsection{Implementing obstacle collision}
 According to the Cut-Cell method, each cell of the grid now has one of three states:
-\lstinline{FLUID}, \lstinline{SOLID}, or \lstinline{CUT_CELL}.
+fluid, solid, or cut-cell.
 
 \begin{minipage}[t]{0.65\textwidth}
 	\begin{enumerate}
@@ -684,7 +684,7 @@ The reason we failed to implement this is twofold:
 			weren't capable of implementing the FCL collision detection correctly.
 			We don't know what caused the issue, but unfortunately we didn't have
 			time to debug it thoroughly.
-	}
+		}
 	\item{
 			We'd forgotten to modify the projection step to account for cut-cells,
 			which explains a bug we experienced, where the fluid would leak through
@@ -885,6 +885,17 @@ fun to explore in the future, but once again it's beyond the scope (and time lim
 of our project.
 
 \subsection{Future Work}
+Considering the amount of ideas that have failed, there's a lot of room for
+improvement. In the future, there's a very specific order of operations that
+we'd like to follow to get the project to a working state.
+\begin{enumerate}
+	\item{Fix the voxelization process}
+	\item{Implement a working Cut-Cell (or AMR) method}
+	\item{Possible further optimize the fluid simulation}
+	\item{Finish with a working genetic algorithm}
+\end{enumerate}
+Once that's all completed, we'd truly have answered all the questions we set out
+to answer in this paper.
 
 % Reference
 \pagebreak
