@@ -62,7 +62,10 @@ breaklinks=true,
 \sloppy
 
 % Title and Author
-\title{Computational Fluid Dynamics for Aerodynamic Optimization}
+\title{
+	Computational Fluid Dynamics for Aerodynamic Optimization \vspace{1cm} \\
+	\includegraphics[width=0.8\textwidth]{resources/title1.png}
+}
 \author{
   Tasada, Daniel\\
   \and
@@ -274,20 +277,20 @@ The Navier-Stokes equations are very complex, so we won't cover them in depth,
 but we will explain what they are and how they are used in CFD models.
 This will be covered in section \ref{navierstokes}. In section \ref{eulerianlagrangian}
 we will be looking at two different types of methods that are used to simulate
-fluid dynamics. For the machine learning part, we will be using a genetic
-algorithm to optimize the shape of the airplane. What genetic algorithms are and
-how they work will be covered in section \ref{genalgsec}.
+fluid dynamics. The machine learning section of this paper goes over genetic algorithms
+and how they work. This is introduced in section \ref{genalgsec}.
 
 \subsection{Navier-Stokes equations} \label{navierstokes}
-The \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations} are the base for most CFD models.
-These are partial differential equations that describe fluid flows. 
-We will not go into too much detail about these equations, but the main most important part is that these equations return the flow velocity of the fluid.
-This flow velocity is a vector field that assigns a vector to every point in the fluid at a given time. 
-Using this velocity field, the behavior of the fluid can be simulated.
-(\cite{navierstokes})
+The \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}
+	are the base for most CFD models. These are partial differential equations
+	that describe fluid flows. We will not go into too much detail about these
+	equations, but the main most important part is that these equations return
+	the flow velocity of the fluid. This flow velocity is a vector field that
+	assigns a vector to every point in the fluid at a given time. Using this
+	velocity field, the behavior of the fluid can be simulated (\cite{navierstokes}).
 
 \subsection{Eulerian vs Lagrangian} \label{eulerianlagrangian}
-There are two main methods to simulate fluid dynamics: the Lagrangian method and the Eulerian method.
+There are two main ways to simulate fluid dynamics: the Lagrangian method and the Eulerian method.
 
 \paragraph{Lagrangian}\mbox{}
 
@@ -346,18 +349,17 @@ the direction in which the particles are moving away from each other, and the
 point of contact is the point at which the particles collide.
 
 The following variables are necessary to perform the calculations:
+\begin{alignat*}{2}
+	& \text{Angular momentum $L$ } (kg\cdot m^2/s):\text{ } && L = mvr; \\
+	& \text{Inertia tensor $I$ } (kg\cdot m^2): && I = \frac{L}{\omega}; \\
+	& \text{Angular velocity $\omega$ } (rad/s): && \omega = \frac{\Delta \theta}{\Delta t};
+\end{alignat*}
 \[
-\begin{array}{ll}
-	\text{Angular momentum $L$ } (kg\cdot m^2/s): & L = mvr; \\
-	\text{Inertia tensor $I$ } (kg\cdot m^2): & I = \frac{L}{\omega}; \\
-    \text{Angular velocity $\omega$ } (rad/s): & \omega = \frac{\Delta \theta}{\Delta t}; \\
-
-	\\
-
-	\text{Collision normal} (n \in \mathbb{R}^3) \text{ in world coordinates away from body}; \\
-	\text{Point of contact } (r_i \in \mathbb{R}^3) \text{ in world coordinates with respect to $p_i$}; \\
-	\text{Orientation } (R_i \in SO(3)) \text{ transforming from object to world coordinates}; \\
-\end{array}
+	\begin{array}{l}
+		\text{Collision normal} (n \in \mathbb{R}^3) \text{ in world coordinates away from body}; \\
+		\text{Point of contact } (r_i \in \mathbb{R}^3) \text{ in world coordinates with respect to $p_i$}; \\
+		\text{Orientation } (R_i \in SO(3)) \text{ transforming from object to world coordinates};
+	\end{array}
 \]
 
 Where $i$ represents one of two particles in a given collision:
@@ -394,9 +396,7 @@ single frame. This can be elegantly mitigated by implementing a three-dimensiona
 grid system, where every particle is assigned to a cell in the grid. This way,
 particles only need to check for collisions with other particles in the same cell
 or in any of its 26 neighboring cells, assuming that the particles are evenly
-distributed within the container, each particle only needs to handle collisions
-with particles in its own cell, and its 26 neighboring cells. This reduces the
-time complexity to $O(n)$.
+distributed within the container. This reduces the time complexity to $O(n)$.
 
 The simulation was unstable at higher densities, where particles would phase
 into each other instead of cleanly bouncing. The bug is likely quite simple to
@@ -415,8 +415,8 @@ In the end it was put aside, and the Lagrangian implementation was never complet
 	have velocity and density fields. The density fields are purely for the purpose
 	of visualization. In the CFD frontend, we render translucent colored cubes in
 	each cell according to its density field. These translucent cubes represent
-	dye getting dropped into the container. When we are talking about `density',
-	you can image it as the density of dye in the fluid. Each frame, the cells
+	dye getting dropped into the container. When we talk about `density',
+	you can image the density of the dye in the fluid. Each frame, the cells
 	interact with each other according to the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
 	\end{minipage}\hfill
 	\begin{minipage}[t]{0.3\textwidth}
@@ -434,7 +434,7 @@ brilliant work on \href{www.dgp.toronto.edu/public_user/stam/reality/Research/pd
 This math will be explained in section \ref{math}. 
 How we implemented this math into the density solver of the fluid simulation is explained in section \ref{density}.
 The way it is implemented in the velocity solver is explained in section \ref{velocity}.
-We will explain the concepts in 2D, so it is easier to visualize and understand.
+We will explain the concepts in 2D, so it's easier to visualize and understand.
 Lastly, section \ref{implementation} explains how to implement the fluid simulation,
 which includes the code's structure and how we implemented the collision detection.
 
@@ -462,11 +462,13 @@ a lot like each other, as this was helpful in developing the simulation. (\cite{
 	\begin{subfigure}[t]{0.45\textwidth}
 		\centering
 		\includegraphics[width=5cm]{resources/collocated_grid_2.png}
+		\caption{Collocated grid}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[t]{0.45\textwidth}
 		\centering
 		\includegraphics[width=5cm]{resources/staggered_grid_2.png}
+		\caption{Staggered grid}
 	\end{subfigure}
 	\caption{Computational grids}
 \end{figure}
@@ -582,7 +584,7 @@ two different grids: one that contains all the density values from the previous
 time step and on that contains the new density values. (\cite{josstam})
  
 \subsection{Velocity Solver} \label{velocity}
-Now we will look at the velocity solver. Just like with the density solver if we
+Now we will look at the velocity solver. Just like with the density solver, if we
 look at the equations in section \ref{math} we see that the change in velocity
 in a single time step is influenced by three factors. These are: the addition of
 forces, viscous diffusion and self-advection. Because the velocity equation
@@ -1123,12 +1125,21 @@ like a lot of fun.
 	work on paper & Nathan & 30/01/2025 & 180 \\ \hline
 	article work & Dani & 31/01/2025 & 220 \\ \hline
 	work on paper & Nathan & 31/01/2025 & 240 \\ \hline
-	article work again & Dani & 02/02/2025 & 120 \\ \hline
-	article refactoring & Nathan & 02/02/2025 & 270 \\ \hline
+	haul ass & Dani & 02/02/2025 & 360 \\ \hline
+	haul ass & Nathan & 02/02/2025 & 360 \\ \hline
+	finishing touches & Dani & 02/03/2025 & 120 \\ \hline
+	finishing touches & Nathan & 02/03/2025 & 120 \\ \hline
 \end{longtable}
+
+Total hours worked:
+\begin{itemize}
+	\item{Dani: 117 hours}
+	\item{Nathan: 90 hours}
+\end{itemize}
 
 \pagebreak
 \section{Eigen-werk verklaring}
+\vspace{3cm}
 Ondergetekende …………………………………………………… verklaart:
 
 \begin{itemize}
