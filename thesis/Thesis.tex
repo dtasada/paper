@@ -1,28 +1,29 @@
 \documentclass[a4paper,12pt,titlepage]{article}
 
 % Packages
-\usepackage{animate}
-\usepackage{amsmath}
 \usepackage{abstract}
+\usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{animate}
 \usepackage{bibentry}
 \usepackage{color}
-\usepackage{dirtree}
 \usepackage{datetime}
+\usepackage{dirtree}
 \usepackage{float}
+\usepackage{float}
+\usepackage{fontspec}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{hyphenat}
 \usepackage{indentfirst}
-\usepackage{listings}
 \usepackage{ipsum}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{physics}
+\usepackage{subcaption}
 \usepackage{titlesec}
 \usepackage{url}
-\usepackage{physics}
-\usepackage{fontspec}
 \usepackage{wrapfig}
-\usepackage{subcaption}
-\usepackage{float}
 \usepackage[normalem]{ulem}
 \usepackage[backend=biber, style=apa]{biblatex}
 \usepackage[
@@ -73,18 +74,18 @@ breaklinks=true,
 \begin{document}
 \maketitle
 
-\pagebreak
+\shipout\null
 
 \begin{center}
-    \vspace*{2cm}  % Add space at the top
+    \vspace*{2cm}
     
     {\huge Computational Fluid Dynamics for Aerodynamic Optimization}
     
-    \vspace{3cm}  % Add large space after title
+    \vspace{3cm}
     
     \textit{Profiel:} Natuur en Techniek
     
-    \vspace{1cm}  % Add space between sections
+    \vspace{1cm}
     
     \textit{Vakken:} Natuurkunde, Informatica
     
@@ -1019,6 +1020,111 @@ Once that's all completed, we'd truly have answered all the questions we set out
 to answer in this paper.
 
 \pagebreak
+\section{Logboek}
+\begin{longtable}{|p{200pt}|l|l|l|l|l|l|l|}
+	\hline
+	\textbf{activiteit} & \textbf{wie} & \textbf{wanneer} & \textbf{tijd (minuten)} \\ \hline
+	Eulerian fluids in Rust & Dani & 04/06/2024 & 180 \\ \hline
+	Research papers and videos about fluid sim & Nathan & 04/06/2024 & 60 \\ \hline
+	Reading and testing eulerian sim in pygame & Nathan & 05/06/2024 & 180 \\ \hline
+	Fixing bugs in Eulerian model & Dani & 05/06/2024 & 40 \\ \hline
+	Learning Rust & Nathan & 06/06/2024 & 60 \\ \hline
+	debugging & Nathan & 06/06/2024 & 30 \\ \hline
+	Fixing bugs in Eulerian model & Dani & 06/06/2024 & 60 \\ \hline
+	Fixing linsolve function & Nathan & 07/06/2024 & 120 \\ \hline
+	Discard Eulerian, implement Lagrange in Rust again & Dani & 08/06/2024 & 280 \\ \hline
+	Rust borrow checker BS & Dani & 10/06/2024 & 50 \\ \hline
+	Rust borrow checker BS again 💀 & Dani & 11/06/2024 & 180 \\ \hline
+	Discard Rust, implement Lagrange in Go & Dani & 21/06/2024 & 220 \\ \hline
+	Mutliple particle bouncing \& shaders & Dani & 22/06/2024 & 340 \\ \hline
+	Try to get particle bouncing working in godot & Nathan & 23/06/2024 & 180 \\ \hline
+	debugging, but sadly still doesnt work & Nathan & 24/06/2024 & 100 \\ \hline
+	Particle boucing is miscalculated & Dani & 25/06/2024 & 300 \\ \hline
+	Try to implement seblague version of CFD & Nathan & 25/06/2024 & 120 \\ \hline
+	debugging, no results & Dani & 26/06/2024 & 60 \\ \hline
+	implemented UI & Dani & 03/07/2024 & 120 \\ \hline
+	start ML testing with balls & Nathan & 03/07/2024 & 180 \\ \hline
+	UI + frustration & Dani & 04/07/2024 & 180 \\ \hline
+	Start paper in word & Nathan & 08/09/2024 & 140 \\ \hline
+	continue ML testing & Nathan & 09/09/2024 & 120 \\ \hline
+	started latex doc & Dani & 09/09/2024 & 150 \\ \hline
+	more ML testing & Nathan & 10/09/2024 & 120 \\ \hline
+	Started implementing physically accurate math & Dani & 10/09/2024 & 160 \\ \hline
+	debugging, no results & Dani & 11/09/2024 & 40 \\ \hline
+	debugging, also no results :( & Nathan & 11/09/2024 & 60 \\ \hline
+	UI update & Nathan & 12/09/2024 & 60 \\ \hline
+	finish ML testing and looking into neat & Nathan & 13/09/2024 & 120 \\ \hline
+	testing with neat & Nathan & 14/09/2024 & 120 \\ \hline
+	working on research paper & Nathan & 07/10/2024 & 140 \\ \hline
+	restarted physically accurate math & Dani & 09/10/2024 & 180 \\ \hline
+	try to implement math & Nathan & 09/10/2024 & 180 \\ \hline
+	nothing burger & Dani & 12/10/2024 & 90 \\ \hline
+	math perserverance + texdoc & Dani & 14/10/2024 & 90 \\ \hline
+	neat template & Dani & 05/11/2024 & 100 \\ \hline
+	testing with neat & Nathan & 06/11/2024 & 120 \\ \hline
+	second attempt at eulerian but this time in go & Dani & 06/11/2024 & 180 \\ \hline
+	2d euler implementation in python & Nathan & 07/11/2024 & 240 \\ \hline
+	3d euler implementation in C++ & Dani & 07/11/2024 & 120 \\ \hline
+	Watch C++ tutorial  & Nathan & 08/11/2024 & 60 \\ \hline
+	3d euler working?? & Dani & 08/11/2024 & 240 \\ \hline
+	mike ash working in 3d! & Dani & 09/11/2024 & 300 \\ \hline
+	debugging & Nathan & 09/11/2024 & 120 \\ \hline
+	restructure & Dani & 10/11/2024 & 30 \\ \hline
+	attempt at shaders, but working cube colors & Dani & 11/11/2024 & 60 \\ \hline
+	working on projection step & Nathan & 11/11/2024 & 120 \\ \hline
+	created git branches & Dani & 11/11/2024 & 60 \\ \hline
+	refactor Fluid class & Dani & 11/11/2024 & 90 \\ \hline
+	Fixing bugs in main sim loop & Nathan & 14/11/2024 & 100 \\ \hline
+	started implementing basic obstacles & Dani & 14/11/2024 & 180 \\ \hline
+	collisions with obstacles & Nathan & 15/11/2024 & 120 \\ \hline
+	tried to refactor Fluid.cpp, twas ass & Dani & 15/11/2024 & 90 \\ \hline
+	collisions 💀 & Dani & 19/11/2024 & 160 \\ \hline
+	trying to get collision to work & Nathan & 21/11/2024 & 120 \\ \hline
+	Math in paper & Nathan & 25/11/2024 & 160 \\ \hline
+	More math in paper & Nathan & 26/11/2024 & 120 \\ \hline
+	makefile 💀 & Dani & 27/11/2024 & 20 \\ \hline
+	thesis \& create Obstacle class & Dani & 30/11/2024 & 60 \\ \hline
+	refactor C float *  to std::array & Dani & 01/12/2024 & 60 \\ \hline
+	start complex geometry & Dani & 01/12/2024 & 270 \\ \hline
+	work on math for paper & Nathan & 02/12/2024 & 120 \\ \hline
+	texdoc for proof of concept & Dani & 02/12/2024 & 60 \\ \hline
+	finish grid diagrams for math section & Nathan & 03/12/2024 & 60 \\ \hline
+	Touch ups on math part & Nathan & 04/12/2024 & 60 \\ \hline
+	refactor readability + obstacle bounding & Dani & 08/12/2024 & 40 \\ \hline
+	added config.toml & Dani & 10/12/2024 & 30 \\ \hline
+	Work on paper & Nathan  & 11/12/2024 & 180 \\ \hline
+	added omp, frac vol, and config.toml opts & Dani & 15/12/2024 & 120 \\ \hline
+	tinker w/ voxelization but its useless & Dani & 15/12/2024 & 60 \\ \hline
+	start implementing FCL & Dani & 22/12/2024 & 60 \\ \hline
+	Writing about different steps in euler sim  & Nathan & 22/12/2024 & 120 \\ \hline
+	Writing in paper, velocity solver & Nathan & 23/12/2024 & 120 \\ \hline
+	bug fixes & Dani & 23/12/2024 & 90 \\ \hline
+	voxelize again, nothing burger again & Dani & 26/12/2024 & 30 \\ \hline
+	finished  voxel, segfault when loading paper\_airplane.obj & Dani & 27/12/2024 & 120 \\ \hline
+	collisions work now, voxelization was not good it seems & Dani & 29/12/2024 & 120 \\ \hline
+	more omp & Dani & 31/12/2024 & 30 \\ \hline
+	std::array -> std::vector & Dani & 31/12/2024 & 60 \\ \hline
+	finished voxel fr & Dani & 01/01/2025 & 60 \\ \hline
+	voxel still not done 💀💀💀💀💀 & Dani & 01/01/2025 & 120 \\ \hline
+	fixed multiple objects loading at once & Dani & 02/01/2025 & 40 \\ \hline
+	bug fixing & Nathan & 03/01/2025 & 60 \\ \hline
+	added scaling settings n whatnot & Dani & 03/01/2025 & 60 \\ \hline
+	nothing burger & Dani & 04/01/2025 & 60 \\ \hline
+	writing math portion in texdoc & Nathan & 06/01/2025 & 200 \\ \hline
+	Mesh-to-BVH and geometry & Dani & 06/01/2025 & 60 \\ \hline
+	Mesh-to-BVH and geometry & Dani & 07/01/2025 & 60 \\ \hline
+	Writing paper & Nathan & 20/01/2025 & 180 \\ \hline
+	cooking up thesis & Dani & 27/01/2025 & 180 \\ \hline
+	paper work & Nathan & 29/01/2025 & 180 \\ \hline
+	rewriting thesis so its actually good & Dani & 30/01/2025 & 120 \\ \hline
+	work on paper & Nathan & 30/01/2025 & 180 \\ \hline
+	article work & Dani & 31/01/2025 & 220 \\ \hline
+	work on paper & Nathan & 31/01/2025 & 240 \\ \hline
+	article work again & Dani & 02/02/2025 & 120 \\ \hline
+	article refactoring & Nathan & 02/02/2025 & 270 \\ \hline
+\end{longtable}
+
+\pagebreak
 \section{Eigen-werk verklaring}
 Ondergetekende …………………………………………………… verklaart:
 
@@ -1030,6 +1136,7 @@ Ondergetekende …………………………………………………… verk
 Heemstede, [datum]…………………………………………………………2025 \\
 
 Handtekening: \\ \\
+\vspace{3cm}
 
 Ondergetekende …………………………………………………… verklaart:
 
