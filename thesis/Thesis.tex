@@ -581,7 +581,7 @@ look at where the particles end up and calculate the weighted average of the
 densities of the four closest cells from a particle and set this as the new density
 of the current cell, also shown in figure \ref{fig:backtrace}. To do this we need to use
 two different grids: one that contains all the density values from the previous
-time step and on that contains the new density values. (\cite{josstam})
+time step and one that contains the new density values. (\cite{josstam})
  
 \subsection{Velocity Solver} \label{velocity}
 Now we will look at the velocity solver. Just like with the density solver, if we
@@ -607,7 +607,7 @@ To solve this system we will we again use the Gauss-Seidel method that was also 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=15cm]{resources/gradient_field.png}
-	\caption{Gradient field from (\cite{christophefinot})}
+	\caption{Gradient field (\cite{christophefinot})}
 	\label{fig:gradient_field}
 \end{figure}
 
@@ -635,7 +635,7 @@ was the right choice, as it's more appropriate for the vector physics and low ov
 we need for the simulation.
 
 The main fluid simulation object we use for the simulation is the \lstinline{Fluid} class.
-The implementation is is available at \lstinline{/simulation/src/Fluid.cpp}.
+The implementation is available at \lstinline{/simulation/src/Fluid.cpp}.
 The interface is as follows:
 
 \begin{figure}[H]
@@ -821,7 +821,7 @@ of the airplane's body. The idea was to use a genetic algorithm to evolve the
 shape of the airplane's body to maximize performance. Once again since we didn't
 have a working fluid simulation we never got around to actually writing this part.
 
-That being said here's the outline of how ML (Machine Learning) works: we grab
+That being said, here's the outline of how ML (Machine Learning) works: we grab
 a basic airplane model, and we generate a population of airplane models. We
 simulate the airflow around each airplane model, and we use the results to calculate
 a fitness score for each airplane model. We then use a genetic algorithm to evolve
@@ -890,8 +890,8 @@ the fitness score.
 The idea is to take the vertex data of the airplane model and apply some random
 mutations to it. This could be anything from changing the position of a vertex
 to adding a new vertex. The idea is to make small changes to the airplane model
-and see if the fitness score improves. If it does, we keep the change, if it
-doesn't we discard it. This is the basic idea behind the genetic algorithm.
+and see if the fitness score improves. If it does, we keep the change; if it
+doesn't, we discard it. This is the basic idea behind the genetic algorithm.
 
 % Conclusion
 \pagebreak
@@ -912,7 +912,7 @@ This lead to the following subquestions:  \\
 To answer the questions 1 and 2 we looked the different methods that can be used to simulate fluid dynamics and the math behind them.
 Most CFD models are based on the Navier-Stokes equations. These equations describe the flow of fluid. 
 The two main methods for implementing these equations are: the Lagrangian method and the Eulerian method. 
-We first tried implementing a Lagrangian fluid simulation, in this model fluid is represented by particles.
+We first tried implementing a Lagrangian fluid simulation. In this model a fluid is represented as a particle collision system.
 While trying to create this model we ran into some issues and decided to switch to a Eulerian fluid simulation.
 In a Eulerian fluid simulation the fluid is represented by a grid of cells, where each cell has a velocity and density value.
 The density solver in our simulation used three steps: adding forces, applying diffusion and moving the densities.
@@ -980,7 +980,7 @@ operations that are executed, but it already gives an idea of the scale of the
 problem.
 
 We haven't optimized the code that much, but the most important thing we did was
-parallelize the these large iterations. Anytime we have any meaningful iteration
+parallelize these long iterations. Anytime we have any meaningful iteration
 over the grid, we use \href{www.openmp.org}{OpenMP} to parallelize it. This was
 a very quick and simple way to get a performance boost, and it works quite well.
 Still, there's some room for improvement.
