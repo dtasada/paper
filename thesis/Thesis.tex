@@ -3,10 +3,12 @@
 % Packages
 \usepackage{animate}
 \usepackage{amsmath}
+\usepackage{abstract}
 \usepackage{amssymb}
 \usepackage{bibentry}
 \usepackage{color}
 \usepackage{dirtree}
+\usepackage{datetime}
 \usepackage{float}
 \usepackage{geometry}
 \usepackage{graphicx}
@@ -59,26 +61,107 @@ breaklinks=true,
 \sloppy
 
 % Title and Author
-\title{Computational Fluid Dynamics With a Paper Airplane}
+\title{Computational Fluid Dynamics for Aerodynamic Optimization}
 \author{
   Tasada, Daniel\\
   \and
   Tse, Nathan\\
 }
-\date{\today}
+\date{February 3, 2025}
 
 % Title and abstract
 \begin{document}
 \maketitle
+
+\pagebreak
+
+\begin{center}
+    \vspace*{2cm}  % Add space at the top
+    
+    {\huge Computational Fluid Dynamics for Aerodynamic Optimization}
+    
+    \vspace{3cm}  % Add large space after title
+    
+    \textit{Profiel:} Natuur en Techniek
+    
+    \vspace{1cm}  % Add space between sections
+    
+    \textit{Vakken:} Natuurkunde, Informatica
+    
+    \vspace{1cm}
+    
+    \textit{Begeleider:} Bart Heemskerk
+    
+    \vspace{1cm}
+    
+    \textit{Door:} Daniel Tasada \& Nathan Tse, 6 VWO
+    
+    \vspace{1cm}
+    
+    Heemstede, 3 februari 2025
+    
+    \vspace{3cm}
+    
+    \includegraphics[width=0.5\textwidth]{resources/watermark.png}
+\end{center}
+
 \begin{abstract}
 	In this paper, we investigate the relationship between an airplane's shape
-	and its performance. Our results show that \dots
+	and its aerodynamic performance through computational fluid dynamics (CFD)
+	and machine learning. We developed a fluid simulation using both Lagrangian
+	and Eulerian methods, ultimately focusing on an Eulerian grid-based approach
+	implemented in C++ using the Raylib library. The simulation successfully
+	models basic fluid dynamics, including density diffusion, advection, and
+	velocity projection. However, we encountered significant challenges in
+	implementing obstacle collision detection using the Cut-Cell method, which
+	prevented full completion of the airplane shape analysis. While we established
+	theoretical frameworks for calculating aerodynamic performance through
+	lift-to-drag ratios and outlined a genetic algorithm approach for shape
+	optimization, these components remained unimplemented due to the underlying
+	collision detection issues. The project demonstrates both the potential and
+	challenges of combining CFD with machine learning for aerodynamic optimization,
+	while also highlighting opportunities for future work in GPU acceleration and
+	improved collision detection methods. The paper provides a detailed analysis
+	of fluid simulation techniques and their practical implementation challenges
+	in aerodynamic modeling. \\
+
+	In dit artikel onderzoeken we de relatie tussen de vorm van een vliegtuig en
+	zijn aerodynamische prestaties met behulp van computationele vloeistofdynamica
+	(CFD) en machine learning. We ontwikkelden een vloeistofsimulatie met behulp
+	van een Euleriaanse rastergebaseerde benadering in C++, waarmee we met succes
+	basisvloeistofdynamica modelleerden. Uitdagingen bij het implementeren van
+	obstakelbotsingsdetectie verhinderden echter een volledige analyse van vliegtuigvormen.
+	Hoewel we theoretische kaders voor aerodynamische prestatieberekening en genetische
+	algoritme-optimalisatie hebben vastgesteld, bleven deze componenten ongeïmplementeerd.
+	Het project toont zowel het potentieel als de beperkingen van het combineren
+	van CFD met machine learning voor aerodynamische optimalisatie.
 \end{abstract}
 
 % Table of Contents
 \pagebreak
-\section{Preface}
-\ipsum[1]
+\renewcommand{\abstractname}{Preface}
+\begin{abstract}
+This paper has, in one way or another, been in the works for a year and a half.
+Our fascination with real-world computer simulations started when we wrote a short
+paper for our physics class about the physics of flight. This paper was what we
+wanted to do back in 5th year, but we didn't have the skills or the time to do it.
+Now that we finally found an excuse to develop this large-scale project, we can
+finally realize that idea into a full-fledged research paper.
+
+We're dedicating this paper to anybody who likes math, programming, physics, or
+seeing cool colors on their computer screen for amusement.
+
+We'd like to thank our supervisor, Bart Heemskerk, for giving us advice and feedback
+throughout the project. Thanks to our physics teacher Jaap Teule for prompting
+the idea for this research two years ago. And lastly, thanks to our friends Leo
+and Quinn for their emotional support during 8 months of work and for their
+proofreading services. \\
+
+\begin{flushright}
+	Daniel Tasada and Nathan Tse \\
+	Heemstede, February 3 2025
+\end{flushright}
+\end{abstract}
 
 \pagebreak
 
@@ -526,6 +609,7 @@ To solve this system we will we again use the Gauss-Seidel method that was also 
 	\label{fig:gradient_field}
 \end{figure}
 
+\pagebreak
 \subsection{The Implementation} \label{implementation}
 \subsubsection{Introduction to the code}
 Our project is structured as follows:
@@ -554,7 +638,7 @@ The interface is as follows:
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{resources/Fluid.png}
+	\includegraphics[width=5.5in]{resources/Fluid.png}
 	\caption{Fluid class diagram}
 	\label{fig:interface}
 \end{figure}
@@ -730,7 +814,7 @@ Improving on these two points would have yielded better results.
 
 \pagebreak
 \section{Machine Learning Theory}
-The second part of our project was to use machine learning to optimize the shape
+The second part of our research was to use machine learning to optimize the shape
 of the airplane's body. The idea was to use a genetic algorithm to evolve the
 shape of the airplane's body to maximize performance. Once again since we didn't
 have a working fluid simulation we never got around to actually writing this part.
@@ -791,9 +875,9 @@ ratio by dividing the lift by the drag. This is the fitness score that we will
 use to evaluate the airplane models.
 
 \subsection{Genetic Algorithm} \label{genalg}
-This is the final part of the project, where the working fluid simulation and a
+This is the final part of the research, where the working fluid simulation and a
 correct fitness function both converge. Since we never got around to implementing
-the whole Machine Learning part of the project, we can't really give any specifics
+the whole Machine Learning part of the research, we can't really give any specifics
 on how our genetic algorithm should work. Knowing how to calculate the fitness
 score is a good start, but the actual population generation and mutation requires
 some trial and error with the different parameters of the genetic algorithm.
