@@ -1,28 +1,29 @@
 \documentclass[a4paper,12pt,titlepage]{article}
 
 % Packages
-\usepackage{animate}
-\usepackage{amsmath}
 \usepackage{abstract}
+\usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{animate}
 \usepackage{bibentry}
 \usepackage{color}
-\usepackage{dirtree}
 \usepackage{datetime}
+\usepackage{dirtree}
 \usepackage{float}
+\usepackage{float}
+\usepackage{fontspec}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{hyphenat}
 \usepackage{indentfirst}
-\usepackage{listings}
 \usepackage{ipsum}
+\usepackage{listings}
+\usepackage{longtable}
+\usepackage{physics}
+\usepackage{subcaption}
 \usepackage{titlesec}
 \usepackage{url}
-\usepackage{physics}
-\usepackage{fontspec}
 \usepackage{wrapfig}
-\usepackage{subcaption}
-\usepackage{float}
 \usepackage[normalem]{ulem}
 \usepackage[backend=biber, style=apa]{biblatex}
 \usepackage[
@@ -73,18 +74,18 @@ breaklinks=true,
 \begin{document}
 \maketitle
 
-\pagebreak
+\shipout\null
 
 \begin{center}
-    \vspace*{2cm}  % Add space at the top
+    \vspace*{2cm}
     
     {\huge Computational Fluid Dynamics for Aerodynamic Optimization}
     
-    \vspace{3cm}  % Add large space after title
+    \vspace{3cm}
     
     \textit{Profiel:} Natuur en Techniek
     
-    \vspace{1cm}  % Add space between sections
+    \vspace{1cm}
     
     \textit{Vakken:} Natuurkunde, Informatica
     
@@ -109,7 +110,7 @@ breaklinks=true,
 	In this paper, we investigate the relationship between an airplane's shape
 	and its aerodynamic performance through computational fluid dynamics (CFD)
 	and machine learning. We developed a fluid simulation using both Lagrangian
-	and Eulerian methods, ultimately focusing on an Eulerian grid-based approach
+	and Eulerian methods, ultimately focusing on a Eulerian grid-based approach
 	implemented in C++ using the Raylib library. The simulation successfully
 	models basic fluid dynamics, including density diffusion, advection, and
 	velocity projection. However, we encountered significant challenges in
@@ -120,7 +121,7 @@ breaklinks=true,
 	optimization, these components remained unimplemented due to the underlying
 	collision detection issues. The project demonstrates both the potential and
 	challenges of combining CFD with machine learning for aerodynamic optimization,
-	while also highlighting opportunities for future work in GPU acceleration and
+	while also highlighting opportunities for future work in optimization and
 	improved collision detection methods. The paper provides a detailed analysis
 	of fluid simulation techniques and their practical implementation challenges
 	in aerodynamic modeling. \\
@@ -133,7 +134,7 @@ breaklinks=true,
 	obstakelbotsingsdetectie verhinderden echter een volledige analyse van vliegtuigvormen.
 	Hoewel we theoretische kaders voor aerodynamische prestatieberekening en genetische
 	algoritme-optimalisatie hebben vastgesteld, bleven deze componenten ongeïmplementeerd.
-	Het project toont zowel het potentieel als de beperkingen van het combineren
+	Het project toont zowel de potentie als de beperkingen van het combineren
 	van CFD met machine learning voor aerodynamische optimalisatie.
 \end{abstract}
 
@@ -144,9 +145,9 @@ breaklinks=true,
 This paper has, in one way or another, been in the works for a year and a half.
 Our fascination with real-world computer simulations started when we wrote a short
 paper for our physics class about the physics of flight. This paper was what we
-wanted to do back in 5th year, but we didn't have the skills or the time to do it.
-Now that we finally found an excuse to develop this large-scale project, we can
-finally realize that idea into a full-fledged research paper.
+wanted to do back in 5th year, but we didn't have the the time or the skill to
+do it. Now that we finally found an excuse to develop this large-scale project,
+we can finally realize that idea into a full-fledged research paper.
 
 We're dedicating this paper to anybody who likes math, programming, physics, or
 seeing cool colors on their computer screen for amusement.
@@ -210,7 +211,7 @@ proofreading services. \\
 
 % Introduction
 \section{Introduction}
-This thesis covers the simulation of the aerodynamics of an airplane, using
+This paper covers the simulation of the aerodynamics of an airplane, using
 our own Computational Fluid Dynamics model (CFD).
 
 The goal is to simulate the airflow around an airplane's body. CFD is a
@@ -229,58 +230,58 @@ very expensive from a computational perspective, so code optimization is importa
 
 The final aim is to determine how the shape of an airplane's body affects its
 performance. The intention is to use machine learning to optimize the shape of the airplane's body to maximize
-performance. Therefore the question we will try to answer in this paper is: \\
+performance. Therefore the question we will try to answer in this paper is the following:
 
 \textbf{What is the most optimal shape for an airplane to maximize its aerodynamic performance?} \\
 
-The question will be divided into the following sub-questions: \\
+The question is divided into the following sub-questions:
 
-\textbf{SQ1:} How does a basic a CFD model work? \\
-
+\textbf{SQ1:} \textit{How does a basic a CFD model work?} \\
 Because we will be making our own CFD model, it is important that we understand how a CFD model works. 
 Answering this question will give us a good idea of how we can create our own CFD model. \\
 
-\textbf{SQ2:} How is a CFD model implemented? \\
+\textbf{SQ2:} \textit{How is a CFD model implemented?} \\
+Not only is understanding how a CFD model works important, but also how it is
+implemented. Part of the research done to answer this question will be by analyzing
+other existing CFD models. After answering this question we will have created a
+basic CFD model. \\
 
-Not only is understanding how a CFD model works important, but also how it is implemented. 
-Part of the research done to answer this question will be by analyzing other existing CFD models.
-After answering this question we will have created a basic CFD model. \\
+\textbf{SQ3:} \textit{How do obstacles work in a CFD?} \\
+To answer our main question we will need to implement the way the airplane interacts
+with the fluid. That is why answering \textbf{SQ3} is an important part of our
+research. It will allow us to analyze how the airplane's shape affects it performance. \\
 
-\textbf{SQ3:} How do obstacles work in a CFD?\\
+\textbf{SQ4:} \textit{How is the performance of an airplane calculated?} \\
+We want to be able to compare different airplane shapes to see which one has the
+best aerodynamic performance. To be able to know how well an airplane is performing
+we need to how performance is defined. The answer to this question will give us
+the information we need to compare the different airplane shapes.\\
 
-To answer our main question we will need to implement the way the airplane interacts with the fluid. 
-That is why answering \textbf{SQ3} is an important part of our research. 
-It will give us the possibilty to analyze how the airplane's shape affects it performance. \\
-
-\textbf{SQ4:} How is the performance of an airplane calculated? \\
-
-We want to be able to compare different airplane shapes to see which one has the best aerodynamic performance 
-To be able to know how well an airplane is performing we need to how performance is defined
-The answer to this question will give us that definition and also the information we need to compare the different airplane shapes.\\
-
-\textbf{SQ5:} How can machine learning be used to optimize an airplane's shape? \\
-
+\textbf{SQ5:} \textit{How can machine learning be used to optimize an airplane's shape?} \\
 A part of the research will require us to use machine learning. 
-This is so that the we can optimize the shape of the airplane way faster and more efficiently than we could do by hand.
-That is why the answer \textbf{SQ5} will in the end help us to find the answer to our main question. 
+This is so that the we can optimize the shape of the airplane faster and more
+efficiently than we could do by hand. The answer to \textbf{SQ5} will help us
+find the answer to our main question. 
 
 \pagebreak
 
 \section{Preliminary Research}
-In this paper we aim to create our own CFD model and use machine learning to research the aerodynamics of an airplane.
-Before we start creating our own model, an understanding of how CFD works 
-and the different types of models and methods that can be used is needed.
-Most CFD models are based on the Navier-Stokes equations. Because the Navier-Stokes equations are very complex we will not be covering them in depth, 
+In this paper we aim to create our own CFD model and use machine learning to
+research the aerodynamics of an airplane. Before we start creating our own model,
+we need to understand how CFD works and the different types of models and methods
+that can be used. Most CFD models are based on the Navier-Stokes equations.
+The Navier-Stokes equations are very complex, so we won't cover them in depth,
 but we will explain what they are and how they are used in CFD models.
-This will be covered in section \ref{navierstokes}.
-In section \ref{eulerianlagrangian} we will be looking at two different types of methods that are used to simulate fluid dynamics.
-For the machine learning part, we will be using a genetic algorithm to optimize the shape of the airplane. 
-What genetic algorithms are and how they work will be covered in section \ref{genalgsec}.
+This will be covered in section \ref{navierstokes}. In section \ref{eulerianlagrangian}
+we will be looking at two different types of methods that are used to simulate
+fluid dynamics. For the machine learning part, we will be using a genetic
+algorithm to optimize the shape of the airplane. What genetic algorithms are and
+how they work will be covered in section \ref{genalgsec}.
 
 \subsection{Navier-Stokes equations} \label{navierstokes}
-The base of almost all CFD models are the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations}.
+The \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{Navier-Stokes equations} are the base for most CFD models.
 These are partial differential equations that describe fluid flows. 
-We will not go into too much detail about these equations, but the gist of it that these equations return the flow velocity of the fluid.
+We will not go into too much detail about these equations, but the main most important part is that these equations return the flow velocity of the fluid.
 This flow velocity is a vector field that assigns a vector to every point in the fluid at a given time. 
 Using this velocity field, the behavior of the fluid can be simulated.
 (\cite{navierstokes})
@@ -477,8 +478,7 @@ Usually the use of a staggered grid is preferred, because it's easier to see how
 However, because Mike Ash and Jos Stam used a collocated grid in their works we decided to use the same grid for the sake of simplicity.
 
 \subsection{Density Solver} \label{density}
-
-First, let's look at the density solver. The density solver follows three steps:
+The density solver follows three steps:
 adding forces, then applying diffusion and lastly moving the densities. 
 If we look at the density equation in section \ref{math}, we see that the change in density in a single time step is influenced by three terms. 
 The first term states that the density should follow the velocity field,
@@ -489,7 +489,7 @@ So, as stated before, first the forces are added, then the diffusion is applied 
 
 \subsubsection{Adding forces}
 The first step is adding forces from a source. In our case forces will be added if the user clicks on the screen.
-If that happens we will simply add a constant amount of density to the intial density. So:
+If that happens we will simply add a constant amount of density to the intial density:
 \[
 \begin{array}{ll}
   \rho_{t+dt} = \rho_t + S \cdot dt
@@ -531,7 +531,7 @@ The solution to this problem is to find the density of the cell when being diffu
 \end{array}	
 \]
 To solve this system of linear equations for the unknowns P$_{x, y}$ the \href{https://en.wikipedia.org/wiki/Gauss–Seidel_method}{Gauss-Seidel method} is used.
-This is an iterative method to solve a system of linear equations. In short, we apply the following formula an N amount of times for every cell in the grid:
+This is an iterative method to solve a system of linear equations. In short, we apply the following formula an $N$ amount of times for every cell in the grid:
 
 \[
 	\begin{array}{ll}
@@ -539,7 +539,7 @@ This is an iterative method to solve a system of linear equations. In short, we 
 	\end{array}
 \]
 
-N is a constant that determines how many times the formula is applied. The higher N is, the more accurate the result will be. (\cite{josstam})
+$N$ is a constant that determines how many times the formula is applied. The higher $N$ is, the more accurate the result will be. (\cite{josstam})
 
 \subsubsection{Advection}
 
@@ -1016,7 +1016,116 @@ we'd like to follow to get the project to a working state.
 	\item{Finish with a working genetic algorithm}
 \end{enumerate}
 Once that's all completed, we'd truly have answered all the questions we set out
-to answer in this paper.
+to answer in this paper. We'd be able to test airplane models and assign them a score,
+and mutate them to be more efficient.
+
+We would've also loved to complete a Lagrangian fluid simulation because it seems
+like a lot of fun.
+
+\pagebreak
+\section{Logboek}
+\begin{longtable}{|p{200pt}|l|l|l|l|l|l|l|}
+	\hline
+	\textbf{activiteit} & \textbf{wie} & \textbf{wanneer} & \textbf{tijd (minuten)} \\ \hline
+	Eulerian fluids in Rust & Dani & 04/06/2024 & 180 \\ \hline
+	Research papers and videos about fluid sim & Nathan & 04/06/2024 & 60 \\ \hline
+	Reading and testing eulerian sim in pygame & Nathan & 05/06/2024 & 180 \\ \hline
+	Fixing bugs in Eulerian model & Dani & 05/06/2024 & 40 \\ \hline
+	Learning Rust & Nathan & 06/06/2024 & 60 \\ \hline
+	debugging & Nathan & 06/06/2024 & 30 \\ \hline
+	Fixing bugs in Eulerian model & Dani & 06/06/2024 & 60 \\ \hline
+	Fixing linsolve function & Nathan & 07/06/2024 & 120 \\ \hline
+	Discard Eulerian, implement Lagrange in Rust again & Dani & 08/06/2024 & 280 \\ \hline
+	Rust borrow checker BS & Dani & 10/06/2024 & 50 \\ \hline
+	Rust borrow checker BS again 💀 & Dani & 11/06/2024 & 180 \\ \hline
+	Discard Rust, implement Lagrange in Go & Dani & 21/06/2024 & 220 \\ \hline
+	Mutliple particle bouncing \& shaders & Dani & 22/06/2024 & 340 \\ \hline
+	Try to get particle bouncing working in godot & Nathan & 23/06/2024 & 180 \\ \hline
+	debugging, but sadly still doesnt work & Nathan & 24/06/2024 & 100 \\ \hline
+	Particle boucing is miscalculated & Dani & 25/06/2024 & 300 \\ \hline
+	Try to implement seblague version of CFD & Nathan & 25/06/2024 & 120 \\ \hline
+	debugging, no results & Dani & 26/06/2024 & 60 \\ \hline
+	implemented UI & Dani & 03/07/2024 & 120 \\ \hline
+	start ML testing with balls & Nathan & 03/07/2024 & 180 \\ \hline
+	UI + frustration & Dani & 04/07/2024 & 180 \\ \hline
+	Start paper in word & Nathan & 08/09/2024 & 140 \\ \hline
+	continue ML testing & Nathan & 09/09/2024 & 120 \\ \hline
+	started latex doc & Dani & 09/09/2024 & 150 \\ \hline
+	more ML testing & Nathan & 10/09/2024 & 120 \\ \hline
+	Started implementing physically accurate math & Dani & 10/09/2024 & 160 \\ \hline
+	debugging, no results & Dani & 11/09/2024 & 40 \\ \hline
+	debugging, also no results :( & Nathan & 11/09/2024 & 60 \\ \hline
+	UI update & Nathan & 12/09/2024 & 60 \\ \hline
+	finish ML testing and looking into neat & Nathan & 13/09/2024 & 120 \\ \hline
+	testing with neat & Nathan & 14/09/2024 & 120 \\ \hline
+	working on research paper & Nathan & 07/10/2024 & 140 \\ \hline
+	restarted physically accurate math & Dani & 09/10/2024 & 180 \\ \hline
+	try to implement math & Nathan & 09/10/2024 & 180 \\ \hline
+	nothing burger & Dani & 12/10/2024 & 90 \\ \hline
+	math perserverance + texdoc & Dani & 14/10/2024 & 90 \\ \hline
+	neat template & Dani & 05/11/2024 & 100 \\ \hline
+	testing with neat & Nathan & 06/11/2024 & 120 \\ \hline
+	second attempt at eulerian but this time in go & Dani & 06/11/2024 & 180 \\ \hline
+	2d euler implementation in python & Nathan & 07/11/2024 & 240 \\ \hline
+	3d euler implementation in C++ & Dani & 07/11/2024 & 120 \\ \hline
+	Watch C++ tutorial  & Nathan & 08/11/2024 & 60 \\ \hline
+	3d euler working?? & Dani & 08/11/2024 & 240 \\ \hline
+	mike ash working in 3d! & Dani & 09/11/2024 & 300 \\ \hline
+	debugging & Nathan & 09/11/2024 & 120 \\ \hline
+	restructure & Dani & 10/11/2024 & 30 \\ \hline
+	attempt at shaders, but working cube colors & Dani & 11/11/2024 & 60 \\ \hline
+	working on projection step & Nathan & 11/11/2024 & 120 \\ \hline
+	created git branches & Dani & 11/11/2024 & 60 \\ \hline
+	refactor Fluid class & Dani & 11/11/2024 & 90 \\ \hline
+	Fixing bugs in main sim loop & Nathan & 14/11/2024 & 100 \\ \hline
+	started implementing basic obstacles & Dani & 14/11/2024 & 180 \\ \hline
+	collisions with obstacles & Nathan & 15/11/2024 & 120 \\ \hline
+	tried to refactor Fluid.cpp, twas ass & Dani & 15/11/2024 & 90 \\ \hline
+	collisions 💀 & Dani & 19/11/2024 & 160 \\ \hline
+	trying to get collision to work & Nathan & 21/11/2024 & 120 \\ \hline
+	Math in paper & Nathan & 25/11/2024 & 160 \\ \hline
+	More math in paper & Nathan & 26/11/2024 & 120 \\ \hline
+	makefile 💀 & Dani & 27/11/2024 & 20 \\ \hline
+	thesis \& create Obstacle class & Dani & 30/11/2024 & 60 \\ \hline
+	refactor C float *  to std::array & Dani & 01/12/2024 & 60 \\ \hline
+	start complex geometry & Dani & 01/12/2024 & 270 \\ \hline
+	work on math for paper & Nathan & 02/12/2024 & 120 \\ \hline
+	texdoc for proof of concept & Dani & 02/12/2024 & 60 \\ \hline
+	finish grid diagrams for math section & Nathan & 03/12/2024 & 60 \\ \hline
+	Touch ups on math part & Nathan & 04/12/2024 & 60 \\ \hline
+	refactor readability + obstacle bounding & Dani & 08/12/2024 & 40 \\ \hline
+	added config.toml & Dani & 10/12/2024 & 30 \\ \hline
+	Work on paper & Nathan  & 11/12/2024 & 180 \\ \hline
+	added omp, frac vol, and config.toml opts & Dani & 15/12/2024 & 120 \\ \hline
+	tinker w/ voxelization but its useless & Dani & 15/12/2024 & 60 \\ \hline
+	start implementing FCL & Dani & 22/12/2024 & 60 \\ \hline
+	Writing about different steps in euler sim  & Nathan & 22/12/2024 & 120 \\ \hline
+	Writing in paper, velocity solver & Nathan & 23/12/2024 & 120 \\ \hline
+	bug fixes & Dani & 23/12/2024 & 90 \\ \hline
+	voxelize again, nothing burger again & Dani & 26/12/2024 & 30 \\ \hline
+	finished  voxel, segfault when loading paper\_airplane.obj & Dani & 27/12/2024 & 120 \\ \hline
+	collisions work now, voxelization was not good it seems & Dani & 29/12/2024 & 120 \\ \hline
+	more omp & Dani & 31/12/2024 & 30 \\ \hline
+	std::array -> std::vector & Dani & 31/12/2024 & 60 \\ \hline
+	finished voxel fr & Dani & 01/01/2025 & 60 \\ \hline
+	voxel still not done 💀💀💀💀💀 & Dani & 01/01/2025 & 120 \\ \hline
+	fixed multiple objects loading at once & Dani & 02/01/2025 & 40 \\ \hline
+	bug fixing & Nathan & 03/01/2025 & 60 \\ \hline
+	added scaling settings n whatnot & Dani & 03/01/2025 & 60 \\ \hline
+	nothing burger & Dani & 04/01/2025 & 60 \\ \hline
+	writing math portion in texdoc & Nathan & 06/01/2025 & 200 \\ \hline
+	Mesh-to-BVH and geometry & Dani & 06/01/2025 & 60 \\ \hline
+	Mesh-to-BVH and geometry & Dani & 07/01/2025 & 60 \\ \hline
+	Writing paper & Nathan & 20/01/2025 & 180 \\ \hline
+	cooking up thesis & Dani & 27/01/2025 & 180 \\ \hline
+	paper work & Nathan & 29/01/2025 & 180 \\ \hline
+	rewriting thesis so its actually good & Dani & 30/01/2025 & 120 \\ \hline
+	work on paper & Nathan & 30/01/2025 & 180 \\ \hline
+	article work & Dani & 31/01/2025 & 220 \\ \hline
+	work on paper & Nathan & 31/01/2025 & 240 \\ \hline
+	article work again & Dani & 02/02/2025 & 120 \\ \hline
+	article refactoring & Nathan & 02/02/2025 & 270 \\ \hline
+\end{longtable}
 
 \pagebreak
 \section{Eigen-werk verklaring}
@@ -1030,6 +1139,7 @@ Ondergetekende …………………………………………………… verk
 Heemstede, [datum]…………………………………………………………2025 \\
 
 Handtekening: \\ \\
+\vspace{3cm}
 
 Ondergetekende …………………………………………………… verklaart:
 
